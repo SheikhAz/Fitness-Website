@@ -1,0 +1,761 @@
+{% load static %} {% load static tailwind_tags %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CrossFit Gym</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    {% tailwind_css %}
+    <style>
+      /* PAGE LOAD ANIMATION */
+      @keyframes heroReveal {
+        0% {
+          opacity: 0;
+          transform: translateY(40px) scale(0.95);
+          filter: blur(2px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+      }
+      .hero-animate {
+        animation: heroReveal 1.5s ease-out forwards;
+      }
+    </style>
+  </head>
+
+  <body class="bg-black text-white font-[Inter]">
+    <!-- HERO SECTION -->
+    <section id="home" class="relative min-h-screen overflow-hidden">
+      <!-- Background -->
+      <img
+        src="{% static 'images/Fitness.jpg' %}"
+        class="absolute inset-0 w-full h-full object-cover"
+        alt="Gym Background"
+      />
+
+      <div class="absolute inset-0 bg-black/70"></div>
+
+      <!-- TOP BAR -->
+      <div class="absolute top-0 w-full z-30">
+        <div
+          class="flex justify-between px-4 sm:px-6 lg:px-20 py-3 text-xs sm:text-sm text-white/90"
+        >
+          <div>CrossFit Gym in Bhilai, Chhattisgarh</div>
+          <div>Join: (+91) 7000032565</div>
+        </div>
+
+        <div class="w-full h-px bg-white/20"></div>
+      </div>
+
+      <!-- NAVBAR -->
+      <nav
+        class="absolute top-[60px] w-full z-[1000] backdrop-blur-md bg-black/40"
+      >
+        <div class="flex justify-between items-center px-4 sm:px-6 lg:px-20">
+          <!-- Logo -->
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div
+              class="flex flex-col font-bold leading-tight text-sm sm:text-base"
+            >
+              <span>CrossFit</span>
+              <span>Gym</span>
+            </div>
+          </div>
+
+          <!-- Desktop Nav -->
+          <ul class="hidden md:flex gap-10 font-medium text-base uppercase">
+            <li class="cursor-pointer hover:text-orange-400">Home</li>
+            <li class="cursor-pointer hover:text-orange-400">Registration</li>
+            <li class="cursor-pointer hover:text-orange-400">About</li>
+            <li class="cursor-pointer hover:text-orange-400">Contact</li>
+          </ul>
+
+          <!-- RIGHT SIDE (Mobile CTA + Hamburger) -->
+          <div class="flex items-center gap-3">
+            <!-- Mobile SignIn/Login -->
+            <a
+              href="#"
+              class="md:hidden bg-orange-500 text-black px-4 py-2 rounded-full font-semibold text-sm hover:bg-orange-600 transition shadow-[0_0_20px_rgba(249,115,22,0.5)]"
+            >
+              SignIn / LogIn
+            </a>
+
+            <!-- Hamburger -->
+            <button id="menuBtn" class="md:hidden relative w-8 h-8 z-[10000]">
+              <span
+                class="line absolute w-6 h-0.5 bg-white top-3 left-1 transition-all duration-300"
+              ></span>
+              <span
+                class="line absolute w-6 h-0.5 bg-white top-4.5 left-1 transition-all duration-300"
+              ></span>
+              <span
+                class="line absolute w-6 h-0.5 bg-white top-6 left-1 transition-all duration-300"
+              ></span>
+            </button>
+
+            <!-- Desktop CTA -->
+            <a
+              href="#"
+              class="hidden md:inline-block bg-orange-500 text-black px-6 py-3 rounded-full font-semibold hover:bg-orange-600 hover:scale-105 shadow-[0_0_25px_rgba(249,115,22,0.5)] transition text-sm"
+            >
+              SignIn / LogIn
+            </a>
+          </div>
+        </div>
+      </nav>
+      <!-- HERO CONTENT -->
+      <div
+        id="heroContent"
+        class="relative z-20 flex flex-col justify-center items-center min-h-screen text-center px-4 sm:px-6 lg:px-20 pt-28 sm:pt-32 lg:pt-40 opacity-0"
+      >
+        <h1
+          class="text-3xl sm:text-5xl lg:text-7xl font-extrabold leading-tight mb-6 max-w-5xl"
+        >
+          Crush your health and <br class="hidden sm:block" />
+          fitness goals in no time
+        </h1>
+
+        <p
+          class="text-sm sm:text-lg lg:text-xl opacity-80 mb-8 max-w-2xl sm:max-w-3xl"
+        >
+          It doesn't matter if your goal is to get stronger, burn fat, or to
+          just stay fit. Our world class coaches will guide you every step of
+          the way.
+        </p>
+
+        <a
+          href="#"
+          class="inline-block bg-orange-500 text-black px-6 sm:px-10 py-3 sm:py-4 rounded-full font-bold hover:bg-orange-600 hover:scale-105 shadow-[0_0_25px_rgba(249,115,22,0.5)] transition text-sm sm:text-base"
+        >
+          Start 2 day free trial
+        </a>
+
+        <!-- Reviews -->
+        <div
+          class="flex items-center justify-center gap-2 sm:gap-4 mt-8 sm:mt-12 text-xs sm:text-base"
+        >
+          <div class="tracking-widest">★★★★★</div>
+          <div
+            class="bg-white text-black w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center rounded-full font-semibold"
+          >
+            83
+          </div>
+          <div>five star reviews</div>
+        </div>
+
+        <!-- Testimonial -->
+        <div
+          class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6 text-center sm:text-left"
+        >
+          <img
+            src="https://randomuser.me/api/portraits/men/32.jpg"
+            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full"
+            alt="User"
+          />
+
+          <p class="text-sm sm:text-lg max-w-xs sm:max-w-md">
+            “6 months after joining I lost 15lbs and I'm getting stronger.”
+          </p>
+        </div>
+      </div>
+    </section>
+    <!-- ================= POPUP NAVBAR ================= -->
+    <div
+      id="popupMenu"
+      class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm rounded-2xl p-8 bg-black/60 backdrop-blur-lg border border-black/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] opacity-0 scale-95 pointer-events-none transition-all duration-500 ease-out z-[9999]"
+    >
+      <!-- CLOSE -->
+      <button id="closeMenu" class="absolute top-4 right-5 text-2xl">✕</button>
+      <!-- MENU ITEMS -->
+      <div class="flex flex-col items-center gap-8 text-xl font-medium mt-6">
+        <a href="#home" class="hover:text-orange-500 transition duration-300"
+          >Home</a
+        >
+        <a
+          href="#registration"
+          class="hover:text-orange-500 transition duration-300"
+          >Registration</a
+        >
+        <a href="#about" class="hover:text-orange-500 transition duration-300"
+          >About</a
+        >
+        <a href="#contact" class="hover:text-orange-500 transition duration-300"
+          >Contact</a
+        >
+      </div>
+    </div>
+    <!-- WHY CHOOSE US SECTION -->
+    <section class="bg-black py-20 lg:py-28 text-center">
+      <div class="max-w-7xl mx-auto px-6 lg:px-20">
+        <!-- Small Heading -->
+        <p class="text-orange-500 font-semibold tracking-widest text-lg mb-3">
+          WHY CHOSE US?
+        </p>
+
+        <!-- Main Heading -->
+        <h2
+          class="text-3xl sm:text-5xl lg:text-4xl font-extrabold mb-14 tracking-wide"
+        >
+          PUSH YOUR LIMITS FORWARD
+        </h2>
+
+        <!-- Features Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
+          <!-- Feature 1 -->
+          <div
+            onclick="toggleFeature(this)"
+            class="feature-card flex flex-col items-center text-center cursor-pointer group hover:-translate-y-2 transition-all duration-300"
+          >
+            <div
+              class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-neutral-800 flex items-center justify-center mb-4 transition-all duration-300 group-hover:bg-red-700 group-hover:scale-110"
+            >
+              <img
+                src="{% static 'images/features/barbell.png' %}"
+                class="w-10 h-10 sm:w-12 sm:h-12 object-contain transition duration-300 group-hover:scale-125 group-hover:rotate-6"
+                alt="Modern Equipment"
+              />
+            </div>
+
+            <h3
+              class="text-base sm:text-xl font-bold mb-2 group-hover:text-orange-500"
+            >
+              Modern equipment
+            </h3>
+
+            <p
+              class="feature-desc text-gray-400 text-sm leading-relaxed max-w-xs max-h-0 overflow-hidden opacity-0 transition-all duration-500"
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut dolore facilisis.
+            </p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div
+            onclick="toggleFeature(this)"
+            class="feature-card flex flex-col items-center text-center cursor-pointer group hover:-translate-y-2 transition-all duration-300"
+          >
+            <div
+              class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-neutral-800 flex items-center justify-center mb-4 transition-all duration-300 group-hover:bg-red-700 group-hover:scale-110"
+            >
+              <img
+                src="{% static 'images/features/vitamins.png' %}"
+                class="w-10 h-10 sm:w-12 sm:h-12 object-contain transition duration-300 group-hover:scale-125 group-hover:rotate-6"
+                alt="Nutrition Plan"
+              />
+            </div>
+
+            <h3
+              class="text-base sm:text-xl font-bold mb-2 group-hover:text-orange-500"
+            >
+              Healthy nutrition plan
+            </h3>
+
+            <p
+              class="feature-desc text-gray-400 text-sm leading-relaxed max-w-xs max-h-0 overflow-hidden opacity-0 transition-all duration-500"
+            >
+              Quis ipsum suspendisse ultrices gravida. Risus commodo viverra
+              maecenas accumsan lacus vel facilisis.
+            </p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div
+            onclick="toggleFeature(this)"
+            class="feature-card flex flex-col items-center text-center cursor-pointer group hover:-translate-y-2 transition-all duration-300"
+          >
+            <div
+              class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-neutral-800 flex items-center justify-center mb-4 transition-all duration-300 group-hover:bg-red-700 group-hover:scale-110"
+            >
+              <img
+                src="{% static 'images/features/trainer.png' %}"
+                class="w-10 h-10 sm:w-12 sm:h-12 object-contain transition duration-300 group-hover:scale-125 group-hover:rotate-6"
+                alt="Training Plan"
+              />
+            </div>
+
+            <h3
+              class="text-base sm:text-xl font-bold mb-2 group-hover:text-orange-500"
+            >
+              Professional training plan
+            </h3>
+
+            <p
+              class="feature-desc text-gray-400 text-sm leading-relaxed max-w-xs max-h-0 overflow-hidden opacity-0 transition-all duration-500"
+            >
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut dolore facilisis.
+            </p>
+          </div>
+
+          <!-- Feature 4 -->
+          <div
+            onclick="toggleFeature(this)"
+            class="feature-card flex flex-col items-center text-center cursor-pointer group hover:-translate-y-2 transition-all duration-300"
+          >
+            <div
+              class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-neutral-800 flex items-center justify-center mb-4 transition-all duration-300 group-hover:bg-red-700 group-hover:scale-110"
+            >
+              <img
+                src="{% static 'images/features/heart-beat.png' %}"
+                class="w-10 h-10 sm:w-12 sm:h-12 object-contain transition duration-300 group-hover:scale-125 group-hover:rotate-6"
+                alt="Personal Needs"
+              />
+            </div>
+
+            <h3
+              class="text-base sm:text-xl font-bold mb-2 group-hover:text-orange-500"
+            >
+              Unique to your needs
+            </h3>
+
+            <p
+              class="feature-desc text-gray-400 text-sm leading-relaxed max-w-xs max-h-0 overflow-hidden opacity-0 transition-all duration-500"
+            >
+              Quis ipsum suspendisse ultrices gravida. Risus commodo viverra
+              maecenas accumsan lacus vel facilisis.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- WHAT WE CAN OFFER -->
+    <section id="about" class="bg-black py-20 lg:py-28">
+      <div class="max-w-7xl mx-auto px-6 lg:px-20">
+        <!-- Heading -->
+        <h2
+          class="text-center text-2xl sm:text-5xl font-bold tracking-wide mb-20"
+        >
+          <span class="text-white">WHAT WE CAN</span>
+          <span class="text-orange-500 font-extrabold"> OFFER</span>
+        </h2>
+
+        <!-- Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10">
+          <!-- CARD 1 -->
+          <div class="group relative overflow-hidden bg-black">
+            <img
+              src="{% static 'images/offer/machine_1.jpg' %}"
+              class="w-full h-[220px] sm:h-[320px] object-cover transition duration-500 group-hover:scale-110"
+            />
+
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"
+            ></div>
+
+            <div
+              class="absolute bottom-0 left-0 w-full h-20 bg-black -skew-y-3"
+            ></div>
+
+            <div class="absolute bottom-5 left-5 z-10">
+              <p class="text-orange-500 text-xs font-semibold tracking-widest">
+                STRENGTH
+              </p>
+              <h3 class="text-lg sm:text-2xl font-bold">WEIGHTLIFTING</h3>
+            </div>
+          </div>
+
+          <!-- CARD 2 -->
+          <div class="group relative overflow-hidden bg-black">
+            <img
+              src="{% static 'images/offer/machine_2.jpg' %}"
+              class="w-full h-[220px] sm:h-[320px] object-cover transition duration-500 group-hover:scale-110"
+            />
+
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"
+            ></div>
+
+            <div
+              class="absolute bottom-0 left-0 w-full h-20 bg-black -skew-y-3"
+            ></div>
+
+            <div class="absolute bottom-5 left-5 z-10">
+              <p class="text-orange-500 text-xs font-semibold tracking-widest">
+                CARDIO
+              </p>
+              <h3 class="text-lg sm:text-2xl font-bold">INDOOR CYCLING</h3>
+            </div>
+          </div>
+
+          <!-- CARD 3 (CENTERED ON MOBILE) -->
+          <div
+            class="group relative overflow-hidden bg-black col-span-2 lg:col-auto mx-auto w-full sm:w-[70%] lg:w-full"
+          >
+            <img
+              src="{% static 'images/offer/trainer.jpg' %}"
+              class="w-full h-[240px] sm:h-[320px] object-cover transition duration-500 group-hover:scale-110"
+            />
+
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"
+            ></div>
+
+            <div
+              class="absolute bottom-0 left-0 w-full h-20 bg-black -skew-y-3"
+            ></div>
+
+            <div class="absolute bottom-5 left-5 z-10">
+              <p class="text-orange-500 text-xs font-semibold tracking-widest">
+                PERSONAL TRAINER
+              </p>
+              <h3 class="text-lg sm:text-2xl font-bold">Certified Trainer</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- FREE TRIAL CTA SECTION -->
+    <section
+      class="relative w-full h-[70vh] lg:h-[80vh] flex items-center justify-center overflow-hidden"
+    >
+      <!-- Background Image -->
+      <img
+        src="{% static 'images/Registration.jpg' %}"
+        class="absolute inset-0 w-full h-full object-cover object-[85%_center] lg:object-center"
+        alt="Gym Training"
+      />
+
+      <!-- Dark Overlay -->
+      <div class="absolute inset-0 bg-black/70"></div>
+
+      <!-- Content -->
+      <div
+        class="relative z-10 max-w-6xl mx-auto px-6 lg:px-20 text-center lg:text-left"
+      >
+        <!-- Small text -->
+        <p class="uppercase tracking-widest text-white/70 text-sm mb-4">
+          ARE YOU READY TO
+        </p>
+
+        <!-- Main Heading -->
+        <h2
+          class="text-3xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6"
+        >
+          <span class="text-orange-500">GET FIT</span>, STRONG
+          <br class="hidden sm:block" />
+          & MOTIVATED!
+        </h2>
+
+        <!-- Small Text -->
+        <p
+          class="uppercase tracking-widest text-white/60 text-xl sm:text-sm mb-2"
+        >
+          Registration now to get
+        </p>
+
+        <!-- Subtitle -->
+        <p class="text-orange-500 text-sm uppercase sm:text-lg mb-8">
+          Where health, beauty and fitness meet.
+        </p>
+
+        <!-- Center Button -->
+        <div class="flex justify-center lg:justify-start">
+          <a
+            href="#"
+            class="relative inline-block bg-orange-500 text-black px-8 sm:px-12 py-4 rounded-full font-bold text-sm sm:text-lg transition-all duration-300 hover:bg-orange-600 hover:scale-105 shadow-[0_0_25px_rgba(249,115,22,0.5)]"
+          >
+            Start 2 Day Free Trial
+          </a>
+        </div>
+      </div>
+    </section>
+    <!-- PRICING PLAN SECTION -->
+    <section class="bg-black py-12 sm:py-16 lg:py-28">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 text-center">
+        <!-- Heading -->
+        <p
+          class="text-orange-500 font-semibold tracking-widest mb-2 sm:mb-3 text-sm"
+        >
+          OUR PLANS
+        </p>
+
+        <h2
+          class="text-2xl sm:text-4xl lg:text-5xl font-extrabold mb-10 sm:mb-16"
+        >
+          CHOOSE YOUR FITNESS PLAN
+        </h2>
+
+        <!-- Pricing Grid -->
+        <div
+          class="grid md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8 lg:gap-10"
+        >
+          <!-- PLAN 1 -->
+          <div
+            onclick="togglePricing(this)"
+            class="pricing-card cursor-pointer bg-black border border-white/10 p-5 sm:p-7 lg:p-10 hover:border-orange-500 transition duration-300"
+          >
+            <h3 class="text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-6">
+              Monthly Fitness
+            </h3>
+
+            <div
+              class="text-orange-500 text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-2"
+            >
+              ₹500
+            </div>
+            <p class="text-white/60 mb-6">PER MONTH</p>
+
+            <!-- Hidden Content -->
+            <div
+              class="pricing-desc overflow-hidden max-h-0 opacity-0 transition-all duration-500"
+            >
+              <ul class="space-y-3 text-white/80 mb-10">
+                <li>✔ Registration Fee included</li>
+                <li>✔ Unlimited Gym Access</li>
+                <li>✔ Personal Trainer Support</li>
+                <li>✔ Diet Guidance</li>
+                <li>✔ No Time Restrictions</li>
+              </ul>
+
+              <a
+                href="#"
+                class="block bg-neutral-800 py-3 font-semibold hover:bg-orange-500 hover:text-black transition"
+              >
+                JOIN NOW
+              </a>
+            </div>
+          </div>
+
+          <!-- PLAN 2 (POPULAR) -->
+          <div
+            onclick="togglePricing(this)"
+            class="pricing-card relative cursor-pointer bg-black border border-white/10 p-5 sm:p-7 lg:p-10 hover:border-orange-500 transition duration-300"
+          >
+            <span
+              class="absolute -top-4 left-1/2 -translate-x-1/2 bg-orange-500 text-black px-4 py-1 text-sm font-bold"
+            >
+              MOST POPULAR
+            </span>
+
+            <h3 class="text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-6">
+              3 Month Transformation
+            </h3>
+
+            <div
+              class="text-orange-500 text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-2"
+            >
+              ₹1,300
+            </div>
+            <p class="text-white/60 mb-6">3 MONTHS</p>
+
+            <div
+              class="pricing-desc overflow-hidden max-h-0 opacity-0 transition-all duration-500"
+            >
+              <ul class="space-y-3 text-white/80 mb-10">
+                <li>✔ No Registration Fee</li>
+                <li>✔ Unlimited Equipment</li>
+                <li>✔ Weight Loss Program</li>
+                <li>✔ Workout Plan</li>
+                <li>✔ Priority Support</li>
+              </ul>
+
+              <a
+                href="#"
+                class="block bg-orange-500 text-black py-3 font-semibold hover:bg-orange-600 transition"
+              >
+                ENROLL NOW
+              </a>
+            </div>
+          </div>
+
+          <!-- PLAN 3 -->
+          <div
+            onclick="togglePricing(this)"
+            class="pricing-card cursor-pointer bg-black border border-white/10 p-5 sm:p-7 lg:p-10 hover:border-orange-500 transition duration-300"
+          >
+            <h3 class="text-lg sm:text-xl lg:text-2xl font-bold mb-3 sm:mb-6">
+              Annual Membership
+            </h3>
+
+            <div
+              class="text-orange-500 text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-2"
+            >
+              ₹7,899
+            </div>
+            <p class="text-white/60 mb-6">12 MONTHS</p>
+
+            <div
+              class="pricing-desc overflow-hidden max-h-0 opacity-0 transition-all duration-500"
+            >
+              <ul class="space-y-3 text-white/80 mb-10">
+                <li>✔ All Gym Facilities</li>
+                <li>✔ Personal Coaching</li>
+                <li>✔ Diet & Nutrition Plan</li>
+                <li>✔ Free Fitness Assessment</li>
+                <li>✔ Locker Facility</li>
+              </ul>
+
+              <a
+                href="#"
+                class="block bg-neutral-800 py-3 font-semibold hover:bg-orange-500 hover:text-black transition"
+              >
+                JOIN TODAY
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ================= FOOTER ================= -->
+    <footer class="bg-black text-white">
+      <!-- TOP CONTACT BAR -->
+      <div class="border-b border-white/10">
+        <div
+          class="max-w-7xl mx-auto px-6 lg:px-20 py-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-10 md:gap-12"
+        >
+          <!-- LOCATION -->
+          <div
+            class="flex items-center gap-5 text-center md:text-left justify-center md:justify-start w-full md:w-auto"
+          >
+            <!-- Icon -->
+            <div
+              class="w-12 h-12 md:w-16 md:h-16 bg-orange-500 rounded-full flex items-center justify-center shrink-0"
+            >
+              <img
+                src="{% static 'images/footer/placeholder.png' %}"
+                class="w-7 h-7 object-contain invert"
+                alt="Location"
+              />
+            </div>
+
+            <!-- Text -->
+            <p class="text-white/80">
+              333 Middle Winchendon Rd,<br />
+              Rindge, NH 03461
+            </p>
+          </div>
+
+          <!-- EMAIL (NOW BELOW ON MOBILE) -->
+          <div
+            class="flex items-center gap-5 text-center md:text-left justify-center md:justify-start w-full md:w-auto"
+          >
+            <!-- Icon -->
+            <div
+              class="w-12 h-12 md:w-16 md:h-16 bg-orange-500 rounded-full flex items-center justify-center shrink-0"
+            >
+              <img
+                src="{% static 'images/footer/email.png' %}"
+                class="w-5 h-5 md:w-7 md:h-7 object-contain invert"
+                alt="Email"
+              />
+            </div>
+
+            <!-- Text -->
+            <p class="text-white/80 break-all md:break-normal">
+              support@gymcenter.com
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN FOOTER -->
+      <div
+        class="max-w-7xl mx-auto px-6 lg:px-20 py-16 grid gap-12 md:gap-16 lg:gap-24 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1fr_1.4fr] items-start"
+      >
+        <!-- LOGO + ABOUT -->
+        <div>
+          <h2 class="text-4xl font-extrabold mb-6">
+            <span class="text-white">GY</span>
+            <span class="text-orange-500">M</span>
+          </h2>
+
+          <p class="text-white/70 mb-6 leading-relaxed">
+            Transform your body and mind with professional training, modern
+            equipment and expert fitness coaching.
+          </p>
+
+          <!-- Social -->
+          <div class="flex gap-4 text-xl">
+            <a href="#" class="hover:scale-110 transition duration-300">
+              <img
+                src="{% static 'images/footer/instagram.png' %}"
+                class="w-6 h-6 object-contain invert opacity-70 hover:opacity-100"
+                alt="Instagram"
+              />
+            </a>
+
+            <a href="#" class="hover:scale-110 transition duration-300">
+              <img
+                src="{% static 'images/footer/email.png' %}"
+                class="w-6 h-6 object-contain invert opacity-70 hover:opacity-100"
+                alt="Email"
+              />
+            </a>
+          </div>
+        </div>
+
+        <!-- LINKS GROUP (USEFUL + SUPPORT) -->
+        <div class="grid grid-cols-2 gap-12 lg:gap-16 lg:col-span-2">
+          <!-- USEFUL LINKS -->
+          <div>
+            <h3 class="text-xl font-bold mb-6">Useful Links</h3>
+            <ul class="space-y-3 text-white/70">
+              <li><a href="#" class="hover:text-orange-500">About</a></li>
+              <li><a href="#" class="hover:text-orange-500">Blog</a></li>
+              <li><a href="#" class="hover:text-orange-500">Classes</a></li>
+              <li><a href="#" class="hover:text-orange-500">Contact</a></li>
+            </ul>
+          </div>
+
+          <!-- SUPPORT -->
+          <div>
+            <h3 class="text-xl font-bold mb-6">Support</h3>
+            <ul class="space-y-3 text-white/70">
+              <li><a href="#" class="hover:text-orange-500">Login</a></li>
+              <li><a href="#" class="hover:text-orange-500">My Account</a></li>
+              <li><a href="#" class="hover:text-orange-500">Subscribe</a></li>
+              <li><a href="#" class="hover:text-orange-500">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- TIPS & GUIDES (UNCHANGED — NOW BELOW ON MOBILE) -->
+        <div>
+          <h3 class="text-xl font-bold mb-6">Tips & Guides</h3>
+
+          <div class="space-y-6 text-white/70 text-sm">
+            <div>
+              <p class="hover:text-orange-500 cursor-pointer">
+                Physical fitness may help prevent depression, anxiety
+              </p>
+              <span class="text-white/40 text-xs">
+                3 min read | 20 Comments
+              </span>
+            </div>
+
+            <div>
+              <p class="hover:text-orange-500 cursor-pointer">
+                Fitness: Best exercise to lose belly fat and tone up
+              </p>
+              <span class="text-white/40 text-xs">
+                3 min read | 20 Comments
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COPYRIGHT -->
+      <div
+        class="border-t border-white/10 text-center py-6 text-white/60 text-sm"
+      >
+        Copyright ©2026 All rights reserved
+        <span class="text-orange-500">by CrossFit Gym</span>
+      </div>
+    </footer>
+    <script src="{% static 'js/home.js' %}"></script>
+    <script src="{% static 'js/pricing.js' %}"></script>
+    <script src="{% static 'js/hamburger.js' %}"></script>
+    <script src="{% static 'js/RefreshTrigger.js' %}"></script>
+    
+  </body>
+</html>
