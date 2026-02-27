@@ -61,21 +61,67 @@
       >
         <div class="flex justify-between items-center px-4 sm:px-6 lg:px-20">
           <!-- Logo -->
-          <div class="flex items-center gap-2 sm:gap-3">
+          <a href="/" class="flex items-center gap-2 sm:gap-3 select-none">
             <div
               class="flex flex-col font-bold leading-tight text-sm sm:text-base"
             >
               <span>CrossFit</span>
               <span>Gym</span>
             </div>
-          </div>
+          </a>
 
           <!-- Desktop Nav -->
           <ul class="hidden md:flex gap-10 font-medium text-base uppercase">
-            <li class="cursor-pointer hover:text-orange-400">Home</li>
-            <li class="cursor-pointer hover:text-orange-400">Registration</li>
-            <li class="cursor-pointer hover:text-orange-400">About</li>
-            <li class="cursor-pointer hover:text-orange-400">Contact</li>
+            <li class="cursor-pointer hover:text-orange-400">
+              <a
+                href="/"
+                >Home</a
+              >
+            </li>
+            <li class="relative group cursor-pointer">
+              <!-- Parent Link -->
+              <a class="hover:text-orange-400 flex items-center gap-1">
+                Membership ▼
+              </a>
+
+              <!-- Dropdown -->
+              <ul
+                class="absolute left-0 top-full mt-3 w-48 bg-black/90 backdrop-blur-md rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300"
+              >
+                <li>
+                  <a
+                    href="/registration/basic"
+                    class="block px-4 py-3 hover:bg-orange-500/20 hover:text-orange-400"
+                  >
+                    Enroll
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="/registration/pro"
+                    class="block px-4 py-3 hover:bg-orange-500/20 hover:text-orange-400"
+                  >
+                    Workout
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="/registration/personal-training"
+                    class="block px-4 py-3 hover:bg-orange-500/20 hover:text-orange-400"
+                  >
+                    View Profile
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="cursor-pointer hover:text-orange-400">
+              <a href="#pricing">Pricing</a>
+            </li>
+            <li class="cursor-pointer hover:text-orange-400">
+              <a href="#about">About</a>
+            </li>
           </ul>
 
           <!-- RIGHT SIDE (Mobile CTA + Hamburger) -->
@@ -170,30 +216,38 @@
     <!-- ================= POPUP NAVBAR ================= -->
     <div
       id="popupMenu"
-      class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm rounded-2xl p-8 bg-black/60 backdrop-blur-lg border border-black/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] opacity-0 scale-95 pointer-events-none transition-all duration-500 ease-out z-[9999]"
+      class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm rounded-2xl p-8 bg-black/60 backdrop-blur-lg border border-black/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] opacity-0 pointer-events-none transition-all duration-500 ease-out z-[9999]"
     >
       <!-- CLOSE -->
       <button id="closeMenu" class="absolute top-4 right-5 text-2xl">✕</button>
+
       <!-- MENU ITEMS -->
-      <div class="flex flex-col items-center gap-8 text-xl font-medium mt-6">
-        <a href="#home" class="hover:text-orange-500 transition duration-300"
-          >Home</a
-        >
+      <div
+        class="flex flex-col items-center gap-6 text-xl font-medium mt-6 w-full"
+      >
+        <a href="/" class="hover:text-orange-500 transition duration-300">
+          Home
+        </a>
         <a
-          href="#registration"
+          href="#pricing"
           class="hover:text-orange-500 transition duration-300"
-          >Registration</a
         >
-        <a href="#about" class="hover:text-orange-500 transition duration-300"
-          >About</a
-        >
-        <a href="#contact" class="hover:text-orange-500 transition duration-300"
-          >Contact</a
-        >
+          Pricing
+        </a>
+
+        <a href="#about" class="hover:text-orange-500 transition duration-300">
+          About
+        </a>
+        <a href="#" class="hover:text-orange-500 transition duration-300">
+          Enroll
+        </a>
+        <a href="/workouts" class="hover:text-orange-500 transition duration-300">
+          Workout
+        </a>
       </div>
     </div>
     <!-- WHY CHOOSE US SECTION -->
-    <section class="bg-black py-20 lg:py-28 text-center">
+    <section id="about" class="bg-black py-20 lg:py-28 text-center">
       <div class="max-w-7xl mx-auto px-6 lg:px-20">
         <!-- Small Heading -->
         <p class="text-orange-500 font-semibold tracking-widest text-lg mb-3">
@@ -328,7 +382,7 @@
       </div>
     </section>
     <!-- WHAT WE CAN OFFER -->
-    <section id="about" class="bg-black py-20 lg:py-28">
+    <section  class="bg-black py-20 lg:py-28">
       <div class="max-w-7xl mx-auto px-6 lg:px-20">
         <!-- Heading -->
         <h2
@@ -469,7 +523,7 @@
       </div>
     </section>
     <!-- PRICING PLAN SECTION -->
-    <section class="bg-black py-12 sm:py-16 lg:py-28">
+    <section id="pricing" class="bg-black py-12 sm:py-16 lg:py-28">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-20 text-center">
         <!-- Heading -->
         <p
@@ -756,6 +810,5 @@
     <script src="{% static 'js/pricing.js' %}"></script>
     <script src="{% static 'js/hamburger.js' %}"></script>
     <script src="{% static 'js/RefreshTrigger.js' %}"></script>
-    
   </body>
 </html>
