@@ -73,24 +73,20 @@
           <!-- Desktop Nav -->
           <ul class="hidden md:flex gap-10 font-medium text-base uppercase">
             <li class="cursor-pointer hover:text-orange-400">
-              <a
-                href="/"
-                >Home</a
-              >
+              <a href="/">Home</a>
             </li>
             <li class="relative group cursor-pointer">
               <!-- Parent Link -->
               <a class="hover:text-orange-400 flex items-center gap-1">
                 Membership ▼
               </a>
-
               <!-- Dropdown -->
               <ul
                 class="absolute left-0 top-full mt-3 w-48 bg-black/90 backdrop-blur-md rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300"
               >
                 <li>
                   <a
-                    href="/registration/basic"
+                    href="/signup"
                     class="block px-4 py-3 hover:bg-orange-500/20 hover:text-orange-400"
                   >
                     Enroll
@@ -99,21 +95,22 @@
 
                 <li>
                   <a
-                    href="/registration/pro"
+                    href="/workout"
                     class="block px-4 py-3 hover:bg-orange-500/20 hover:text-orange-400"
                   >
                     Workout
                   </a>
                 </li>
-
+                {% if request.user.is_authenticated %}
                 <li>
                   <a
-                    href="/registration/personal-training"
+                    href="/profile"
                     class="block px-4 py-3 hover:bg-orange-500/20 hover:text-orange-400"
                   >
                     View Profile
                   </a>
                 </li>
+                {% endif %}
               </ul>
             </li>
             <li class="cursor-pointer hover:text-orange-400">
@@ -128,10 +125,10 @@
           <div class="flex items-center gap-3">
             <!-- Mobile SignIn/Login -->
             <a
-              href="#"
+              href="/signup"
               class="md:hidden bg-orange-500 text-black px-4 py-2 rounded-full font-semibold text-sm hover:bg-orange-600 transition shadow-[0_0_20px_rgba(249,115,22,0.5)]"
             >
-              SignIn / LogIn
+              SignUp / LogIn
             </a>
 
             <!-- Hamburger -->
@@ -148,12 +145,21 @@
             </button>
 
             <!-- Desktop CTA -->
+            {% if request.user.is_authenticated %}
             <a
-              href="#"
-              class="hidden md:inline-block bg-orange-500 text-black px-6 py-3 rounded-full font-semibold hover:bg-orange-600 hover:scale-105 shadow-[0_0_25px_rgba(249,115,22,0.5)] transition text-sm"
+              href="/profile"
+              class="hidden md:inline-block bg-orange-500 text-black px-6 py-3 rounded-full font-semibold hover:bg-orange-600 transition text-sm"
             >
-              SignIn / LogIn
+              My Profile
             </a>
+            {% else %}
+            <a
+              href="/signup"
+              class="hidden md:inline-block bg-orange-500 text-black px-6 py-3 rounded-full font-semibold hover:bg-orange-600 transition text-sm"
+            >
+              SignUp / LogIn
+            </a>
+            {% endif %}
           </div>
         </div>
       </nav>
@@ -178,7 +184,7 @@
         </p>
 
         <a
-          href="#"
+          href="/signup"
           class="inline-block bg-orange-500 text-black px-6 sm:px-10 py-3 sm:py-4 rounded-full font-bold hover:bg-orange-600 hover:scale-105 shadow-[0_0_25px_rgba(249,115,22,0.5)] transition text-sm sm:text-base"
         >
           Start 2 day free trial
@@ -216,7 +222,7 @@
     <!-- ================= POPUP NAVBAR ================= -->
     <div
       id="popupMenu"
-      class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm rounded-2xl p-8 bg-black/60 backdrop-blur-lg border border-black/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] opacity-0 pointer-events-none transition-all duration-500 ease-out z-[9999]"
+      class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm rounded-2xl p-8 bg-black/60 backdrop-blur-lg border border-orange-500/20 shadow-[0_20px_60px_rgba(0,0,0,0.6),0_0_40px_rgba(249,115,22,0.25)] opacity-0 pointer-events-none transition-all duration-500 ease-out z-[9999]"
     >
       <!-- CLOSE -->
       <button id="closeMenu" class="absolute top-4 right-5 text-2xl">✕</button>
@@ -225,23 +231,35 @@
       <div
         class="flex flex-col items-center gap-6 text-xl font-medium mt-6 w-full"
       >
-        <a href="/" class="hover:text-orange-500 transition duration-300">
+        <a
+          href="/"
+          class="text-orange-500 font-extrabold transition duration-300"
+        >
           Home
         </a>
         <a
           href="#pricing"
-          class="hover:text-orange-500 transition duration-300"
+          class="text-orange-500 font-extrabold transition duration-300"
         >
           Pricing
         </a>
 
-        <a href="#about" class="hover:text-orange-500 transition duration-300">
+        <a
+          href="#about"
+          class="text-orange-500 font-extrabold transition duration-300"
+        >
           About
         </a>
-        <a href="#" class="hover:text-orange-500 transition duration-300">
+        <a
+          href="/signup"
+          class="text-orange-500 font-extrabold transition duration-300"
+        >
           Enroll
         </a>
-        <a href="/workouts" class="hover:text-orange-500 transition duration-300">
+        <a
+          href="/workout"
+          class="text-orange-500 font-extrabold transition duration-300"
+        >
           Workout
         </a>
       </div>
@@ -281,7 +299,7 @@
             <h3
               class="text-base sm:text-xl font-bold mb-2 group-hover:text-orange-500"
             >
-              Modern equipment
+              Modern Equipment
             </h3>
 
             <p
@@ -310,7 +328,7 @@
             <h3
               class="text-base sm:text-xl font-bold mb-2 group-hover:text-orange-500"
             >
-              Healthy nutrition plan
+              Healthy Nutrition Plan
             </h3>
 
             <p
@@ -382,7 +400,7 @@
       </div>
     </section>
     <!-- WHAT WE CAN OFFER -->
-    <section  class="bg-black py-20 lg:py-28">
+    <section class="bg-black py-20 lg:py-28">
       <div class="max-w-7xl mx-auto px-6 lg:px-20">
         <!-- Heading -->
         <h2
@@ -514,7 +532,7 @@
         <!-- Center Button -->
         <div class="flex justify-center lg:justify-start">
           <a
-            href="#"
+            href="/signup"
             class="relative inline-block bg-orange-500 text-black px-8 sm:px-12 py-4 rounded-full font-bold text-sm sm:text-lg transition-all duration-300 hover:bg-orange-600 hover:scale-105 shadow-[0_0_25px_rgba(249,115,22,0.5)]"
           >
             Start 2 Day Free Trial

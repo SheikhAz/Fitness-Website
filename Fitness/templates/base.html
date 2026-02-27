@@ -1,0 +1,131 @@
+{% load static %} {% load static tailwind_tags %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CrossFit Gym {% block title %}{% endblock %}</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    {% tailwind_css %}
+    <style>
+      /* PAGE LOAD ANIMATION */
+      @keyframes heroReveal {
+        0% {
+          opacity: 0;
+          transform: translateY(40px) scale(0.95);
+          filter: blur(2px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+      }
+      .hero-animate {
+        animation: heroReveal 1.5s ease-out forwards;
+      }
+      .glass {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+    </style>
+  </head>
+  <body class="bg-black text-white font-[Inter]">
+    {% block extra %}{% endblock %}
+    <!-- HERO SECTION -->
+    <section id="home" class="relative min-h-screen overflow-hidden">
+      <!-- Background -->
+      <img
+        src="{% static 'images/Fitness.jpg' %}"
+        class="absolute inset-0 w-full h-full object-cover"
+        alt="Gym Background"
+      />
+
+      <div class="absolute inset-0 bg-black/70"></div>
+
+      <!-- TOP BAR -->
+      <div class="absolute top-0 w-full z-30">
+        <div
+          class="flex justify-between px-4 sm:px-6 lg:px-20 py-3 text-xs sm:text-sm text-white/90"
+        >
+          <div>CrossFit Gym in Bhilai, Chhattisgarh</div>
+          <div>Join: (+91) 7000032565</div>
+        </div>
+
+        <div class="w-full h-px bg-white/20"></div>
+      </div>
+
+      <!-- NAVBAR -->
+      <nav
+        class="absolute top-[60px] w-full z-[1000] backdrop-blur-0 bg-black/40"
+      >
+        <div
+          class="flex justify-center items-center px-4 sm:px-6 lg:px-20 py-4"
+        >
+          <!-- Logo Centered -->
+          <a
+            href="/"
+            class="flex flex-col items-center font-bold leading-tight text-sm sm:text-base select-none"
+          >
+            <span>CrossFit</span>
+            <span>Gym</span>
+          </a>
+        </div>
+      </nav>
+      <!-- HERO CONTENT -->
+      <div
+        id="heroContent"
+        class="relative z-20 flex flex-col items-center text-center px-4 sm:px-6 lg:px-20 pt-40 sm:pt-52 lg:pt-36 pb-6 opacity-0 text-orange-500"
+      >
+        <h1 class="text-4xl font-extrabold leading-tight mb-6 max-w-5xl">
+          {% block content %}{% endblock %}
+        </h1>
+      </div>
+      {% block body %}{% endblock %}
+    </section>
+    <!-- ================= POPUP NAVBAR ================= -->
+    <div
+      id="popupMenu"
+      class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm rounded-2xl p-8 bg-black/60 backdrop-blur-lg border border-black/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] opacity-0 pointer-events-none transition-all duration-500 ease-out z-[9999]"
+    >
+      <!-- CLOSE -->
+      <button id="closeMenu" class="absolute top-4 right-5 text-2xl">✕</button>
+
+      <!-- MENU ITEMS -->
+      <div
+        class="flex flex-col items-center gap-6 text-xl font-medium mt-6 w-full"
+      >
+        <a href="/" class="hover:text-orange-500 transition duration-300">
+          Home
+        </a>
+        <a
+          href="#pricing"
+          class="hover:text-orange-500 transition duration-300"
+        >
+          Pricing
+        </a>
+
+        <a href="#about" class="hover:text-orange-500 transition duration-300">
+          About
+        </a>
+        <a href="#" class="hover:text-orange-500 transition duration-300">
+          Enroll
+        </a>
+        <a
+          href="/workouts"
+          class="hover:text-orange-500 transition duration-300"
+        >
+          Workout
+        </a>
+      </div>
+    </div>
+    <script src="{% static 'js/home.js' %}"></script>
+    <script src="{% static 'js/pricing.js' %}"></script>
+    <script src="{% static 'js/hamburger.js' %}"></script>
+    <script src="{% static 'js/RefreshTrigger.js' %}"></script>
+  </body>
+</html>
