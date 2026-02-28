@@ -1,13 +1,13 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from django.contrib.auth import authenticate ,login as auth_log
+from django.contrib.auth import authenticate ,login as auth_log ,logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def loginPage(request):
     if request.method == "POST":
-        phone = request.POST.get('phone')
+        phone = request.POST.get('usernumber')
         password = request.POST.get('password')
 
         user = authenticate(request , username = phone ,password=password)
@@ -21,10 +21,14 @@ def loginPage(request):
 
 def signupPage(request):
     if request.method == "POST":
-        phone = request.POST.get('phone')
+        phone = request.POST.get('usernumber')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
         username = phone
+        # Checking that Number is Valid or Not.
+        if len(username)>10 or len(username)<10:
+            messages.error(request , "Phone Number Must be 10 Digits")
+            return redirect('/signup')
         # Checking the Password.
         if password != confirm_password:
             messages.error(request,"Password Do not Match")
@@ -50,3 +54,9 @@ def workout(request):
 @login_required
 def Profile(request):
     return render(request , 'profile.html')
+
+
+def handlelogout(request):
+    logout(request)
+    messages.success(request ,"Logout Successfully......")
+    return redirect('/')

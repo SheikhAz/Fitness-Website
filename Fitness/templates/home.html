@@ -32,6 +32,27 @@
   </head>
 
   <body class="bg-black text-white font-[Inter]">
+    {% if messages %}
+    <div
+      id="message-container"
+      class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] space-y-3 w-full max-w-md px-4"
+    >
+      {% for message in messages %}
+      <div
+        class="flash-message flex items-center justify-between px-5 py-3 rounded-xl text-sm font-medium text-white shadow-2xl backdrop-blur-md {% if message.tags == 'success' %} bg-gradient-to-r from-green-500 to-emerald-600 {% elif message.tags == 'error' %} bg-gradient-to-r from-red-500 to-red-700 {% else %} bg-gray-800 {% endif %}"
+      >
+        <span>{{ message }}</span>
+
+        <button
+          onclick="this.parentElement.remove()"
+          class="ml-4 text-lg font-bold hover:scale-110 transition"
+        >
+          ×
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
     <!-- HERO SECTION -->
     <section id="home" class="relative min-h-screen overflow-hidden">
       <!-- Background -->
@@ -101,16 +122,6 @@
                     Workout
                   </a>
                 </li>
-                {% if request.user.is_authenticated %}
-                <li>
-                  <a
-                    href="/profile"
-                    class="block px-4 py-3 hover:bg-orange-500/20 hover:text-orange-400"
-                  >
-                    View Profile
-                  </a>
-                </li>
-                {% endif %}
               </ul>
             </li>
             <li class="cursor-pointer hover:text-orange-400">
@@ -124,12 +135,21 @@
           <!-- RIGHT SIDE (Mobile CTA + Hamburger) -->
           <div class="flex items-center gap-3">
             <!-- Mobile SignIn/Login -->
+             {% if request.user.is_authenticated %}
+             <a
+              href="/profile"
+              class="md:hidden bg-orange-500 text-black px-4 py-2 rounded-full font-semibold text-sm hover:bg-orange-600 transition shadow-[0_0_20px_rgba(249,115,22,0.5)]"
+            >
+              My Profile
+            </a>
+            {% else %}
             <a
               href="/signup"
               class="md:hidden bg-orange-500 text-black px-4 py-2 rounded-full font-semibold text-sm hover:bg-orange-600 transition shadow-[0_0_20px_rgba(249,115,22,0.5)]"
             >
               SignUp / LogIn
             </a>
+            {% endif %}
 
             <!-- Hamburger -->
             <button id="menuBtn" class="md:hidden relative w-8 h-8 z-[10000]">
@@ -145,6 +165,7 @@
             </button>
 
             <!-- Desktop CTA -->
+
             {% if request.user.is_authenticated %}
             <a
               href="/profile"
@@ -152,6 +173,16 @@
             >
               My Profile
             </a>
+            {% endif %} {% if request.user.is_authenticated %}
+            <form action="{% url 'logout' %}" method="POST">
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="hidden md:inline-block bg-orange-500 text-black px-6 py-3 rounded-full font-semibold hover:bg-orange-600 transition text-sm"
+              >
+                Logout
+              </button>
+            </form>
             {% else %}
             <a
               href="/signup"
@@ -251,17 +282,26 @@
           About
         </a>
         <a
-          href="/signup"
-          class="text-orange-500 font-extrabold transition duration-300"
+        href="/workout"
+        class="text-orange-500 font-extrabold transition duration-300"
         >
-          Enroll
-        </a>
-        <a
-          href="/workout"
-          class="text-orange-500 font-extrabold transition duration-300"
-        >
-          Workout
-        </a>
+        Workout
+      </a>
+      {% if request.user.is_authenticated %}
+      <a
+        href="/logout"
+        class="md:hidden bg-orange-500 text-black px-4 py-2 rounded-full font-semibold text-lg hover:bg-orange-600 transition shadow-[0_0_20px_rgba(249,115,22,0.5)]"
+      >
+        Logout
+      </a>
+      {% else %}
+      <a
+        href="/signup"
+        class="text-orange-500 font-extrabold transition duration-300"
+      >
+        Enroll
+      </a>
+      {% endif %}
       </div>
     </div>
     <!-- WHY CHOOSE US SECTION -->
@@ -828,5 +868,6 @@
     <script src="{% static 'js/pricing.js' %}"></script>
     <script src="{% static 'js/hamburger.js' %}"></script>
     <script src="{% static 'js/RefreshTrigger.js' %}"></script>
+    <script src="{% static 'js/messages.js' %}"></script>
   </body>
 </html>
