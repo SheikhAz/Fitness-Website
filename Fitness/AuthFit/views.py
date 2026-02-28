@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate ,login as auth_log ,logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from AuthFit.models import Contact
 
 # Create your views here.
 def loginPage(request):
@@ -48,15 +49,36 @@ def signupPage(request):
 
 def homePage(request):
     return render(request , 'home.html')
-def workout(request):
-    return render(request , 'workout.html')
 
-@login_required
-def Profile(request):
-    return render(request , 'profile.html')
+def contact(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        number = request.POST.get('number')
+        email = request.POST.get('email')
+        message = request.POST.get('description')
+        # Checking that Phone Number is 10 digits only
 
+        if len(number)>10 or len(number)<10:
+            messages.error(request,"Please Enter a Valid Number")
+            return redirect('/contact')
+
+        query = Contact(name=name, email=email, phonenumber=number,
+        description = message)
+        query.save()
+        messages.success(request , "Thanks for Contacting us we will get back you soon")
+        return redirect('/contact')
+    return render(request , 'contact.html')
 
 def handlelogout(request):
     logout(request)
     messages.success(request ,"Logout Successfully......")
     return redirect('/')
+
+
+def workout(request):
+    return render(request, 'workout.html')
+
+
+@login_required
+def Profile(request):
+    return render(request, 'profile.html')
