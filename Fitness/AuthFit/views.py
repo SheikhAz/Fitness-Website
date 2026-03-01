@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate ,login as auth_log ,logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from AuthFit.models import Contact
+from AuthFit.models import Contact, Enrollment
 
 # Create your views here.
 def loginPage(request):
@@ -74,6 +74,25 @@ def handlelogout(request):
     messages.success(request ,"Logout Successfully......")
     return redirect('/')
 
+
+def enrollment(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        gender = request.POST.get('gender')
+        dob = request.POST.get('dob')
+        plan = request.POST.get('plan')
+        trainer = request.POST.get('trainer')
+        reference = request.POST.get('reference')
+        address = request.POST.get('address')
+
+        enroll = Enrollment(fullname = name,email = email,phone = phone ,dob = dob,plan = plan ,trainer = trainer ,Reference = reference,address = address)
+        enroll.save()
+        messages.success(
+            request, "Welcome aboard! Your gym membership has been successfully activated.")
+        return redirect('/profile')
+    return render(request, 'enrollment.html')
 
 def workout(request):
     return render(request, 'workout.html')

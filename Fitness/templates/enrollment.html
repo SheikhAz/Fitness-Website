@@ -1,0 +1,221 @@
+{% extends "base.html" %} {% block title %}Enrollment for GYM{% endblock %}
+{%block content %}Gym Registration Form
+<p class="text-gray-500 mt-3 text-sm">
+  Please complete this form to register for gym membership and gain access to
+  all our fitness services.
+</p>
+{% endblock %} {% block extra %} {% if messages %}
+<div
+  id="message-container"
+  class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] space-y-3 w-full max-w-md px-4"
+>
+  {% for message in messages %}
+  <div
+    class="flash-message flex items-center justify-between px-5 py-3 rounded-xl text-sm font-medium text-white shadow-2xl backdrop-blur-md {% if message.tags == 'success' %} bg-gradient-to-r from-green-500 to-emerald-600 {% elif message.tags == 'error' %} bg-gradient-to-r from-red-500 to-red-700 {% else %} bg-gray-800 {% endif %}"
+  >
+    <span>{{ message }}</span>
+    <button
+      onclick="this.parentElement.remove()"
+      class="ml-4 text-lg font-bold hover:scale-110 transition"
+    >
+      ×
+    </button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %} {% endblock %} {% block body %}
+<div class=" hero-animate flex justify-center px-4 sm:px-6 lg:px-8 py-6">
+  <div class="w-full max-w-3xl">
+    <form
+      method="POST"
+      class="bg-black/60 backdrop-blur-md border border-orange-500/20 rounded-2xl p-8 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.7),0_0_50px_rgba(249,115,22,0.15)]"
+    >
+      {% csrf_token %}
+
+      <!-- PERSONAL INFORMATION -->
+      <h2 class="text-lg font-semibold text-orange-500 mb-6">
+        Personal Information
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <input
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          required
+          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-white sm:col-span-2"
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email Address"
+          required
+          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-white"
+        />
+
+        <input
+          type="tel"
+          name="phone"
+          placeholder="Phone Number"
+          required
+          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-gray-500"
+        />
+
+        <!-- Gender -->
+        <div class="relative">
+          <button
+            type="button"
+            onclick="toggleDropdown()"
+            class="input-field flex justify-between items-center pt-3 px-1 text-gray-500"
+          >
+            <span id="selectedGender">Select Gender</span>
+            <span class="text-lg text-white">▼</span>
+          </button>
+
+          <div
+            id="genderDropdown"
+            class="hidden absolute mt-2 w-full bg-black/95 border border-orange-500/40 rounded-lg shadow-xl z-50 overflow-hidden"
+          >
+            <div onclick="selectGender('Male')" class="dropdown-item">Male</div>
+            <div onclick="selectGender('Female')" class="dropdown-item">
+              Female
+            </div>
+          </div>
+
+          <input type="hidden" name="gender" id="genderInput" required />
+        </div>
+
+        <input type="date" name="dob" required class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-gray-500" />
+      </div>
+
+      <!-- MEMBERSHIP SECTION -->
+      <h2 class="text-lg font-semibold text-orange-500 mt-10 mb-6">
+        Membership Details
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 cursor-pointer">
+        <!-- Plan -->
+        <div class="relative sm:col-span-2">
+          <button
+            type="button"
+            onclick="togglePlanDropdown()"
+            class="input-field flex justify-between items-center"
+          >
+            <span id="selectedPlan">Select Membership Plan</span>
+            <span class="text-sm">▼</span>
+          </button>
+
+          <div
+            id="planDropdown"
+            class="hidden absolute mt-2 w-full bg-black/95 border border-orange-500/40 rounded-lg shadow-xl z-50 overflow-hidden"
+          >
+            <div
+              onclick="selectPlan('Basic Plan - $500')"
+              class="dropdown-item"
+            >
+              Basic Plan - $500
+            </div>
+            <div
+              onclick="selectPlan('Popular Plan - $1300')"
+              class="dropdown-item"
+            >
+              Popular Plan - $1300
+            </div>
+            <div
+              onclick="selectPlan('Annual Plan - $7999')"
+              class="dropdown-item"
+            >
+              Annual Plan - $7999
+            </div>
+          </div>
+
+          <input type="hidden" name="plan" id="planInput" required />
+        </div>
+
+        <!-- Trainer -->
+        <div
+          class="sm:col-span-2 flex items-center justify-between bg-black/40 border border-white/10 rounded-lg px-4 py-3"
+        >
+          <span class="text-sm text-gray-300">
+            Personal Trainer Required?
+          </span>
+
+          <div class="flex gap-6">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="trainer"
+                value="Yes"
+                required
+                class="accent-orange-500 w-4 h-4"
+              />
+              <span class="text-white text-sm">Yes</span>
+            </label>
+
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="trainer"
+                value="No"
+                required
+                class="accent-orange-500 w-4 h-4"
+              />
+              <span class="text-white text-sm">No</span>
+            </label>
+          </div>
+        </div>
+
+        <input
+          type="text"
+          name="reference"
+          placeholder="Reference (Optional)"
+          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-white sm:col-span-2"
+        />
+
+        <textarea
+          name="address"
+          rows="3"
+          placeholder="Address"
+          required
+          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-white sm:col-span-2"
+        ></textarea>
+
+        <!-- Agreement -->
+        <div
+          class="sm:col-span-2 flex items-center gap-2 text-sm text-gray-300"
+        >
+          <input type="checkbox" required class="accent-orange-500" />
+          I agree to gym terms and conditions.
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <button
+        type="submit"
+        class="mt-8 w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold py-3 rounded-full transition shadow-[0_0_25px_rgba(249,115,22,0.5)]"
+      >
+        Enroll Now
+      </button>
+    </form>
+  </div>
+</div>
+<script>
+  function toggleDropdown() {
+    document.getElementById("genderDropdown").classList.toggle("hidden");
+  }
+  function selectGender(value) {
+    document.getElementById("selectedGender").innerText = value;
+    document.getElementById("genderInput").value = value;
+    document.getElementById("genderDropdown").classList.add("hidden");
+  }
+  function togglePlanDropdown() {
+    document.getElementById("planDropdown").classList.toggle("hidden");
+  }
+  function selectPlan(value) {
+    document.getElementById("selectedPlan").innerText = value;
+    document.getElementById("planInput").value = value;
+    document.getElementById("planDropdown").classList.add("hidden");
+  }
+</script>
+{% endblock %}

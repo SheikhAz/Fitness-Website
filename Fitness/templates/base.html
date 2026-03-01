@@ -32,6 +32,14 @@
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
       }
+      .input-style {
+        @apply w-full px-4 py-3 rounded-lg bg-black/50 border border-white/20 
+        focus:border-orange-500 focus:outline-none text-white text-sm sm:text-base;
+      }
+      input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1); /* makes icon white */
+        cursor: pointer;
+      }
     </style>
   </head>
   <body class="bg-black text-white font-[Inter]">
@@ -128,6 +136,5 @@
     <script src="{% static 'js/hamburger.js' %}"></script>
     <script src="{% static 'js/RefreshTrigger.js' %}"></script>
     <script src="{% static 'js/messages.js' %}"></script>
-    
   </body>
 </html>
