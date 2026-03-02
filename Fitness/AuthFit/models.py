@@ -12,21 +12,33 @@ class Contact(models.Model):
     def __str__(self):
         return self.name
     
-class Enrollment(models.Model):
+class Trainer(models.Model):
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
         ('O', 'Other'),
     ]
-    MembershipPlan = [
-        ('B' ,'Basic'),
-        ('P' ,'Popular'),
-        ('A' ,'Annual'),
-        ('T' ,'TRIAL'),
-    ]
-    Trainer = [
-        ('Y','Yes'),
-        ('N','No')
+    name = models.CharField(max_length=30)
+    gender = models.CharField(max_length=1,choices=GENDER_CHOICES,default='M')
+    address = models.TextField()
+    phone = models.CharField(max_length=10)
+    salary = models.IntegerField()
+
+    def __str__(self):
+        return self.name
+class MembershipPlan(models.Model):
+    plan = models.CharField(max_length=100)
+    price = models.IntegerField()
+
+    def __str__(self):
+        return self.plan
+    
+
+class Enrollment(models.Model):
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other'),
     ]
     PAYMENT = [
         ("D",'Done'),
@@ -48,8 +60,14 @@ class Enrollment(models.Model):
     gender = models.CharField(max_length=1,choices=GENDER_CHOICES)
     phone = models.CharField(max_length=10)
     dob = models.DateField()
-    plan = models.CharField(max_length=1,choices=MembershipPlan)
-    trainer = models.CharField(max_length=1, choices=Trainer)
+    selectPlan = models.ForeignKey(MembershipPlan, on_delete=models.CASCADE, related_name="enrollments")
+    trainer = models.ForeignKey(
+        Trainer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="enrollments"
+    )
     Reference = models.CharField(max_length=30,null=True,blank=True)
     address = models.TextField()
     paymentStatus = models.CharField(max_length=1,choices=PAYMENT,blank=True,null=True)
@@ -63,17 +81,4 @@ class Enrollment(models.Model):
         return f"{self.fullname}"
 
 
-class Trainer(models.Model):
-    GENDER_CHOICES = [
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('O', 'Other'),
-    ]
-    name = models.CharField(max_length=30)
-    gender = models.CharField(max_length=1,choices=GENDER_CHOICES,default='M')
-    address = models.TextField()
-    phone = models.CharField(max_length=10)
-    salary = models.IntegerField()
 
-    def __str__(self):
-        return self.name

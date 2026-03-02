@@ -102,108 +102,109 @@
       </h2>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 cursor-pointer">
-        <!-- Plan -->
         <div class="relative sm:col-span-2 mt-2">
+          <!-- Button -->
           <button
             type="button"
             onclick="togglePlanDropdown()"
             class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
           >
-            <span id="selectedPlan" class="text-gray-400"
-              >Select Membership Plan</span
-            >
-            <span
-              class="text-orange-500 transition-transform duration-300"
-              id="planArrow"
-              >▼</span
-            >
-          </button>
-
-          <div
-            id="planDropdown"
-            class="hidden absolute mt-3 w-full bg-[#111] border border-orange-500/40 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden z-50 animate-fadeIn"
-          >
-            <div onclick="selectPlan('B')" class="dropdown-item">
-              Basic Plan <span class="float-right text-orange-400">$500</span>
-            </div>
-
-            <div onclick="selectPlan('P')" class="dropdown-item">
-              Popular Plan
-              <span class="float-right text-orange-400">$1300</span>
-            </div>
-
-            <div onclick="selectPlan('A')" class="dropdown-item">
-              Annual Plan <span class="float-right text-orange-400">$7999</span>
-            </div>
-
-            <div onclick="selectPlan('T')" class="dropdown-item">
-              Trial <span class="float-right text-orange-400">2 Days</span>
-            </div>
-          </div>
-
-          <input type="hidden" name="plan" id="planInput" required />
-        </div>
-
-        <!-- Trainer -->
-        <div class="relative w-full sm:col-span-2">
-          <button
-            type="button"
-            onclick="toggleTrainerDropdown()"
-            class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
-          >
-            <span id="selectedTrainer" class="text-gray-400">
-              Personal Trainer Required?
+            <span id="selectedPlan" class="text-gray-400">
+              Select Membership Plan
             </span>
             <span
               class="text-orange-500 transition-transform duration-300"
-              id="trainerArrow"
+              id="planArrow"
             >
               ▼
             </span>
           </button>
 
+          <!-- Dropdown -->
           <div
-            id="trainerDropdown"
+            id="planDropdown"
             class="hidden absolute mt-3 w-full bg-[#111] border border-orange-500/40 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden z-50 animate-fadeIn"
           >
-            <div onclick="selectTrainer('Y')" class="dropdown-item">
-              Yes
-              <span class="float-right text-orange-400">+ Extra Charges</span>
+            {% for p in plans %}
+            <div
+              onclick="selectPlan('{{ p.id }}','{{ p.plan }}','{{ p.price }}')"
+              class="dropdown-item"
+            >
+              {{ p.plan }}
+              <span class="float-right text-orange-400"> ₹{{ p.price }} </span>
             </div>
-
-            <div onclick="selectTrainer('N')" class="dropdown-item">No</div>
+            {% endfor %}
           </div>
 
-          <input type="hidden" name="trainer" id="trainerInput" required />
+          <input type="hidden" name="plan" id="planInput" required />
         </div>
+      </div>
 
-        <input
-          type="text"
-          name="reference"
-          placeholder="Reference (Optional)"
-          class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20 sm:col-span-2"
-        />
-
-        <textarea
-          name="address"
-          rows="3"
-          placeholder="Address"
-          required
-          class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20 sm:col-span-2"
-        ></textarea>
-
-        <!-- Agreement -->
-        <div
-          class="sm:col-span-2 flex items-center gap-2 text-sm text-gray-300"
+      <!-- Trainer -->
+      <div class="relative w-full sm:col-span-2 mt-6">
+        <button
+          type="button"
+          onclick="toggleTrainerDropdown()"
+          class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
         >
-          <input type="checkbox" required class="accent-orange-500" />
-          I agree to gym terms and conditions.
+          <span id="selectedTrainer" class="text-gray-400">
+            Select Personal Trainer
+          </span>
+          <span
+            class="text-orange-500 transition-transform duration-300"
+            id="trainerArrow"
+          >
+            ▼
+          </span>
+        </button>
+
+        <div
+          id="trainerDropdown"
+          class="hidden absolute mt-3 w-full bg-[#111] border border-orange-500/40 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden z-50 animate-fadeIn"
+        >
+          {% for t in trainers %}
+          <div
+            onclick="selectTrainer('{{ t.id }}','{{ t.name }}')"
+            class="dropdown-item"
+          >
+            {{ t.name }}
+          </div>
+          {% endfor %}
         </div>
+
+        <input type="hidden" name="trainer" id="trainerInput" />
+      </div>
+
+      <input
+        type="text"
+        name="reference"
+        placeholder="Reference (Optional)"
+        class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20 sm:col-span-2 mt-5"
+      />
+
+      <textarea
+        name="address"
+        rows="3"
+        placeholder="Address"
+        required
+        class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20 sm:col-span-2 mt-5"
+      ></textarea>
+
+      <!-- Agreement -->
+      <div
+        class="sm:col-span-2 flex items-center gap-2 text-sm text-gray-300 mt-3"
+      >
+        <input type="checkbox" required class="accent-orange-500" />
+        I agree to gym terms and conditions.
       </div>
 
       <!-- SUBMIT -->
       <button
         type="submit"
+        onclick="
+          this.innerText = 'Processing...';
+          this.disabled = true;
+        "
         class="mt-8 w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold py-3 rounded-full transition shadow-[0_0_25px_rgba(249,115,22,0.5)]"
       >
         Enroll Now
@@ -212,6 +213,34 @@
   </div>
 </div>
 <script>
+  /* ---------- CLOSE ALL DROPDOWNS ---------- */
+  function closeAllDropdowns() {
+    document.getElementById("planDropdown")?.classList.add("hidden");
+    document.getElementById("trainerDropdown")?.classList.add("hidden");
+    document.getElementById("genderDropdown")?.classList.add("hidden");
+
+    document.getElementById("planArrow")?.classList.remove("rotate");
+    document.getElementById("trainerArrow")?.classList.remove("rotate");
+    document.getElementById("genderArrow")?.classList.remove("rotate");
+  }
+
+  /* ---------- OUTSIDE CLICK DETECTION ---------- */
+  document.addEventListener("click", function (event) {
+    const clickedInsideDropdown =
+      event.target.closest("#planDropdown") ||
+      event.target.closest("#trainerDropdown") ||
+      event.target.closest("#genderDropdown");
+
+    const clickedButton =
+      event.target.closest("[onclick='togglePlanDropdown()']") ||
+      event.target.closest("[onclick='toggleTrainerDropdown()']") ||
+      event.target.closest("[onclick='toggleDropdown()']");
+
+    if (!clickedInsideDropdown && !clickedButton) {
+      closeAllDropdowns();
+    }
+  });
+  /* ---------- Gender ---------- */
   function toggleDropdown() {
     document.getElementById("genderDropdown").classList.toggle("hidden");
   }
@@ -224,35 +253,46 @@
     document.getElementById("genderDropdown").classList.add("hidden");
   }
 
+  /* ---------- Plan (Dynamic Version) ---------- */
   function togglePlanDropdown() {
-    document.getElementById("planDropdown").classList.toggle("hidden");
+    const dropdown = document.getElementById("planDropdown");
+    const arrow = document.getElementById("planArrow");
+
+    dropdown.classList.toggle("hidden");
+
+    if (arrow) {
+      arrow.classList.toggle("rotate");
+    }
   }
 
-  function selectPlan(value) {
-    const plans = {
-      B: "Basic Plan - $500",
-      P: "Popular Plan - $1300",
-      A: "Annual Plan - $7999",
-      T: "Trial - 2 Days",
-    };
+  function selectPlan(id, name, price) {
+    document.getElementById("selectedPlan").innerText = name + " - ₹" + price;
 
-    document.getElementById("selectedPlan").innerText = plans[value];
-    document.getElementById("planInput").value = value;
+    document.getElementById("planInput").value = id;
+
     document.getElementById("planDropdown").classList.add("hidden");
+
+    const arrow = document.getElementById("planArrow");
+    if (arrow) {
+      arrow.classList.remove("rotate");
+    }
   }
+
+  /* ---------- Trainer ---------- */
   function toggleTrainerDropdown() {
-    document.getElementById("trainerDropdown").classList.toggle("hidden");
+    const dropdown = document.getElementById("trainerDropdown");
+    const arrow = document.getElementById("trainerArrow");
+
+    dropdown.classList.toggle("hidden");
+    arrow.classList.toggle("rotate");
   }
 
-  function selectTrainer(value) {
-    const trainerText = value === "Y" ? "Yes" : "No";
-
-    document.getElementById("selectedTrainer").innerText =
-      "Personal Trainer Required? - " + trainerText;
-
-    document.getElementById("trainerInput").value = value;
+  function selectTrainer(id, name) {
+    document.getElementById("selectedTrainer").innerText = name;
+    document.getElementById("trainerInput").value = id;
 
     document.getElementById("trainerDropdown").classList.add("hidden");
+    document.getElementById("trainerArrow").classList.remove("rotate");
   }
 </script>
 {% endblock %}

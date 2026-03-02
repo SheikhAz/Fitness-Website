@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login as auth_log, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from AuthFit.models import Contact, Enrollment
+from AuthFit.models import Contact, Enrollment ,MembershipPlan ,Trainer
 
 # Create your views here.
 
@@ -48,7 +48,7 @@ def signupPage(request):
             password=password,
         )
         messages.success(request, "Account is created Successfully......")
-        return redirect('/login')
+        return redirect('/')
     return render(request, 'authenication/signup.html')
 
 
@@ -93,6 +93,10 @@ def handlelogout(request):
 
 @login_required
 def enrollment(request):
+    plans = MembershipPlan.objects.all()
+    trainers = Trainer.objects.all()
+
+    # If user already has enrollment
     if Enrollment.objects.filter(user=request.user).exists():
         return redirect('/profile')
 
@@ -102,23 +106,40 @@ def enrollment(request):
         phone = request.POST.get('phone')
         gender = request.POST.get('gender')
         dob = request.POST.get('dob')
-        plan = request.POST.get('plan')
+        plan_id = request.POST.get('plan')
         trainer = request.POST.get('trainer')
+        selected_trainer = None
+        if trainer:
+            selected_trainer = Trainer.objects.get(id=trainer)
         reference = request.POST.get('reference')
         address = request.POST.get('address')
 
-        # Checking that email id is Already in Use by other User
-        if User.objects.filter(email=email).exists():
-            messages.error(
-                request, "An account with this email already exists.")
-            return redirect('/enrollment')
+        selected_plan = MembershipPlan.objects.get(id=plan_id)
 
-        enroll = Enrollment(fullname=name, email=email, phone=phone, dob=dob, plan=plan,trainer=trainer, gender=gender, Reference=reference, address=address, user=request.user,)
+        enroll = Enrollment(
+            fullname=name,
+            email=email,
+            phone=phone,
+            dob=dob,
+            selectPlan=selected_plan,
+            trainer=trainer,
+            gender=gender,
+            Reference=reference,
+            address=address,
+            user=request.user,
+        )
         enroll.save()
+
         messages.success(
-            request, "Welcome aboard! Your gym membership has been successfully activated.")
+            request,
+            "Welcome aboard! Your gym membership has been successfully activated."
+        )
         return redirect('/profile')
-    return render(request, 'enrollment.html')
+
+    return render(request, 'enrollment.html', {
+        "plans": plans,
+        "trainers": trainers
+    })
 
 
 def workout(request):
