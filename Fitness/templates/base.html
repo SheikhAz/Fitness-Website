@@ -40,6 +40,38 @@
         filter: invert(1); /* makes icon white */
         cursor: pointer;
       }
+      .dropdown-item {
+        padding: 14px 18px;
+        cursor: pointer;
+        color: #e5e7eb;
+        font-weight: 500;
+        transition: all 0.25s ease;
+      }
+
+      .dropdown-item:hover {
+        background: linear-gradient(
+          to right,
+          rgba(255, 115, 0, 0.15),
+          transparent
+        );
+        padding-left: 24px;
+        color: #ff7300;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 0.2s ease-in-out;
+      }
     </style>
   </head>
   <body class="bg-black text-white font-[Inter]">

@@ -24,7 +24,7 @@
   {% endfor %}
 </div>
 {% endif %} {% endblock %} {% block body %}
-<div class=" hero-animate flex justify-center px-4 sm:px-6 lg:px-8 py-6">
+<div class="hero-animate flex justify-center px-4 sm:px-6 lg:px-8 py-6">
   <div class="w-full max-w-3xl">
     <form
       method="POST"
@@ -43,7 +43,7 @@
           name="name"
           placeholder="Full Name"
           required
-          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-white sm:col-span-2"
+          class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20 sm:col-span-2"
         />
 
         <input
@@ -51,7 +51,7 @@
           name="email"
           placeholder="Email Address"
           required
-          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-white"
+          class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
         />
 
         <input
@@ -59,34 +59,41 @@
           name="phone"
           placeholder="Phone Number"
           required
-          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-gray-500"
+          class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
         />
 
         <!-- Gender -->
-        <div class="relative">
+        <div class="relative w-full">
           <button
             type="button"
             onclick="toggleDropdown()"
-            class="input-field flex justify-between items-center pt-3 px-1 text-gray-500"
+            class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
           >
-            <span id="selectedGender">Select Gender</span>
-            <span class="text-lg text-white">▼</span>
+            <span id="selectedGender" class="text-gray-400">Select Gender</span>
+            <span
+              class="text-orange-500 transition-transform duration-300"
+              id="genderArrow"
+              >▼</span
+            >
           </button>
 
           <div
             id="genderDropdown"
-            class="hidden absolute mt-2 w-full bg-black/95 border border-orange-500/40 rounded-lg shadow-xl z-50 overflow-hidden"
+            class="hidden absolute mt-3 w-full bg-[#111] border border-orange-500/40 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden z-50 animate-fadeIn"
           >
-            <div onclick="selectGender('Male')" class="dropdown-item">Male</div>
-            <div onclick="selectGender('Female')" class="dropdown-item">
-              Female
-            </div>
+            <div onclick="selectGender('M')" class="dropdown-item">Male</div>
+            <div onclick="selectGender('F')" class="dropdown-item">Female</div>
           </div>
 
           <input type="hidden" name="gender" id="genderInput" required />
         </div>
 
-        <input type="date" name="dob" required class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-gray-500" />
+        <input
+          type="date"
+          name="dob"
+          required
+          class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
+        />
       </div>
 
       <!-- MEMBERSHIP SECTION -->
@@ -96,37 +103,41 @@
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 cursor-pointer">
         <!-- Plan -->
-        <div class="relative sm:col-span-2">
+        <div class="relative sm:col-span-2 mt-2">
           <button
             type="button"
             onclick="togglePlanDropdown()"
-            class="input-field flex justify-between items-center"
+            class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
           >
-            <span id="selectedPlan">Select Membership Plan</span>
-            <span class="text-sm">▼</span>
+            <span id="selectedPlan" class="text-gray-400"
+              >Select Membership Plan</span
+            >
+            <span
+              class="text-orange-500 transition-transform duration-300"
+              id="planArrow"
+              >▼</span
+            >
           </button>
 
           <div
             id="planDropdown"
-            class="hidden absolute mt-2 w-full bg-black/95 border border-orange-500/40 rounded-lg shadow-xl z-50 overflow-hidden"
+            class="hidden absolute mt-3 w-full bg-[#111] border border-orange-500/40 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden z-50 animate-fadeIn"
           >
-            <div
-              onclick="selectPlan('Basic Plan - $500')"
-              class="dropdown-item"
-            >
-              Basic Plan - $500
+            <div onclick="selectPlan('B')" class="dropdown-item">
+              Basic Plan <span class="float-right text-orange-400">$500</span>
             </div>
-            <div
-              onclick="selectPlan('Popular Plan - $1300')"
-              class="dropdown-item"
-            >
-              Popular Plan - $1300
+
+            <div onclick="selectPlan('P')" class="dropdown-item">
+              Popular Plan
+              <span class="float-right text-orange-400">$1300</span>
             </div>
-            <div
-              onclick="selectPlan('Annual Plan - $7999')"
-              class="dropdown-item"
-            >
-              Annual Plan - $7999
+
+            <div onclick="selectPlan('A')" class="dropdown-item">
+              Annual Plan <span class="float-right text-orange-400">$7999</span>
+            </div>
+
+            <div onclick="selectPlan('T')" class="dropdown-item">
+              Trial <span class="float-right text-orange-400">2 Days</span>
             </div>
           </div>
 
@@ -134,43 +145,43 @@
         </div>
 
         <!-- Trainer -->
-        <div
-          class="sm:col-span-2 flex items-center justify-between bg-black/40 border border-white/10 rounded-lg px-4 py-3"
-        >
-          <span class="text-sm text-gray-300">
-            Personal Trainer Required?
-          </span>
+        <div class="relative w-full sm:col-span-2">
+          <button
+            type="button"
+            onclick="toggleTrainerDropdown()"
+            class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
+          >
+            <span id="selectedTrainer" class="text-gray-400">
+              Personal Trainer Required?
+            </span>
+            <span
+              class="text-orange-500 transition-transform duration-300"
+              id="trainerArrow"
+            >
+              ▼
+            </span>
+          </button>
 
-          <div class="flex gap-6">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="trainer"
-                value="Yes"
-                required
-                class="accent-orange-500 w-4 h-4"
-              />
-              <span class="text-white text-sm">Yes</span>
-            </label>
+          <div
+            id="trainerDropdown"
+            class="hidden absolute mt-3 w-full bg-[#111] border border-orange-500/40 rounded-xl shadow-2xl backdrop-blur-md overflow-hidden z-50 animate-fadeIn"
+          >
+            <div onclick="selectTrainer('Y')" class="dropdown-item">
+              Yes
+              <span class="float-right text-orange-400">+ Extra Charges</span>
+            </div>
 
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="trainer"
-                value="No"
-                required
-                class="accent-orange-500 w-4 h-4"
-              />
-              <span class="text-white text-sm">No</span>
-            </label>
+            <div onclick="selectTrainer('N')" class="dropdown-item">No</div>
           </div>
+
+          <input type="hidden" name="trainer" id="trainerInput" required />
         </div>
 
         <input
           type="text"
           name="reference"
           placeholder="Reference (Optional)"
-          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-white sm:col-span-2"
+          class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20 sm:col-span-2"
         />
 
         <textarea
@@ -178,7 +189,7 @@
           rows="3"
           placeholder="Address"
           required
-          class="w-full px-4 py-3 rounded-lg bg-black/40 border border-white/20 focus:border-orange-500 focus:outline-none text-white sm:col-span-2"
+          class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20 sm:col-span-2"
         ></textarea>
 
         <!-- Agreement -->
@@ -204,18 +215,44 @@
   function toggleDropdown() {
     document.getElementById("genderDropdown").classList.toggle("hidden");
   }
+
   function selectGender(value) {
-    document.getElementById("selectedGender").innerText = value;
+    document.getElementById("selectedGender").innerText =
+      value === "M" ? "Male" : value === "F" ? "Female" : "Other";
+
     document.getElementById("genderInput").value = value;
     document.getElementById("genderDropdown").classList.add("hidden");
   }
+
   function togglePlanDropdown() {
     document.getElementById("planDropdown").classList.toggle("hidden");
   }
+
   function selectPlan(value) {
-    document.getElementById("selectedPlan").innerText = value;
+    const plans = {
+      B: "Basic Plan - $500",
+      P: "Popular Plan - $1300",
+      A: "Annual Plan - $7999",
+      T: "Trial - 2 Days",
+    };
+
+    document.getElementById("selectedPlan").innerText = plans[value];
     document.getElementById("planInput").value = value;
     document.getElementById("planDropdown").classList.add("hidden");
+  }
+  function toggleTrainerDropdown() {
+    document.getElementById("trainerDropdown").classList.toggle("hidden");
+  }
+
+  function selectTrainer(value) {
+    const trainerText = value === "Y" ? "Yes" : "No";
+
+    document.getElementById("selectedTrainer").innerText =
+      "Personal Trainer Required? - " + trainerText;
+
+    document.getElementById("trainerInput").value = value;
+
+    document.getElementById("trainerDropdown").classList.add("hidden");
   }
 </script>
 {% endblock %}
