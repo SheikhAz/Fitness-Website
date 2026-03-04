@@ -56,9 +56,11 @@
 
         <input
           type="tel"
+          value="{{user.username}}"
           name="phone"
           placeholder="Phone Number"
           required
+          readonly
           class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20"
         />
 
@@ -178,7 +180,7 @@
       <input
         type="text"
         name="reference"
-        placeholder="Reference (Optional)"
+        placeholder="Refered By (Optional)"
         class="w-full bg-black/60 border border-orange-500/40 text-white rounded-xl px-4 py-3 flex justify-between items-center transition-all duration-300 hover:border-orange-500 hover:shadow-lg hover:shadow-orange-500/20 sm:col-span-2 mt-5"
       />
 
@@ -201,10 +203,7 @@
       <!-- SUBMIT -->
       <button
         type="submit"
-        onclick="
-          this.innerText = 'Processing...';
-          this.disabled = true;
-        "
+        id="enrollBtn"
         class="mt-8 w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold py-3 rounded-full transition shadow-[0_0_25px_rgba(249,115,22,0.5)]"
       >
         Enroll Now
@@ -294,5 +293,14 @@
     document.getElementById("trainerDropdown").classList.add("hidden");
     document.getElementById("trainerArrow").classList.remove("rotate");
   }
+  const form = document.querySelector("form");
+  const button = document.getElementById("enrollBtn");
+
+  form.addEventListener("submit", function (e) {
+    if (form.checkValidity()) {
+      button.innerText = "Processing...";
+      button.disabled = true;
+    }
+  });
 </script>
 {% endblock %}

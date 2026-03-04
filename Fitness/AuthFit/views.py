@@ -3,7 +3,8 @@ from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login as auth_log, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from AuthFit.models import Contact, Enrollment ,MembershipPlan ,Trainer
+from AuthFit.models import Contact, Enrollment ,MembershipPlan ,Trainer ,Gallery
+
 
 # Create your views here.
 
@@ -48,7 +49,7 @@ def signupPage(request):
             password=password,
         )
         messages.success(request, "Account is created Successfully......")
-        return redirect('/')
+        return redirect('/login')
     return render(request, 'authenication/signup.html')
 
 
@@ -122,7 +123,7 @@ def enrollment(request):
             phone=phone,
             dob=dob,
             selectPlan=selected_plan,
-            trainer=trainer,
+            trainer=selected_trainer,
             gender=gender,
             Reference=reference,
             address=address,
@@ -134,6 +135,7 @@ def enrollment(request):
             request,
             "Welcome aboard! Your gym membership has been successfully activated."
         )
+        print("GENDER:", request.POST.get('gender'))
         return redirect('/profile')
 
     return render(request, 'enrollment.html', {
@@ -148,4 +150,15 @@ def workout(request):
 
 @login_required
 def Profile(request):
-    return render(request, 'profile.html')
+    enrollment = Enrollment.objects.filter(user=request.user).first()
+
+    return render(request, 'profile.html', {
+        'enrollment': enrollment
+    })
+
+
+def gallery(request):
+    posts = Gallery.objects.all().order_by("-timestamp")
+    return render(request, "gallery.html", {
+        "posts": posts
+    })

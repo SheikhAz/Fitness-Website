@@ -1,7 +1,5 @@
-{% extends "base.html" %}
-{% block title %}Profile{% endblock %}
-
-{% block content %}User Profile{% endblock %}
+{% extends "base.html" %} {% load static %} {% block title %}Profile 
+{% endblock %} 
 {% block extra %} {% if messages %}
 <div
   id="message-container"
@@ -22,3 +20,104 @@
   {% endfor %}
 </div>
 {% endif %} {% endblock %}
+{% block content %}{% if enrollment.is_expired %}
+<div
+  class="mb-6 p-4 rounded-xl text-red-800 text-center font-semibold"
+>⚠ Membership Expired
+</div>
+{% endif %}{% endblock %}
+{% block body %} 
+<div class="min-h-screen hero-animate -mt-24 sm:-mt-28 lg:-mt-20">
+  <div class="max-w-6xl mx-auto lg:py-24 py-8">
+    <!-- Main Layout -->
+    <div class="flex flex-col md:flex-row md:items-center gap-8">
+      <!-- ================= LEFT SIDE ================= -->
+      <div class="relative z-10 text-center">
+        <!-- Static Profile Image -->
+        <div class="relative w-32 h-32 mx-auto">
+          <img
+            src="{% static 'images/profile.jpg' %}"
+            class="w-32 h-32 rounded-full object-cover border-4 border-orange-500/10 shadow-2xl"
+          />
+        </div>
+        <!-- Name -->
+        {% if enrollment %}
+        <h2 class="mt-6 text-3xl font-semibold text-orange-500">
+          {{ enrollment.fullname }}
+        </h2>
+        <h2 class=" text-xl font-semibold text-green-500">
+          {{ enrollment.unique_id }}
+        </h2>
+        {% endif %}
+        <p class="text-gray-300 text-sm mt-2">Welcome to your profile</p>
+      </div>
+
+      <!-- ================= RIGHT SIDE ================= -->
+      <div class="md:w-2/3 w-full">
+        <div
+          class="bg-black/75 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-2xl p-10"
+        >
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-16">
+            <!-- ROW 1 -->
+            <div class = "border-b border-white/10">
+              <p class="text-gray-400 text-sm ">Phone Number</p>
+              <p class="text-lg font-medium mt-1 text-orange-500">
+                {{ enrollment.phone|default:"Not Provided" }}
+              </p>
+            </div>
+
+            <div class = "border-b border-white/10">
+              <p class="text-gray-400 text-sm">Email Address</p>
+              <p class="text-lg font-medium mt-1 text-orange-500">
+                {{ enrollment.email|default:user.email }}
+              </p>
+            </div>
+            <!-- ROW 2 -->
+            <div class = "border-b border-white/10">
+              <p class="text-gray-400 text-sm">Membership Plan</p>
+              <p class="text-lg font-medium mt-1 text-orange-500">
+                {{ enrollment.selectPlan|default:"Not Provided" }}
+              </p>
+            </div>
+
+            <div class = "border-b border-white/10">
+              <p class="text-gray-400 text-sm">Payment Status</p>
+              <p class="text-lg font-medium mt-1 text-green-400">
+                {{ enrollment.paymentStatus|default:"Not Provided"}}
+              </p>
+            </div>
+
+            <!-- ROW 3 -->
+            <div class = "border-b border-white/10">
+              <p class="text-gray-400 text-sm">Date of Joining</p>
+              <p class="text-lg font-medium mt-1 text-orange-500">
+                {{ enrollment.doj|date:"F d, Y"|default:"Not Provided" }}
+              </p>
+            </div>
+
+            <div class = "border-b border-white/10">
+              <p class="text-gray-400 text-sm">Membership Status</p>
+
+              {% if enrollment.is_expired %}
+              <p class="text-lg font-medium mt-1 text-red-400">Expired</p>
+              {% else %}
+              <p class="text-lg font-medium mt-1 text-green-400">
+                Active ({{ enrollment.days_remaining }} days left)
+              </p>
+              {% endif %}
+            </div>
+
+            <!-- ROW 4 -->
+            <div>
+              <p class="text-gray-400 text-sm">Trainer</p>
+              <p class="text-lg font-medium mt-1 text-orange-500">
+                {{ enrollment.trainer|default:"Not Provided" }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
