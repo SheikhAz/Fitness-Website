@@ -1,10 +1,10 @@
-from datetime import date
+from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login as auth_log, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Gallery
+from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Gallery ,Attendence
 
 
 # Create your views here.
@@ -166,4 +166,21 @@ def gallery(request):
 
 
 def attendence(request):
-    return render(request, 'attendence.html')
+
+    today = timezone.now().date()
+
+    already_mark = Attendence.objects.filter(
+        user=request.user,
+        date=today
+    ).exists()
+
+    if request.method == "POST" and not already_mark:
+        Attendence.objects.create(
+            user=request.user,
+            date=today
+        )
+        return redirect('/profile')
+
+    return render(request, 'attendence.html', {
+        'already_mark': already_mark
+    })

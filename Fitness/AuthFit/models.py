@@ -127,3 +127,14 @@ class Gallery(models.Model):
     def __str__(self):
         return self.title
     
+
+class Attendence(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(default=timezone.localdate)
+    timestamp = models.TimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user','date')
+
+    def __str__(self):
+        return f"{self.user.enrollment.unique_id} - {self.user.enrollment.fullname} - {self.date}"
