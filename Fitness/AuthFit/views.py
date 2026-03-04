@@ -1,3 +1,5 @@
+from .models import Attendence
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import redirect, render
@@ -136,7 +138,6 @@ def enrollment(request):
             request,
             "Welcome aboard! Your gym membership has been successfully activated."
         )
-        print("GENDER:", request.POST.get('gender'))
         return redirect('/profile')
 
     return render(request, 'enrollment.html', {
@@ -167,19 +168,26 @@ def gallery(request):
 
 def attendence(request):
 
-    today = timezone.now().date()
+    today = timezone.localdate()
+    user = request.user
 
     already_mark = Attendence.objects.filter(
-        user=request.user,
+        user=user,
         date=today
     ).exists()
 
-    if request.method == "POST" and not already_mark:
-        Attendence.objects.create(
-            user=request.user,
+    if request.method == "POST":
+        obj, created = Attendence.objects.get_or_create(
+            user=user,
             date=today
         )
-        return redirect('/profile')
+
+        if created:
+            messages.success(request, "Attendance Successfully Marked.")
+        else:
+            messages.error(request, "Attendance already marked today.")
+
+        return redirect('/attendence')
 
     return render(request, 'attendence.html', {
         'already_mark': already_mark

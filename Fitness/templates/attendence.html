@@ -1,16 +1,43 @@
 {% extends "base.html" %} {% block title %}Attendence{% endblock %} 
 {% block content %} Attendence {% endblock %} {% block body %}
+{% block extra %}
+{% if messages %}
+<div
+  id="message-container"
+  class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] space-y-3 w-full max-w-md px-4"
+>
+  {% for message in messages %}
+  <div
+    class="flash-message flex items-center justify-between px-5 py-3 rounded-xl text-sm font-medium text-white shadow-2xl backdrop-blur-md {% if message.tags == 'success' %} bg-gradient-to-r from-green-500 to-emerald-600 {% elif message.tags == 'error' %} bg-gradient-to-r from-red-500 to-red-700 {% else %} bg-gray-800 {% endif %}"
+  >
+    <span>{{ message }}</span>
+    <button
+      onclick="this.parentElement.remove()"
+      class="ml-4 text-lg font-bold hover:scale-110 transition"
+    >
+      ×
+    </button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
 <div class="hero-animate max-w-4xl mx-auto px-6 py-10 relative z-20">
   <div class="backdrop-blur-md p-8 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
     <form method="POST">
-      {% csrf_token %}
-      <button
-        type="submit"
-        class="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold py-3 rounded-full transition duration-300 shadow-[0_0_25px_rgba(249,115,22,0.5)]"
-      >
-        Mark Attendance
-      </button>
-    </form>
+  {% csrf_token %}
+  <button
+    type="submit"
+    {% if already_mark %}disabled{% endif %}
+    class="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold py-3 rounded-full transition duration-300 shadow-[0_0_25px_rgba(249,115,22,0.5)]"
+  >
+    {% if already_mark %}
+      Attendance Already Marked
+    {% else %}
+      Mark Attendance
+    {% endif %}
+  </button>
+</form>
   </div>
 </div>
 {% endblock %}
