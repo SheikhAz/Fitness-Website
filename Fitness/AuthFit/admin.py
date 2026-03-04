@@ -14,4 +14,3 @@ class EnrollmentAdmin(admin.ModelAdmin):
                     "selectPlan", "paymentStatus", "days_remaining")
     search_fields = ("unique_id", "fullname", "phone", "email")
     list_filter = ("paymentStatus", "selectPlan", "trainer", "gender")
-    ordering = ("-id",)

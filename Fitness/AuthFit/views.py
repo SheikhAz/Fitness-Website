@@ -1,9 +1,10 @@
+from datetime import date
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login as auth_log, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from AuthFit.models import Contact, Enrollment ,MembershipPlan ,Trainer ,Gallery
+from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Gallery
 
 
 # Create your views here.
@@ -162,3 +163,7 @@ def gallery(request):
     return render(request, "gallery.html", {
         "posts": posts
     })
+
+
+def attendence(request):
+    return render(request, 'attendence.html')

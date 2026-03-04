@@ -1,0 +1,16 @@
+{% extends "base.html" %} {% block title %}Attendence{% endblock %} 
+{% block content %} Attendence {% endblock %} {% block body %}
+<div class="hero-animate max-w-4xl mx-auto px-6 py-10 relative z-20">
+  <div class="backdrop-blur-md p-8 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
+    <form method="POST">
+      {% csrf_token %}
+      <button
+        type="submit"
+        class="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold py-3 rounded-full transition duration-300 shadow-[0_0_25px_rgba(249,115,22,0.5)]"
+      >
+        Mark Attendance
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
