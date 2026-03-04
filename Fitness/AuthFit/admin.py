@@ -19,11 +19,6 @@ class AttendenceAdmin(admin.ModelAdmin):
                      'user__enrollment__unique_id')
     list_filter = ('date',)
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        today = timezone.localdate()
-        return qs.filter(date=today)
-
     def member_id(self, obj):
         return obj.user.enrollment.unique_id
     member_id.short_description = "MEMBER ID"

@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login as auth_log, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Gallery ,Attendence
+import calendar
 
 
 # Create your views here.
@@ -189,6 +190,15 @@ def attendence(request):
 
         return redirect('/attendence')
 
+    attendence = Attendence.objects.filter(user = user).order_by('-date')
+    attended= Attendence.objects.filter(user = user).order_by('-date')[:7]
+
+    total_days = attendence.count()
+    monthly_days = calendar.monthrange(today.year ,today.month)[1]
+
     return render(request, 'attendence.html', {
-        'already_mark': already_mark
+        'already_mark': already_mark,
+        'attended':attended,
+        'total_days':total_days,
+        'monthly_days':monthly_days,
     })

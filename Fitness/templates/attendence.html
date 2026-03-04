@@ -1,7 +1,5 @@
-{% extends "base.html" %} {% block title %}Attendence{% endblock %} 
-{% block content %} Attendence {% endblock %} {% block body %}
-{% block extra %}
-{% if messages %}
+{% extends "base.html" %} {% block title %}Attendance{% endblock %} 
+{% block body %} {% block extra %} {% if messages %}
 <div
   id="message-container"
   class="fixed top-5 left-1/2 -translate-x-1/2 z-[9999] space-y-3 w-full max-w-md px-4"
@@ -20,24 +18,75 @@
   </div>
   {% endfor %}
 </div>
-{% endif %}
-{% endblock %}
-<div class="hero-animate max-w-4xl mx-auto px-6 py-10 relative z-20">
+{% endif %} {% endblock %}
+<div
+  class="hero-animate min-h-screen max-w-4xl mx-auto relative z-20 -mt-20 sm:-mt-28 lg:-mt-14"
+>
   <div class="backdrop-blur-md p-8 shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
     <form method="POST">
-  {% csrf_token %}
-  <button
-    type="submit"
-    {% if already_mark %}disabled{% endif %}
-    class="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold py-3 rounded-full transition duration-300 shadow-[0_0_25px_rgba(249,115,22,0.5)]"
-  >
-    {% if already_mark %}
-      Attendance Already Marked
-    {% else %}
-      Mark Attendance
-    {% endif %}
-  </button>
-</form>
+      {% csrf_token %}
+      <button
+        type="submit"
+        {%
+        if
+        already_mark
+        %}disabled{%
+        endif
+        %}
+        class="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold py-3 rounded-full transition duration-300 shadow-[0_0_25px_rgba(249,115,22,0.5)]"
+      >
+        {% if already_mark %} Attendance Already Marked {% else %} Mark
+        Attendance {% endif %}
+      </button>
+    </form>
+    <h2 class="text-xl font-semibold text-orange-500 mb-4 text-center pt-8">
+        Attendance Card
+    </h2>
+  </div>
+  
+  <div class="grid grid-cols-2 gap-4 mb-6">
+
+        <div class="bg-red-700/20 p-4 rounded-xl text-center">
+            <p class="text-white">Total Days</p>
+            <h2 class="text-2xl font-bold text-green-500">
+                {{ total_days }}
+            </h2>
+        </div>
+
+        <div class="bg-red-700/20 p-4 rounded-xl text-center">
+            <p class="text-white">This Month</p>
+            <h2 class="text-2xl font-bold text-red-600">
+                {{ monthly_days }}
+            </h2>
+        </div>
+    </div>
+
+    
+  <div class="mt-8">
+    <h2 class="text-xl font-semibold text-orange-500 mb-4 text-center">
+      Attendance Timeline
+    </h2>
+
+    <div class="space-y-3 flex flex-col items-center">
+      {% for a in attended %}
+      <div
+        class="w-full max-w-60 flex justify-center items-center bg-black/50 backdrop-blur-md border border-orange-400/20 px-5 py-3 rounded-xl shadow-lg"
+      >
+        <div>
+          <p class="text-white font-medium">
+            {{ a.date }}
+            <span class="text-pink-600 text-sm"> {{ a.timestamp }} </span>
+          </p>
+        </div>
+      </div>
+      {% empty %}
+
+      <div class="text-center text-gray-400 py-6">
+        No attendance history yet
+      </div>
+
+      {% endfor %}
+    </div>
   </div>
 </div>
 {% endblock %}
