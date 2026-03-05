@@ -2,7 +2,7 @@
    "version" : 2,
    "builds" : [
         {
-            "src" : "Fitness/wsgi.py",
+            "src" : "Fitness/Fitness/wsgi.py",
             "use": "@vercel/python",
             "config" : {"maxLambdaSize":"15mb" , "runtime":"python3.13"}
         },
@@ -21,7 +21,7 @@
     },
     {
         "src":"/(.*)",
-        "dest":"Fitness/wsgi.py"
+        "dest":"Fitness/Fitness/wsgi.py"
     }
    ]
 }
