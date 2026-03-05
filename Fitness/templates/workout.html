@@ -1,3 +1,219 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}Workout{% endblock %}
 {% block content %}Workouts{% endblock %}
+
+{% block body %}
+
+<div class="hero-animate bg-black max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+
+<!-- CATEGORY BUTTONS -->
+<div class="flex flex-wrap justify-center gap-4 mb-10">
+    <a href="#back" class="border border-white px-5 py-2 rounded hover:bg-orange-500 hover:border-orange-500 transition">
+        Back 
+    </a>
+
+    <a href="#chest" class="border border-white px-5 py-2 rounded hover:bg-orange-500 hover:border-orange-500 transition">
+        Chest
+    </a>
+
+    <a href="#leg" class="border border-white px-5 py-2 rounded hover:bg-orange-500 hover:border-orange-500 transition">
+        Leg
+    </a>
+
+    <a href="#biceps" class="border border-white px-5 py-2 rounded hover:bg-orange-500 hover:border-orange-500 transition">
+        Biceps
+    </a>
+
+    <a href="#triceps" class="border border-white px-5 py-2 rounded hover:bg-orange-500 hover:border-orange-500 transition">
+        Triceps
+    </a>
+    <a href="#shoulder" class="border border-white px-5 py-2 rounded hover:bg-orange-500 hover:border-orange-500 transition">
+        Shoulder
+    </a>
+    <a href="#forearms" class="border border-white px-5 py-2 rounded hover:bg-orange-500 hover:border-orange-500 transition">
+        Forearms
+    </a>
+</div>
+
+
+<!-- BACK WORKOUT -->
+<section id="back">
+    <h2  class="text-2xl font-bold text-orange-500 mb-6 text-center">
+        Back Workout
+    </h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/back_1.mp4' %}" type="video/mp4">
+        </video>
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/back_2.mp4' %}" type="video/mp4">
+        </video>
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/back_3.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/back_4.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/back_5.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/back_6.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/back_7.mp4' %}" type="video/mp4">
+        </video>
+
+    </div>
+</section>
+
+
+<!-- BICEPS WORKOUT -->
+<section id = "biceps">
+    <h2 class="text-2xl font-bold text-orange-500 mb-6 text-center">
+        Biceps Workout
+    </h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/biceps_1.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/biceps_3.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/biceps_4.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/biceps_5.mp4' %}" type="video/mp4">
+        </video>
+
+    </div>
+</section>
+
+
+<!-- CHEST WORKOUT -->
+<section id="chest">
+    <h2 class="text-2xl font-bold text-orange-500 mb-6 text-center">
+        Chest Workout
+    </h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/chest_1.mp4' %}" type="video/mp4">
+        </video>
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/chest_2.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/chest_3.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/chest_4.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/chest_5.mp4' %}" type="video/mp4">
+        </video>
+
+    </div>
+</section>
+
+
+<!-- LEG WORKOUT -->
+<section id="leg">
+    <h2 class="text-2xl font-bold text-orange-500 mb-6 text-center">
+        Leg Workout
+    </h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/leg_1.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/leg_2.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/legs_3.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/legs_4.mp4' %}" type="video/mp4">
+        </video>
+
+    </div>
+</section>
+
+
+<!-- FOREARM WORKOUT -->
+<section id="forearms">
+    <h2 class="text-2xl font-bold text-orange-500 mb-6 text-center">
+        Forearm Workout
+    </h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/forearm.mp4' %}" type="video/mp4">
+        </video>
+
+    </div>
+</section>
+<!-- SHOULDER WORKOUT -->
+<section id="shoulder">
+    <h2 class="text-2xl font-bold text-orange-500 mb-6 text-center">
+        Shoulder Workout
+    </h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/shoulder_1.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/shoulder_2.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/shoulder_3.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/shoulder_4.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/shoulder_5.mp4' %}" type="video/mp4">
+        </video>
+    </div>
+</section>
+<!-- TRICEPS WORKOUT -->
+<section id="triceps">
+    <h2 class="text-2xl font-bold text-orange-500 mb-6 text-center">
+        Triceps Workout
+    </h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/triceps_1.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/triceps_2.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/triceps_3.mp4' %}" type="video/mp4">
+        </video>
+        <video controls controlsList="nodownload nofullscreen noremoteplayback " muted preload="metadata" class="rounded-lg w-full">
+            <source src="{% static 'workout/triceps_4.mp4' %}" type="video/mp4">
+        </video>
+    </div>
+</section>
+</div>
+
+{% endblock %}

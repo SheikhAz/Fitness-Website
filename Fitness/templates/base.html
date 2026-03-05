@@ -74,6 +74,44 @@
       .rotate {
         transform: rotate(180deg);
       }
+
+      /* Dark overlay for workout page background */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65); /* darkness level */
+        z-index: -1;
+      }
+
+      /* keep background fixed so it doesn't zoom visually */
+      body {
+        background-attachment: fixed !important;
+        background-position: center !important;
+        background-size: cover !important;
+      }
+      video::-webkit-media-controls-timeline {
+        display: none;
+      }
+
+      video::-webkit-media-controls-current-time-display {
+        display: none;
+      }
+
+      video::-webkit-media-controls-time-remaining-display {
+        display: none;
+      }
+
+      video::-webkit-media-controls-volume-slider {
+        display: none;
+      }
+
+      video::-webkit-media-controls-mute-button {
+        display: none;
+      }
+      video::-webkit-media-controls-muted-button {
+        display: none;
+      }
     </style>
   </head>
   <body class="bg-black text-white font-[Inter]">
