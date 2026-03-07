@@ -137,4 +137,6 @@ class Attendence(models.Model):
         unique_together = ('user','date')
 
     def __str__(self):
-        return f"{self.user.enrollment.unique_id} - {self.user.enrollment.fullname} - {self.date}"
+        if hasattr(self.user, "enrollment"):
+            return f"{self.user.enrollment.unique_id}"
+        return f"{self.user.username} - {self.date}"

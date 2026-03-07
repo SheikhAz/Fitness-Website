@@ -192,6 +192,8 @@ def attendence(request):
 
     attendence = Attendence.objects.filter(user = user).order_by('-date')
     attended= Attendence.objects.filter(user = user).order_by('-date')[:7]
+    
+    
 
     total_days = attendence.count()
     monthly_days = calendar.monthrange(today.year ,today.month)[1]
@@ -201,4 +203,5 @@ def attendence(request):
         'attended':attended,
         'total_days':total_days,
         'monthly_days':monthly_days,
+        'today':today
     })

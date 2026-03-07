@@ -10,7 +10,6 @@ admin.site.register(Trainer)
 admin.site.register(MembershipPlan)
 admin.site.register(Gallery)
 
-
 @admin.register(Attendence)
 class AttendenceAdmin(admin.ModelAdmin):
 

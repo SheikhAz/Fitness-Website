@@ -161,8 +161,7 @@
           <!-- RIGHT SIDE (Mobile CTA + Hamburger) -->
           <div class="flex items-center gap-3">
             <!-- Mobile SignIn/Login -->
-            {% if request.user.is_authenticated %}
-            {% if enrolled %}
+            {% if request.user.is_authenticated %} {% if enrolled %}
             <a
               href="/attendence"
               class="md:hidden bg-orange-500 text-black px-4 py-2 rounded-full font-semibold text-xs hover:bg-orange-600 transition shadow-[0_0_20px_rgba(249,115,22,0.5)]"
@@ -234,7 +233,7 @@
         class="relative z-20 flex flex-col justify-center items-center min-h-screen text-center px-4 sm:px-6 lg:px-20 pt-28 sm:pt-32 lg:pt-40 opacity-0"
       >
         <h1
-          class="text-3xl sm:text-5xl lg:text-7xl font-extrabold leading-tight mb-6 max-w-5xl"
+          class="text-3xl sm:text-5xl lg:text-7xl font-serif font-extrabold leading-tight mb-6 max-w-5xl"
         >
           Crush your health and <br class="hidden sm:block" />
           fitness goals in no time
@@ -264,31 +263,65 @@
         {% endif %}
 
         <!-- Reviews -->
-        <div
-          class="flex items-center justify-center gap-2 sm:gap-4 mt-8 sm:mt-12 text-xs sm:text-base"
-        >
-          <div class="tracking-widest">★★★★★</div>
-          <div
-            class="bg-white text-black w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center rounded-full font-semibold"
-          >
-            83
+        <div class="flex justify-center mt-8 sm:mt-12 px-4 overflow-hidden">
+          <div id="review-slider" class="relative w-full max-w-2xl">
+            <div
+              id="reviews"
+              class="flex transition-transform duration-700 ease-in-out"
+            >
+              <!-- Review 1 -->
+              <blockquote
+                class="min-w-full flex flex-col items-center text-center p-4"
+              >
+                <p
+                  class="font-medium font-serif text-sm sm:text-base md:text-lg lg:text-lg"
+                >
+                  "Good gym and equipment are sufficient for almost hitting every body parts, less costly compared to other gyms in area"
+                </p>
+
+                <footer class="mt-2 md:mt-3">
+                  <p class="font-semibold text-sm sm:text-base text-orange-500">
+                    Sajid Sheikh
+                  </p>
+                </footer>
+              </blockquote>
+
+              <!-- Review 2 -->
+              <blockquote
+                class="min-w-full flex flex-col items-center text-center p-4"
+              >
+                <p
+                  class="font-medium font-serif text-sm sm:text-base md:text-lg lg:text-lg"
+                >
+                  "Super gym well maintained equipments well behaved trainer best place to transform must take a try too get better you"
+                </p>
+
+                <footer class="mt-2 md:mt-3">
+                  <p class="font-semibold text-sm sm:text-base text-orange-500">
+                    Arbaj Khan
+                  </p>
+                </footer>
+              </blockquote>
+
+              <!-- Review 3 -->
+              <blockquote
+                class="min-w-full flex flex-col items-center text-center p-4"
+              >
+                <p
+                  class="font-medium font-serif text-sm sm:text-base md:text-lg lg:text-lg"
+                >
+                  "Fast service and excellent support. The process was very
+                  smooth and I will definitely use it again."
+                </p>
+
+                <footer class="mt-2 md:mt-3">
+                  <p class="font-semibold text-sm sm:text-base text-orange-500">
+                    Sarah Khan
+                  </p>
+                </footer>
+              </blockquote>
+            </div>
           </div>
-          <div>five star reviews</div>
-        </div>
-
-        <!-- Testimonial -->
-        <div
-          class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6 text-center sm:text-left"
-        >
-          <img
-            src="https://randomuser.me/api/portraits/men/32.jpg"
-            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full"
-            alt="User"
-          />
-
-          <p class="text-sm sm:text-lg max-w-xs sm:max-w-md">
-            “6 months after joining I lost 15lbs and I'm getting stronger.”
-          </p>
         </div>
       </div>
     </section>
@@ -316,8 +349,7 @@
         >
           Pricing
         </a>
-        {% if request.user.is_authenticated %} 
-        {% if not enrolled %}
+        {% if request.user.is_authenticated %} {% if not enrolled %}
         <li>
           <a
             href="/enrollment"
@@ -326,8 +358,7 @@
             Enroll
           </a>
         </li>
-        {% endif %} 
-        {% else %}
+        {% endif %} {% else %}
         <li>
           <a
             href="/signup"
@@ -940,5 +971,20 @@
     <script src="{% static 'js/hamburger.js' %}"></script>
     <script src="{% static 'js/RefreshTrigger.js' %}"></script>
     <script src="{% static 'js/messages.js' %}"></script>
+    <script>
+      let index = 0;
+      const reviews = document.getElementById("reviews");
+      const total = reviews.children.length;
+
+      setInterval(() => {
+        index++;
+
+        if (index >= total) {
+          index = 0;
+        }
+
+        reviews.style.transform = `translateX(-${index * 100}%)`;
+      }, 10000); // 10 seconds
+    </script>
   </body>
 </html>
