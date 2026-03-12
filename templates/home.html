@@ -729,13 +729,21 @@
                 <li>✔ Diet Guidance</li>
                 <li>✔ No Time Restrictions</li>
               </ul>
-
+              {% if request.user.is_authenticated %}
               <a
-                href="#"
+                href="/enrollment"
                 class="block bg-neutral-800 py-3 font-semibold hover:bg-orange-500 hover:text-black transition"
               >
                 JOIN NOW
               </a>
+              {% else %}
+              <a
+                href="/signup"
+                class="block bg-neutral-800 py-3 font-semibold hover:bg-orange-500 hover:text-black transition"
+              >
+                JOIN NOW
+              </a>
+              {% endif %}
             </div>
           </div>
 
@@ -772,12 +780,21 @@
                 <li>✔ Priority Support</li>
               </ul>
 
+              {% if request.user.is_authenticated %}
               <a
-                href="#"
-                class="block bg-orange-500 text-black py-3 font-semibold hover:bg-orange-600 transition"
+                href="/enrollment"
+                class="block bg-neutral-800 py-3 font-semibold hover:bg-orange-500 hover:text-black transition"
               >
-                ENROLL NOW
+                JOIN NOW
               </a>
+              {% else %}
+              <a
+                href="/signup"
+                class="block bg-neutral-800 py-3 font-semibold hover:bg-orange-500 hover:text-black transition"
+              >
+                JOIN NOW
+              </a>
+              {% endif %}
             </div>
           </div>
 
@@ -808,12 +825,21 @@
                 <li>✔ Locker Facility</li>
               </ul>
 
+              {% if request.user.is_authenticated %}
               <a
-                href="#"
+                href="/enrollment"
                 class="block bg-neutral-800 py-3 font-semibold hover:bg-orange-500 hover:text-black transition"
               >
-                JOIN TODAY
+                JOIN NOW
               </a>
+              {% else %}
+              <a
+                href="/signup"
+                class="block bg-neutral-800 py-3 font-semibold hover:bg-orange-500 hover:text-black transition"
+              >
+                JOIN NOW
+              </a>
+              {% endif %}
             </div>
           </div>
         </div>
