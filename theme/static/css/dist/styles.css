@@ -988,10 +988,6 @@ input:where([type='file']):focus {
   margin-top: 0.75rem;
 }
 
-.mt-4 {
-  margin-top: 1rem;
-}
-
 .mt-5 {
   margin-top: 1.25rem;
 }
@@ -1190,10 +1186,6 @@ input:where([type='file']):focus {
 
 .max-w-xs {
   max-width: 20rem;
-}
-
-.flex-shrink-0 {
-  flex-shrink: 0;
 }
 
 .shrink-0 {
@@ -1650,10 +1642,6 @@ input:where([type='file']):focus {
   padding-top: 2rem;
 }
 
-.text-left {
-  text-align: left;
-}
-
 .text-center {
   text-align: center;
 }
@@ -1747,10 +1735,6 @@ input:where([type='file']):focus {
   letter-spacing: 0em;
 }
 
-.tracking-tight {
-  letter-spacing: -0.025em;
-}
-
 .tracking-wide {
   letter-spacing: 0.025em;
 }
@@ -1762,10 +1746,6 @@ input:where([type='file']):focus {
 .text-black {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity, 1));
-}
-
-.text-black\/60 {
-  color: rgb(0 0 0 / 0.6);
 }
 
 .text-gray-300 {
@@ -1818,6 +1798,11 @@ input:where([type='file']):focus {
   color: rgb(220 38 38 / var(--tw-text-opacity, 1));
 }
 
+.text-red-700 {
+  --tw-text-opacity: 1;
+  color: rgb(185 28 28 / var(--tw-text-opacity, 1));
+}
+
 .text-red-800 {
   --tw-text-opacity: 1;
   color: rgb(153 27 27 / var(--tw-text-opacity, 1));
@@ -1846,16 +1831,6 @@ input:where([type='file']):focus {
 
 .text-white\/90 {
   color: rgb(255 255 255 / 0.9);
-}
-
-.text-yellow-500 {
-  --tw-text-opacity: 1;
-  color: rgb(234 179 8 / var(--tw-text-opacity, 1));
-}
-
-.text-red-700 {
-  --tw-text-opacity: 1;
-  color: rgb(185 28 28 / var(--tw-text-opacity, 1));
 }
 
 .accent-orange-500 {
@@ -1997,12 +1972,12 @@ input:where([type='file']):focus {
   transition-duration: 700ms;
 }
 
-.ease-out {
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-}
-
 .ease-in-out {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ease-out {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
 .hover\:-translate-y-2:hover {
@@ -2187,32 +2162,12 @@ input:where([type='file']):focus {
     max-width: 48rem;
   }
 
-  .sm\:max-w-md {
-    max-width: 28rem;
-  }
-
-  .sm\:max-w-xs {
-    max-width: 20rem;
-  }
-
-  .sm\:max-w-sm {
-    max-width: 24rem;
-  }
-
   .sm\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .sm\:flex-row {
-    flex-direction: row;
-  }
-
   .sm\:gap-3 {
     gap: 0.75rem;
-  }
-
-  .sm\:gap-4 {
-    gap: 1rem;
   }
 
   .sm\:gap-8 {
@@ -2264,10 +2219,6 @@ input:where([type='file']):focus {
     padding-top: 13rem;
   }
 
-  .sm\:text-left {
-    text-align: left;
-  }
-
   .sm\:text-2xl {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -2307,18 +2258,9 @@ input:where([type='file']):focus {
     font-size: 1.25rem;
     line-height: 1.75rem;
   }
-
-  .sm\:text-xs {
-    font-size: 0.75rem;
-    line-height: 1rem;
-  }
 }
 
 @media (min-width: 768px) {
-  .md\:mt-10 {
-    margin-top: 2.5rem;
-  }
-
   .md\:mt-3 {
     margin-top: 0.75rem;
   }
@@ -2357,14 +2299,6 @@ input:where([type='file']):focus {
 
   .md\:w-auto {
     width: auto;
-  }
-
-  .md\:max-w-screen-sm {
-    max-width: 640px;
-  }
-
-  .md\:max-w-xs {
-    max-width: 20rem;
   }
 
   .md\:grid-cols-2 {
@@ -2412,16 +2346,6 @@ input:where([type='file']):focus {
     text-align: left;
   }
 
-  .md\:text-2xl {
-    font-size: 1.5rem;
-    line-height: 2rem;
-  }
-
-  .md\:text-xs {
-    font-size: 0.75rem;
-    line-height: 1rem;
-  }
-
   .md\:text-lg {
     font-size: 1.125rem;
     line-height: 1.75rem;
@@ -2459,10 +2383,6 @@ input:where([type='file']):focus {
 
   .lg\:w-full {
     width: 100%;
-  }
-
-  .lg\:max-w-2xl {
-    max-width: 42rem;
   }
 
   .lg\:grid-cols-2 {
@@ -2551,11 +2471,6 @@ input:where([type='file']):focus {
     line-height: 2rem;
   }
 
-  .lg\:text-3xl {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-
   .lg\:text-4xl {
     font-size: 2.25rem;
     line-height: 2.5rem;
@@ -2576,18 +2491,13 @@ input:where([type='file']):focus {
     line-height: 1;
   }
 
-  .lg\:text-xl {
-    font-size: 1.25rem;
+  .lg\:text-lg {
+    font-size: 1.125rem;
     line-height: 1.75rem;
   }
 
-  .lg\:text-xs {
-    font-size: 0.75rem;
-    line-height: 1rem;
-  }
-
-  .lg\:text-lg {
-    font-size: 1.125rem;
+  .lg\:text-xl {
+    font-size: 1.25rem;
     line-height: 1.75rem;
   }
 }
