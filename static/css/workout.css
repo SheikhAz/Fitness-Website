@@ -1,0 +1,100 @@
+/* Container */
+.workout-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 50px 20px;
+  background: #000;
+  color: #fff;
+}
+
+/* Buttons */
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.category-buttons a {
+  border: 1px solid #fff;
+  padding: 8px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #fff;
+  transition: 0.3s;
+}
+
+.category-buttons a:hover {
+  background: #f97316;
+  border-color: #f97316;
+}
+
+/* Sections */
+section {
+  margin-bottom: 60px;
+}
+
+section h2 {
+  text-align: center;
+  color: #f97316;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+/* Grid */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .video-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .video-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Video */
+.video-grid video {
+  width: 100%;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+/* Hover */
+.video-grid video:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+video::-webkit-media-controls-timeline {
+  display: none;
+}
+
+video::-webkit-media-controls-current-time-display {
+  display: none;
+}
+
+video::-webkit-media-controls-time-remaining-display {
+  display: none;
+}
+
+video::-webkit-media-controls-volume-slider {
+  display: none;
+}
+
+video::-webkit-media-controls-mute-button {
+  display: none;
+}
+video::-webkit-media-controls-muted-button {
+  display: none;
+}

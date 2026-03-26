@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% load static %} {% block title %}Contact
+{% endblock %} {% block heading %}Contact Us{% endblock %} {% block link %}
+<link rel="stylesheet" href="{% static 'css/contact.css' %}" />
+{% endblock %} {% block message %}
+<div id="message-container">
+  {% for message in messages %}
+  <div
+    class="flash-message {% if message.tags == 'success' %} success {% elif message.tags == 'error' %} error {% else %} default {% endif %}"
+  >
+    <span>{{ message }}</span>
+
+    <button class="close-btn">×</button>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}{% block content %}
+
+<div class="contact-container hero-animate">
+  <div class="contact-grid">
+    <!-- LEFT -->
+    <div class="form-section">
+      <h2>Get In Touch</h2>
+
+      <form method="POST" class="contact-form">
+        {% csrf_token %}
+
+        <div class="input-group top">
+          <input type="text" name="name" placeholder="Full Name" required />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email@gmail.com"
+            required
+          />
+          <input type="tel" name="number" placeholder="Phone No." required />
+          <textarea
+            name="description"
+            rows="4"
+            placeholder="Write Message"
+            required
+          ></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Send Message</button>
+      </form>
+    </div>
+
+    <!-- RIGHT (MAP) -->
+    <div class="map-section">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1105.7099913287266!2d81.33746154628165!3d21.225888869330596!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a293d35028e3f7b%3A0x6721af497255ff3!2sThe%20Lion%20Den&#39;s%20Gym!5e0!3m2!1sen!2sin!4v1774478615519!5m2!1sen!2sin"
+        width="600"
+        height="450"
+        style="border: 0"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </div>
+</div>
+<script src="{% static 'js/messages.js' %}"></script>
+{% endblock %}

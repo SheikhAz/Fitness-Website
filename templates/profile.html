@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block link %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}" />
+{% endblock %}
+
+{% block message %}
+<div id="message-container">
+  {% for message in messages %}
+  <div class="flash-message {{ message.tags }}">
+    <span>{{ message }}</span>
+    <button class="close-btn">×</button>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="page hero-animate">
+  <div class="wrapper">
+    <div class="main">
+      <!-- LEFT SIDE -->
+      <div class="profile-left">
+        <div class="avatar-circle">
+          <img src="{% static 'images/profile.jpg' %}" alt="profile">
+        </div>
+
+        {% if enrollment %}
+        <div class="member-name">{{ enrollment.fullname }}</div>
+        <div class="member-id">{{ enrollment.unique_id }}</div>
+        {% endif %}
+
+        <div class="welcome-msg">Welcome to your profile</div>
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div class="info-card">
+
+        <div class="card-row top">
+          <div class="card-cell side">
+            <div class="cell-label">Phone Number</div>
+            <div class="cell-value orange">
+              {{ enrollment.phone|default:"Not Provided" }}
+            </div>
+          </div>
+
+          <div class="card-cell">
+            <div class="cell-label">Email Address</div>
+            <div class="cell-value orange">
+              {{ enrollment.email|default:user.email }}
+            </div>
+          </div>
+        </div>
+
+        <div class="card-row">
+          <div class="card-cell side">
+            <div class="cell-label">Membership Plan</div>
+            <div class="cell-value orange">
+              {{ enrollment.selectPlan|default:"Not Provided" }}
+            </div>
+          </div>
+
+          <div class="card-cell">
+            <div class="cell-label">Payment Status</div>
+            <div class="cell-value green">
+              {{ enrollment.paymentStatus|default:"Not Provided" }}
+            </div>
+          </div>
+        </div>
+
+        <div class="card-row">
+          <div class="card-cell side">
+            <div class="cell-label">Date of Joining</div>
+            <div class="cell-value orange">
+              {{ enrollment.doj|date:"F d, Y"|default:"Not Provided" }}
+            </div>
+          </div>
+
+          <div class="card-cell">
+            <div class="cell-label">Membership Status</div>
+
+            {% if enrollment.is_expired %}
+            <div class="cell-value danger">Expired</div>
+            {% else %}
+            <div class="cell-value green">
+              Active ({{ enrollment.days_remaining }} days left)
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="card-row single">
+          <div class="card-cell side">
+            <div class="cell-label">Trainer</div>
+            <div class="cell-value orange">
+              {{ enrollment.trainer|default:"Not Provided" }}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

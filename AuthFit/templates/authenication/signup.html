@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Sign UP{% endblock %}
+{% block link %}
+<link rel="stylesheet" href="{% static "css/signup.css" %}">
+{% endblock %}
+{% block heading %}Sign Up{% endblock %}
+{% block message %}
+<div id="message-container">
+      {% for message in messages %}
+      <div
+        class="flash-message {% if message.tags == 'success' %} success {% elif message.tags == 'error' %} error {% else %} default {% endif %}"
+      >
+        <span>{{ message }}</span>
+
+        <button class="close-btn">×</button>
+      </div>
+      {% endfor %}
+</div>
+{% endblock %}
+{% block content %}
+<div class="hero-container hero-animate">
+  <form method="POST" action="" class="signup-form">
+    {% csrf_token %}
+    <!-- Phone Number -->
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" name="phone" class='text' required />
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" class='text' name="password" required />
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input type="password" class='text' name="confirm_password" required />
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="submit-btn">
+      Create Account
+    </button>
+
+    <!-- Login Link -->
+    <p class="login-text">
+      Already have an account?
+      <a href="/login" class='text'>Login</a>
+    </p>
+
+  </form>
+</div>
+<script src="{% static 'js/messages.js' %}"></script>
+{% endblock %}
+

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gallery{% endblock %}
+
+{% block link %}
+<link rel="stylesheet" href="{% static 'css/gallery.css' %}">
+{% endblock %}
+
+{% block heading %}
+Gallery
+{% endblock %}
+
+{% block content %}
+
+<div class="gallery-container hero-animate">
+
+    <div class="gallery-grid">
+        
+        {% for post in posts %}
+            {% if post.images %}
+            <div class="gallery-item">
+                <img 
+                    src="{{ post.images.url }}"
+                    alt="Gallery Image"
+                    class="gallery-img">
+            </div>
+            {% endif %}
+        {% empty %}
+            <p class="gallery-empty">
+                No gallery images uploaded.
+            </p>
+        {% endfor %}
+
+    </div>
+
+</div>
+<script src="{% static 'js/messages.js' %}"></script>
+{% endblock %}

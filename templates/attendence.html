@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Attendance{% endblock %}
+{% block heading %}Attendance{% endblock %}
+{% block link %}
+<link rel="stylesheet" href="{% static 'css/attendence.css' %}" />
+{% endblock %}
+{% block message %}
+<div id="message-container">
+  {% for message in messages %}
+  <div
+    class="flash-message {% if message.tags == 'success' %} success {% elif message.tags == 'error' %} error {% else %} default {% endif %}"
+  >
+    <span>{{ message }}</span>
+
+    <button class="close-btn">×</button>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block content %}
+<div class="attendance-container hero-animate">
+
+  <!-- DATE -->
+  <div class="date-box">
+    <h2>{{ today }}</h2>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+
+    <!-- BUTTON -->
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit" {% if already_mark %}disabled{% endif %} class="btn">
+        {% if already_mark %}
+          Attendance Already Marked
+        {% else %}
+          Mark Attendance
+        {% endif %}
+      </button>
+    </form>
+
+    <h2 class="heading">Attendance Card</h2>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat-box">
+        <p>Total Days</p>
+        <h2 class="green">{{ total_days }}</h2>
+      </div>
+
+      <div class="stat-box">
+        <p>This Month</p>
+        <h2 class="red">{{ monthly_days }}</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline">
+    <h2 class="heading">Attendance Timeline</h2>
+
+    <div class="timeline-list">
+      {% for a in attended %}
+      <div class="timeline-item">
+        <p>
+          {{ a.date }}
+          <span class="time">{{ a.timestamp }}</span>
+        </p>
+      </div>
+      {% empty %}
+      <div class="empty">No attendance history yet</div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+<script src="{% static 'js/messages.js' %}"></script>
+{% endblock %}

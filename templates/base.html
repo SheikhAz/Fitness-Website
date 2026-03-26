@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EnterGYM {% block title %}{% endblock %}</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{% static "css/base.css" %}">
+  {% block link %}{% endblock %}
+</head>
+
+<body>
+
+  <!-- EXTRA CONTENT (MESSAGES ETC) -->
+  <div id="extra">{% block message %}{% endblock %}</div>
+
+  <!-- HERO SECTION -->
+  <section class="hero">
+
+    <!-- Background -->
+    <img src="{% static 'images/Fitness.jpg' %}" class="hero-bg" alt="Gym Background">
+    <div class="overlay"></div>
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div>EnterName Gym in Bhilai, Chhattisgarh</div>
+        <div class='left-inner'>Join: (+91) 1000000000</div>
+      </div>
+      <div class="divider"></div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="nav-inner">
+        <a href="/" class="logo">
+          <span>EnterName</span>
+          <br>
+          <span>Gym</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- HERO CONTENT -->
+    <div id="heroContent" class="hero-content">
+      <h1>{% block heading %}{% endblock %}</h1>
+    </div>
+
+    <!-- BODY CONTENT -->
+    {% block content %}{% endblock %}
+
+  </section>
+  <!-- JS -->
+  <script src="{% static "js/base.js" %}"></script>
+</body>
+</html>
