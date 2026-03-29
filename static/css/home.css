@@ -390,7 +390,18 @@ body {
     font-size: large;
   }
 }
+.hero-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: smoothFade 0.5s ease-out forwards;
+}
 
+@keyframes smoothFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 /* HERO CONTENT */
 .hero-content {
   position: relative;
@@ -1328,7 +1339,6 @@ body {
     grid-column: span 2;
     text-align: center;
   }
-  
   .footer-social {
     margin-left: 160px;
   }

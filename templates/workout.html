@@ -1,119 +1,185 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}Workout{% endblock %}
-
-{% block link %}
-<link rel="stylesheet" href="{% static 'css/workout.css' %}">
-{% endblock %}
-
-{% block heading %}
-Workouts
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% load static %} {% block title %}Workout 
+{%endblock%} {% block link %}
+<link rel="stylesheet" href="{% static 'css/workout.css' %}" />
+{% endblock %} {% block heading %} Workouts {% endblock %} {% block content %}
 
 <div class="workout-container hero-animate">
+  <!-- CATEGORY BUTTONS -->
+  <div class="category-buttons">
+    <a href="#back">Back</a>
+    <a href="#chest">Chest</a>
+    <a href="#leg">Leg</a>
+    <a href="#biceps">Biceps</a>
+    <a href="#triceps">Triceps</a>
+    <a href="#shoulder">Shoulder</a>
+    <a href="#forearms">Forearms</a>
+  </div>
 
-    <!-- CATEGORY BUTTONS -->
-    <div class="category-buttons">
-        <a href="#back">Back</a>
-        <a href="#chest">Chest</a>
-        <a href="#leg">Leg</a>
-        <a href="#biceps">Biceps</a>
-        <a href="#triceps">Triceps</a>
-        <a href="#shoulder">Shoulder</a>
-        <a href="#forearms">Forearms</a>
+  <!-- BACK -->
+  <section id="back">
+    <h2>Back Workout</h2>
+    <div class="video-grid">
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/back_4.png' %}"
+      >
+        <source src="{% static 'workout/back_1.mp4' %}" />
+      </video>
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/back_3.png' %}"
+      >
+        <source src="{% static 'workout/back_2.mp4' %}" />
+      </video>
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/back_2.png' %}"
+      >
+        <source src="{% static 'workout/back_3.mp4' %}" />
+      </video>
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/back_1.png' %}"
+      >
+        <source src="{% static 'workout/back_4.mp4' %}" />
+      </video>
     </div>
+  </section>
 
-    <!-- BACK -->
-    <section id="back">
-        <h2>Back Workout</h2>
-        <div class="video-grid">
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/back_1.mp4' %}">
-            </video>
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/back_2.mp4' %}">
-            </video>
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/back_3.mp4' %}">
-            </video>
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/back_4.mp4' %}">
-            </video>
-        </div>
-    </section>
+  <!-- BICEPS -->
+  <section id="biceps">
+    <h2>Biceps Workout</h2>
+    <div class="video-grid">
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/biceps_2.png' %}"
+      >
+        <source src="{% static 'workout/biceps_1.mp4' %}" />
+      </video>
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/biceps_1.png' %}"
+      >
+        <source src="{% static 'workout/biceps_3.mp4' %}" />
+      </video>
+    </div>
+  </section>
 
-    <!-- BICEPS -->
-    <section id="biceps">
-        <h2>Biceps Workout</h2>
-        <div class="video-grid">
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/biceps_1.mp4' %}">
-            </video>
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/biceps_3.mp4' %}">
-            </video>
-        </div>
-    </section>
+  <!-- CHEST -->
+  <section id="chest">
+    <h2>Chest Workout</h2>
+    <div class="video-grid">
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/chest_2.png' %}"
+      >
+        <source src="{% static 'workout/chest_1.mp4' %}" />
+      </video>
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/chest_1.png' %}"
+      >
+        <source src="{% static 'workout/chest_2.mp4' %}" />
+      </video>
+    </div>
+  </section>
 
-    <!-- CHEST -->
-    <section id="chest">
-        <h2>Chest Workout</h2>
-        <div class="video-grid">
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/chest_1.mp4' %}">
-            </video>
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/chest_2.mp4' %}">
-            </video>
-        </div>
-    </section>
+  <!-- LEG -->
+  <section id="leg">
+    <h2>Leg Workout</h2>
+    <div class="video-grid">
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/leg_2.png' %}"
+      >
+        <source src="{% static 'workout/leg_1.mp4' %}" />
+      </video>
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/leg_1.png' %}"
+      >
+        <source src="{% static 'workout/leg_2.mp4' %}" />
+      </video>
+    </div>
+  </section>
 
-    <!-- LEG -->
-    <section id="leg">
-        <h2>Leg Workout</h2>
-        <div class="video-grid">
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/leg_1.mp4' %}">
-            </video>
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/leg_2.mp4' %}">
-            </video>
-        </div>
-    </section>
+  <!-- FOREARMS -->
+  <section id="forearms">
+    <h2>Forearm Workout</h2>
+    <div class="video-grid">
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/fourarm.png' %}"
+      >
+        <source src="{% static 'workout/forearm.mp4' %}" />
+      </video>
+    </div>
+  </section>
 
-    <!-- FOREARMS -->
-    <section id="forearms">
-        <h2>Forearm Workout</h2>
-        <div class="video-grid">
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/forearm.mp4' %}">
-            </video>
-        </div>
-    </section>
+  <!-- SHOULDER -->
+  <section id="shoulder">
+    <h2>Shoulder Workout</h2>
+    <div class="video-grid">
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/shoulder.png' %}"
+      >
+        <source src="{% static 'workout/shoulder_1.mp4' %}" />
+      </video>
+    </div>
+  </section>
 
-    <!-- SHOULDER -->
-    <section id="shoulder">
-        <h2>Shoulder Workout</h2>
-        <div class="video-grid">
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/shoulder_1.mp4' %}">
-            </video>
-        </div>
-    </section>
-
-    <!-- TRICEPS -->
-    <section id="triceps">
-        <h2>Triceps Workout</h2>
-        <div class="video-grid">
-            <video controls muted preload="metadata">
-                <source src="{% static 'workout/triceps_1.mp4' %}">
-            </video>
-        </div>
-    </section>
-
+  <!-- TRICEPS -->
+  <section id="triceps">
+    <h2>Triceps Workout</h2>
+    <div class="video-grid">
+      <video
+        controls
+        muted
+        preload="none"
+        loading="lazy"
+        poster="{% static 'images/workout/triceps.png' %}"
+      >
+        <source src="{% static 'workout/triceps_1.mp4' %}" />
+      </video>
+    </div>
+  </section>
 </div>
 <script src="{% static 'js/messages.js' %}"></script>
 {% endblock %}

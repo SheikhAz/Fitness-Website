@@ -108,7 +108,10 @@
   outline: none;
   transition: 0.3s;
 }
-
+.text {
+  font-size: 18px;
+  font-weight: 600;
+}
 .form-group input:focus {
   border-color: #f97316;
 }
@@ -165,7 +168,8 @@
     padding: 32px;
 
     background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(1px);
+    will-change: transform, opacity;
 
     border: 1px solid rgba(249, 115, 22, 0.2);
     border-radius: 16px;
@@ -173,5 +177,18 @@
     box-shadow:
       0 20px 60px rgba(0, 0, 0, 0.6),
       0 0 40px rgba(249, 115, 22, 0.25);
+  }
+}
+
+.hero-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: smoothFade 0.5s ease-out forwards;
+}
+
+@keyframes smoothFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

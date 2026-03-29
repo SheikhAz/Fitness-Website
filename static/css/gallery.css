@@ -11,7 +11,18 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
+.hero-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: smoothFade 0.5s ease-out forwards;
+}
 
+@keyframes smoothFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 /* Tablet */
 @media (min-width: 768px) {
   .gallery-grid {

@@ -10,7 +10,18 @@ body {
   font-family: Arial, sans-serif;
   color: #fff;
 }
+.hero-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: smoothFade 0.5s ease-out forwards;
+}
 
+@keyframes smoothFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 #message-container {
   position: fixed;
   top: 20px;
