@@ -132,44 +132,6 @@
   color: red;
 }
 
-/* MESSAGE */
-.flash-message {
-  padding: 10px;
-  margin: 10px;
-  border-radius: 5px;
-}
-
-.flash-message.success { background: green; }
-.flash-message.error { background: red; }
-
-@media (max-width: 768px) {
-
-  /* STACK LEFT + RIGHT */
-  .main {
-    flex-direction: column;
-    gap: 30px;
-    margin-right: 0;
-    padding: 20px;
-  }
-
-  /* FULL WIDTH CARD */
-  .info-card {
-    width: 350px;
-  }
-
-  /* 🔥 IMPORTANT: MAKE ROWS SINGLE COLUMN */
-  .card-row {
-    grid-template-columns: 1fr;  /* THIS makes it row-wise */
-  }
-
-  /* REMOVE SIDE MARGINS */
-  .side {
-    margin-left: 0;
-  }
-
-  .top {
-    margin-top: 10px;
-  }
 #message-container {
   position: fixed;
   top: 20px;
@@ -226,6 +188,35 @@
 .close-btn:hover {
   transform: scale(1.1);
 }
+@media (max-width: 768px) {
+
+  /* STACK LEFT + RIGHT */
+  .main {
+    flex-direction: column;
+    gap: 30px;
+    margin-right: 0;
+    padding: 20px;
+  }
+
+  /* FULL WIDTH CARD */
+  .info-card {
+    width: 350px;
+  }
+
+  /* 🔥 IMPORTANT: MAKE ROWS SINGLE COLUMN */
+  .card-row {
+    grid-template-columns: 1fr;  /* THIS makes it row-wise */
+  }
+
+  /* REMOVE SIDE MARGINS */
+  .side {
+    margin-left: 0;
+  }
+
+  .top {
+    margin-top: 10px;
+  }
+
   /* ADJUST SPACING */
   .card-cell {
     padding: 18px 20px;

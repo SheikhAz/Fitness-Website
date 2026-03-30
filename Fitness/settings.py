@@ -9,9 +9,10 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
-from pathlib import Path
 import os
+import dj_database_url
+from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,8 +49,8 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 
@@ -89,6 +90,8 @@ DATABASES = {
         'PORT': '5432'
     }
 }
+
+DATABASES["default"] = dj_database_url.parse('postgresql://gym_database_9871_user:bEmZpd6HlLwXy9gYW5cTrsEvRNF7IgXC@dpg-d754r2c50q8c739smhi0-a.oregon-postgres.render.com/gym_database_9871')
 
 
 # Password validation

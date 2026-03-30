@@ -77,7 +77,7 @@ class Enrollment(models.Model):
     address = models.TextField()
     paymentStatus = models.CharField(
         max_length=10, choices=PAYMENT, blank=True, null=True)
-    Amount = models.CharField(max_length=10)
+    Amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     paymentMethod = models.CharField(
         max_length=1, choices=METHOD, blank=True, null=True)
     doj = models.DateField(auto_now_add=True,null=True, blank=True)
@@ -109,6 +109,9 @@ class Enrollment(models.Model):
 
         if not self.unique_id:
             self.unique_id = self.generate_unique_id()
+
+        if self.selectPlan:
+            self.Amount = self.selectPlan.price
 
         if self.DueDate and timezone.now().date() > self.DueDate:
             self.paymentStatus = "Pending"

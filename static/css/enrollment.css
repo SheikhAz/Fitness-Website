@@ -73,7 +73,7 @@
   --text-muted: #9ca3af;
   --text-white: #ffffff;
 }
-.navbar{
+.navbar {
   font-size: 15px;
 }
 .hero-header h1 {
@@ -147,8 +147,8 @@
   letter-spacing: 0.5px;
   margin-bottom: 20px;
 }
-.color-price{
-  color:var(--orange) ;
+.color-price {
+  color: var(--orange);
 }
 /* ── Grid ── */
 .grid-2 {
@@ -169,7 +169,7 @@
   border-radius: 12px;
   padding: 13px 16px;
   font-family: "Barlow", sans-serif;
-  font-size: 18px;
+  font-size: 15px;
   outline: none;
   transition:
     border-color 0.3s,
@@ -366,7 +366,7 @@ textarea.field {
   .grid-2 {
     grid-template-columns: 1fr;
   }
-  .hero-header h1{
+  .hero-header h1 {
     font-size: 28px;
   }
   .col-full {
