@@ -1,7 +1,7 @@
 from django.contrib import admin
+from django.db.models import Sum
 from .models import Contact, Gallery ,Trainer ,MembershipPlan ,Attendence
 from .models import Enrollment
-from django.utils import timezone
 
 
 # Register your models here.
@@ -33,3 +33,23 @@ class EnrollmentAdmin(admin.ModelAdmin):
                     "selectPlan", "paymentStatus", "days_remaining")
     search_fields = ("unique_id", "fullname", "phone", "email")
     list_filter = ("paymentStatus", "selectPlan", "trainer", "gender")
+    change_list_template = "admin/enrollment_change_list.html"
+
+    def changelist_view(self, request, extra_context=None):
+        # Get queryset
+        qs = self.get_queryset(request)
+
+        # Filter only monthly plan users
+        monthly_qs = qs.filter(
+        selectPlan__plan__icontains="month",
+        paymentStatus="Done"
+        )
+
+        # Calculate total income
+        total_income = monthly_qs.aggregate(total=Sum('Amount'))['total'] or 0
+
+        extra_context = extra_context or {}
+        extra_context['total_income'] = total_income
+
+        return super().changelist_view(request, extra_context=extra_context)
+ 
