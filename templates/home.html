@@ -80,8 +80,8 @@
           <div class="nav-right">
             {% if request.user.is_authenticated %} {% if isStaff %}
             <!-- STAFF -->
-            <a href="/admin/" class="btn">Admin Panel</a>
-            <a href="/admin/AuthFit/attendence/">Attendance List</a>
+            <a href="/admin/" class="btn">AdPanel</a>
+            <a href="/admin/AuthFit/enrollment/" class="btn">Enroll List</a>
             {% else %}
             <!-- USER -->
             <a href="/profile/" class="btn">My Profile</a>
@@ -169,7 +169,6 @@
           <li><a href="/admin/revenue/">Revenue</a></li>
           {% endif %} {% if isStaff or isSuperuser %}
           <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
-          <li><a href="/admin/AuthFit/enrollment/">Enrollment</a></li>
           <li><a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a></li>
           <li><a href="/admin/AuthFit/contact/">User Queries</a></li>
         </ul>
