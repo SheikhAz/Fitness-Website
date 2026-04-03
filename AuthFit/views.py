@@ -1,17 +1,83 @@
+from django.contrib.auth.decorators import login_required
 from .models import Attendence
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib import messages
-from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login as auth_log, logout
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
-from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Gallery ,Attendence
+from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer,Attendence
 import calendar
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .attendance import mark_attendance
+from cloudinary.utils import cloudinary_url
+from django.contrib.auth.decorators import user_passes_test
+
+
 
 
 # Create your views here.
 
+# ==============================
+# 🔐 STAFF CHECK
+# ==============================
+def is_staff(user):
+    return user.is_staff or user.is_superuser
+
+
+# ==============================
+# ✅ SAVE EMBEDDING (STAFF ONLY)
+# ==============================
+@csrf_exempt
+def save_embedding(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+
+            # 🔐 API SECURITY
+            API_KEY = "mysecret123"
+            if data.get("api_key") != API_KEY:
+                return JsonResponse({"error": "Unauthorized"})
+
+            unique_id = data.get("unique_id")
+            embedding = data.get("embedding")
+
+            if not unique_id or not embedding:
+                return JsonResponse({"error": "Missing data"})
+
+            enrollment = Enrollment.objects.get(unique_id=unique_id)
+
+            # 🔥 CONVERT STRING → LIST
+            new_emb = json.loads(embedding)
+
+            # 🔥 INIT LIST IF EMPTY
+            if not enrollment.face_embeddings:
+                enrollment.face_embeddings = []
+
+            # 🔥 LIMIT MAX EMBEDDINGS (IMPORTANT)
+            MAX_EMB = 7
+            if len(enrollment.face_embeddings) >= MAX_EMB:
+                enrollment.face_embeddings.pop(0)  # remove oldest
+
+            # 🔥 ADD NEW EMBEDDING
+            enrollment.face_embeddings.append(new_emb)
+
+            enrollment.face_enrolled = True
+            enrollment.save()
+
+            return JsonResponse({
+                "status": "success",
+                "total_embeddings": len(enrollment.face_embeddings)
+            })
+
+        except Enrollment.DoesNotExist:
+            return JsonResponse({"error": "User not found"})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)})
+
+    return JsonResponse({"error": "Invalid request"})
 
 def loginPage(request):
     if request.method == "POST":
@@ -24,7 +90,7 @@ def loginPage(request):
             return redirect('/')
         else:
             messages.error(request, "Invalid Phone or Password ")
-            return redirect('/login')
+            return redirect('/login/')
     return render(request, 'authenication/login.html')
 
 
@@ -46,25 +112,101 @@ def signupPage(request):
         if User.objects.filter(username=phone).exists():
             messages.error(
                 request, "Phone Number is Already Used By Other User")
-            return redirect('/signup')
+            return redirect('/signup/')
 
         User.objects.create_user(
             username=username,
             password=password,
         )
         messages.success(request, "Account is created Successfully......")
-        return redirect('/login')
+        return redirect('/login/')
     return render(request, 'authenication/signup.html')
 
 
+@csrf_exempt
+def mark_attendance_api(request):
+    if request.method == "POST":
+        import json
+
+        try:
+            data = json.loads(request.body)
+
+            API_KEY = "mysecret123"
+            if data.get("api_key") != API_KEY:
+                return JsonResponse({"error": "Unauthorized"})
+
+            unique_id = data.get("unique_id")
+
+            result = mark_attendance(unique_id)
+
+            return JsonResponse(result)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)})
+
+    return JsonResponse({"error": "Invalid request"})
+
+
+# ==============================
+# 👥 GET USERS (BONUS IMPROVEMENT)
+# ==============================
+def get_users(request):
+    users = Enrollment.objects.filter(face_embeddings__isnull=False)
+
+    data = []
+
+    for u in users:
+        data.append({
+            "unique_id": u.unique_id,
+            "name": u.fullname,
+            "embeddings": u.face_embeddings
+        })
+
+    return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+def upload_face_image(request):
+    if request.method == "POST":
+        try:
+            api_key = request.POST.get("api_key")
+            if api_key != "mysecret123":
+                return JsonResponse({"error": "Unauthorized"})
+
+            unique_id = request.POST.get("unique_id")
+            face_image = request.FILES.get("face_image")
+
+            if not unique_id or not face_image:
+                return JsonResponse({"error": "Missing data"})
+
+            enrollment = Enrollment.objects.get(unique_id=unique_id)
+            enrollment.face_image = face_image  # Cloudinary handles upload automatically
+            enrollment.save()
+
+            return JsonResponse({"status": "success", "image_url": enrollment.face_image.url})
+
+        except Enrollment.DoesNotExist:
+            return JsonResponse({"error": "User not found"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)})
+
+    return JsonResponse({"error": "Invalid request"})
+
 def homePage(request):
     enrolled = False
+    isStaff = False
+    isSuperuser = False
 
     if request.user.is_authenticated:
         enrolled = Enrollment.objects.filter(user=request.user).exists()
+        isStaff = request.user.is_staff
+        isSuperuser = request.user.is_superuser
+
 
     return render(request, "home.html", {
-        "enrolled": enrolled
+        "enrolled": enrolled,
+        "isStaff": isStaff,
+        "isSuperuser":isSuperuser,
     })
 
 
@@ -79,14 +221,14 @@ def contact(request):
 
         if len(number) > 10 or len(number) < 10:
             messages.error(request, "Please Enter a Valid Number")
-            return redirect('/contact')
+            return redirect('/contact/')
 
         query = Contact(name=name, email=email, phonenumber=number,
                         description=message)
         query.save()
         messages.success(
             request, "Thanks for Contacting us we will get back you soon")
-        return redirect('/contact')
+        return redirect('/contact/')
     return render(request, 'contact.html')
 
 
@@ -103,7 +245,7 @@ def enrollment(request):
 
     # If user already has enrollment
     if Enrollment.objects.filter(user=request.user).exists():
-        return redirect('/profile')
+        return redirect('/profile/')
 
     if request.method == "POST":
         name = request.POST.get('name')
@@ -139,7 +281,7 @@ def enrollment(request):
             request,
             "Welcome aboard! Your gym membership has been successfully activated."
         )
-        return redirect('/profile')
+        return redirect('/profile/')
 
     return render(request, 'enrollment.html', {
         "plans": plans,
@@ -155,15 +297,19 @@ def workout(request):
 def Profile(request):
     enrollment = Enrollment.objects.filter(user=request.user).first()
 
+    image_url = None
+
+    if enrollment and enrollment.face_image:
+        image_url, _ = cloudinary_url(
+            enrollment.face_image.public_id,
+            width=300,
+            height=300,
+            crop="fill"
+        )
+
     return render(request, 'profile.html', {
-        'enrollment': enrollment
-    })
-
-
-def gallery(request):
-    posts = Gallery.objects.all().order_by("-timestamp")
-    return render(request, "gallery.html", {
-        "posts": posts
+        'enrollment': enrollment,
+        'image_url': image_url
     })
 
 
@@ -188,7 +334,7 @@ def attendence(request):
         else:
             messages.error(request, "Attendance already marked today.")
 
-        return redirect('/attendence')
+        return redirect('/attendence/')
 
     attendence = Attendence.objects.filter(user = user).order_by('-date')
     attended= Attendence.objects.filter(user = user).order_by('-date')[:7]

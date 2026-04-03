@@ -1,0 +1,254 @@
+{% extends "base.html" %} {% load static %} {% block title %}Face Enrollment
+{% endblock %} {% block link %}
+<link rel="stylesheet" href="{% static 'css/enroll_face.css' %}" />
+{% endblock %} {% block heading %}Enroll Your Face{% endblock %} 
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<input type="hidden" id="csrf_token" value="{{ csrf_token }}" />
+
+<div class="enroll-wrapper">
+  <p class="enroll-subtitle">
+    Position your face clearly in the camera to complete enrollment
+  </p>
+    <div class="enroll-card">
+        <!-- Camera -->
+        <div class="camera-col">
+            <div class="video-container">
+                <video id="video" autoplay muted playsinline></video>
+                <div id="faceBox" class="face-box"></div>
+                <div class="corner corner-tl"></div>
+                <div class="corner corner-tr"></div>
+                <div class="corner corner-bl"></div>
+                <div class="corner corner-br"></div>
+            </div>
+            <div id="statusPill" class="status-pill">
+                <div class="status-dot"></div>
+                <span id="status">Loading models...</span>
+            </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-col">
+            <div>
+                <p class="steps-label">Steps</p>
+                <div class="step">
+                <div id="s1" class="step-num">1</div>
+                <div>
+                    <p class="step-title">Models loaded</p>
+                    <p class="step-desc">Face detection ready</p>
+                </div>
+                <span id="s1c" class="step-check" style="display: none"
+                    >&#10003;</span
+                >
+                </div>
+                <div class="step-connector"></div>
+                <div class="step">
+                <div id="s2" class="step-num">2</div>
+                <div>
+                    <p class="step-title">Camera active</p>
+                    <p class="step-desc">Align face in the frame</p>
+                </div>
+                <span id="s2c" class="step-check" style="display: none"
+                    >&#10003;</span
+                >
+                </div>
+                <div class="step-connector"></div>
+                <div class="step">
+                <div id="s3" class="step-num">3</div>
+                <div>
+                    <p class="step-title">Face detected</p>
+                    <p class="step-desc">Click capture to enroll</p>
+                </div>
+                <span id="s3c" class="step-check" style="display: none"
+                    >&#10003;</span
+                >
+                </div>
+                <div class="step-connector"></div>
+                <div class="step">
+                <div id="s4" class="step-num">4</div>
+                <div>
+                    <p class="step-title">Enrollment saved</p>
+                    <p class="step-desc">Pending capture</p>
+                </div>
+                <span id="s4c" class="step-check" style="display: none"
+                    >&#10003;</span
+                >
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="tips-box">
+                <h4>Tips</h4>
+                <ul>
+                <li>Ensure good lighting on your face</li>
+                <li>Look directly at the camera</li>
+                <li>Remove sunglasses or hats</li>
+                </ul>
+            </div>
+
+            <button
+                id="captureBtn"
+                onclick="startCapture()"
+                disabled
+                class="capture-btn"
+            >
+                Capture &amp; Enroll
+            </button>
+            <p class="enroll-note">
+                Your face data is stored securely and only used for attendance
+            </p>
+        </div>
+  </div>
+  <canvas id="canvas" style="display:none;"></canvas>
+</div>
+
+<script>
+  const video      = document.getElementById("video");
+  const faceBox    = document.getElementById("faceBox");
+  const statusText = document.getElementById("status");
+  const statusPill = document.getElementById("statusPill");
+  const captureBtn = document.getElementById("captureBtn");
+  const csrfToken  = document.getElementById("csrf_token").value;
+
+  let faceDetected   = false;
+  let detectInterval = null;
+
+  function markStep(n) {
+    document.getElementById("s" + n).classList.add("done");
+    document.getElementById("s" + n + "c").style.display = "block";
+  }
+
+  const MODEL_URL = "{% static 'models' %}";
+
+  Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+  ])
+  .then(() => {
+    markStep(1);
+    statusText.innerText = "Models ready — starting camera...";
+    startCamera();
+  })
+  .catch((err) => {
+    console.error("Model error:", err);
+    statusText.innerText = "Model load failed — check /static/models/ files";
+  });
+
+  async function startCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+      statusText.innerText = "Camera on — align your face";
+
+      video.addEventListener("playing", () => {
+        markStep(2);
+        captureBtn.disabled = false;
+        startDetection();
+      });
+
+    } catch (err) {
+      console.error("Camera error:", err);
+      statusText.innerText = err.name === "NotAllowedError"
+        ? "Camera blocked — allow camera in browser settings"
+        : "Camera error: " + err.message;
+    }
+  }
+
+  function startDetection() {
+    detectInterval = setInterval(async () => {
+      try {
+        const det = await faceapi
+          .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+          .withFaceLandmarks();
+
+        if (det.length > 0) {
+          const box = det[0].detection.box;
+          faceBox.style.cssText = `
+            display:block;
+            left:${box.x}px; top:${box.y}px;
+            width:${box.width}px; height:${box.height}px;
+          `;
+
+          if (!faceDetected) {
+            markStep(3);
+            statusPill.classList.add("detected");
+          }
+
+          statusText.innerText = "Face detected — click Capture!";
+          faceDetected = true;
+
+        } else {
+          faceBox.style.display = "none";
+          statusText.innerText  = "No face — move closer";
+          statusPill.classList.remove("detected");
+          faceDetected = false;
+
+          document.getElementById("s3").classList.remove("done");
+          document.getElementById("s3c").style.display = "none";
+        }
+      } catch (e) {
+        console.error("Detection error:", e);
+      }
+    }, 300);
+  }
+
+  async function startCapture() {
+    if (!faceDetected) {
+      statusText.innerText = "Position your face first";
+      return;
+    }
+
+    // ── Get canvas here (not at top) to avoid null error ──
+    const canvas = document.getElementById("canvas");
+    if (!canvas) {
+      console.error("Canvas element not found — add <canvas id='canvas'> to your HTML");
+      statusText.innerText = "Internal error — canvas missing";
+      return;
+    }
+
+    clearInterval(detectInterval);
+    captureBtn.disabled  = true;
+    statusText.innerText = "Capturing...";
+    statusPill.classList.remove("detected");
+
+    // ── Draw current video frame to canvas ──
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+
+    const imageData = canvas.toDataURL("image/jpeg");
+
+    try {
+      const res = await fetch("/enroll-face/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({ image: imageData }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        markStep(4);
+        statusPill.classList.add("detected");
+        statusText.innerText  = "Enrolled successfully!";
+        faceBox.style.display = "none";
+        captureBtn.disabled   = true;
+      } else {
+        throw new Error(data.error || "Server error");
+      }
+
+    } catch (err) {
+      console.error("Enroll error:", err);
+      statusText.innerText = "Failed: " + err.message;
+      captureBtn.disabled  = false;
+      startDetection();
+    }
+  }
+</script>
+
+{% endblock %}

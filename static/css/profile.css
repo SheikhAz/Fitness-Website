@@ -39,15 +39,21 @@
   border-radius: 50%;
   border: 2px solid #e05c14;
   overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 15px rgba(224, 92, 20, 0.4);
+  transition: 0.3s ease;
 }
 
 .avatar-circle img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s ease;
 
 }
-
+.avatar-circle:hover img {
+  transform: scale(1.1);
+}
 .member-name {
   font-size: 24px;
   font-weight: bold;
@@ -131,6 +137,16 @@
 .danger {
   color: red;
 }
+.status-dot {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  background: #3dd870;
+  border-radius: 50%;
+  border: 2px solid #000;
+}
 
 #message-container {
   position: fixed;
@@ -188,6 +204,18 @@
 .close-btn:hover {
   transform: scale(1.1);
 }
+.avatar-initial {
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #e05c14;
+  font-size: 40px;
+  font-weight: bold;
+}
+
 @media (max-width: 768px) {
 
   /* STACK LEFT + RIGHT */
@@ -242,8 +270,8 @@
 
   /* PROFILE IMAGE SMALLER */
   .avatar-circle {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
   }
 
   .member-name {

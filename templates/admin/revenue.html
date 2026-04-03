@@ -1,0 +1,381 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<style>
+  /* ── Root variables that sit on top of Django admin's own vars ── */
+  :root {
+    --dash-orange:   #ff6a00;
+    --dash-orange2:  #ff4500;
+    --dash-red:      #ff2424;
+    --dash-green:    #00e676;
+    --dash-blue:     #2979ff;
+    --dash-purple:   #aa00ff;
+    --dash-surface:  #141414;
+    --dash-card:     #1a1a1a;
+    --dash-border:   rgba(255,106,0,.18);
+    --dash-muted:    #666;
+    --dash-text:     #e8e8e8;
+    --dash-glow:     0 0 28px rgba(255,106,0,.25);
+  }
+
+  /* ── Wrapper ── */
+  #dash-root {
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--dash-text);
+    padding: 8px 0 40px;
+  }
+
+  /* ── Page title ── */
+  .dash-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: .08em;
+    color: var(--dash-orange);
+    margin: 0 0 6px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .dash-title .dash-live {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    background: rgba(255,106,0,.12);
+    border: 1px solid rgba(255,106,0,.35);
+    color: var(--dash-orange);
+    padding: 3px 10px;
+    border-radius: 3px;
+  }
+  .dash-subtitle {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+    margin-bottom: 24px;
+  }
+
+  /* ── KPI strip ── */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    border-radius: 4px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--kpi-accent, var(--dash-orange));
+  }
+  .kpi-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--dash-muted);
+    margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: .04em;
+    color: var(--kpi-accent, var(--dash-orange));
+    line-height: 1;
+  }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--dash-muted);
+    margin-top: 4px;
+    font-weight: 500;
+  }
+  .kpi-icon {
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 28px;
+    opacity: .08;
+  }
+
+  /* ── Chart grid ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .chart-card {
+    background: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: var(--dash-glow);
+  }
+  .chart-card.wide {
+    grid-column: span 2;
+  }
+  .chart-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .chart-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: .06em;
+    color: var(--dash-text);
+  }
+  .chart-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+  .badge-orange { color: var(--dash-orange); border-color: rgba(255,106,0,.35); background: rgba(255,106,0,.08); }
+  .badge-green  { color: var(--dash-green);  border-color: rgba(0,230,118,.35);  background: rgba(0,230,118,.06); }
+  .badge-blue   { color: var(--dash-blue);   border-color: rgba(41,121,255,.35); background: rgba(41,121,255,.06); }
+  .badge-purple { color: var(--dash-purple); border-color: rgba(170,0,255,.35);  background: rgba(170,0,255,.06); }
+
+  canvas { max-height: 260px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .kpi-strip { grid-template-columns: 1fr 1fr; }
+    .chart-grid { grid-template-columns: 1fr; }
+    .chart-card.wide { grid-column: span 1; }
+  }
+  @media (max-width: 520px) {
+    .kpi-strip { grid-template-columns: 1fr 1fr; }
+    .kpi-value { font-size: 22px; }
+  }
+</style>
+
+<div id="dash-root">
+
+  <!-- Title -->
+  <div class="dash-title">
+    Revenue Dashboard
+    <span class="dash-live">Live</span>
+  </div>
+  <div class="dash-subtitle">EnterName Gym · Bhilai, Chhattisgarh &nbsp;·&nbsp; Financial Overview</div>
+
+  <!-- KPI Strip -->
+<div class="kpi-strip">
+
+  <!-- Monthly Revenue -->
+  <div class="kpi-card" style="--kpi-accent: var(--dash-orange)">
+    <div class="kpi-label">Monthly Revenue</div>
+    <div class="kpi-value">₹{{ total_revenue|default:"0" }}</div>
+    <div class="kpi-sub">Total earned</div>
+    <span class="kpi-icon">₹</span>
+  </div>
+
+  <!-- Today's Revenue -->
+  <div class="kpi-card" style="--kpi-accent: var(--dash-green)">
+    <div class="kpi-label">Weekly Revenue</div>
+    <div class="kpi-value">₹{{ today_revenue|default:"0" }}</div>
+    <div class="kpi-sub">Last 7 days data</div>
+    <span class="kpi-icon">📈</span>
+  </div>
+
+  <!-- Total Members -->
+  <div class="kpi-card" style="--kpi-accent: var(--dash-blue)">
+    <div class="kpi-label">Total Members</div>
+    <div class="kpi-value">{{ total_members|default:"0" }}</div>
+    <div class="kpi-sub">All registered users</div>
+    <span class="kpi-icon">👥</span>
+  </div>
+
+</div>
+
+
+<!-- Charts -->
+<div class="chart-grid">
+
+  <!-- Monthly Revenue -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <span class="chart-card-title">Monthly Revenue</span>
+      <span class="chart-badge badge-orange">Bar</span>
+    </div>
+    <canvas id="monthlyChart"></canvas>
+  </div>
+
+  <!-- Daily Revenue -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <span class="chart-card-title">Daily Revenue · 7 Days</span>
+      <span class="chart-badge badge-green">Line</span>
+    </div>
+    <canvas id="dailyChart"></canvas>
+  </div>
+
+  <!-- Member Growth -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <span class="chart-card-title">Member Growth</span>
+      <span class="chart-badge badge-blue">Line</span>
+    </div>
+    <canvas id="memberChart"></canvas>
+  </div>
+
+  <!-- Payment Analytics -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <span class="chart-card-title">Payment Analytics</span>
+      <span class="chart-badge badge-purple">Pie</span>
+    </div>
+    <canvas id="paymentChart"></canvas>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  /* Shared dark theme defaults */
+  Chart.defaults.color = '#888';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+  Chart.defaults.font.family = "'Rajdhani', sans-serif";
+  Chart.defaults.font.size = 12;
+
+  const gridLines = {
+    color: 'rgba(255,255,255,0.05)',
+    drawBorder: false,
+  };
+
+  const tickStyle = { color: '#666', font: { size: 11 } };
+
+  /* ── Monthly Revenue (Bar) ── */
+  new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ monthly_labels|safe }},
+      datasets: [{
+        label: 'Revenue ₹',
+        data: {{ monthly_data|safe }},
+        backgroundColor: 'rgba(255,106,0,0.7)',
+        borderColor: '#ff6a00',
+        borderWidth: 1,
+        borderRadius: 3,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: gridLines, ticks: tickStyle },
+        y: { grid: gridLines, ticks: { ...tickStyle, callback: v => '₹' + v } }
+      }
+    }
+  });
+
+  /* ── Daily Revenue (Line) ── */
+  new Chart(document.getElementById('dailyChart'), {
+    type: 'line',
+    data: {
+      labels: {{ daily_labels|safe }},
+      datasets: [{
+        label: 'Daily Revenue ₹',
+        data: {{ daily_data|safe }},
+        borderColor: '#00e676',
+        backgroundColor: 'rgba(0,230,118,0.08)',
+        borderWidth: 2,
+        pointBackgroundColor: '#00e676',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        tension: 0.4,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: gridLines, ticks: tickStyle },
+        y: { grid: gridLines, ticks: { ...tickStyle, callback: v => '₹' + v } }
+      }
+    }
+  });
+
+  /* ── Member Growth (Line) ── */
+  new Chart(document.getElementById('memberChart'), {
+    type: 'line',
+    data: {
+      labels: {{ member_labels|safe }},
+      datasets: [{
+        label: 'New Members',
+        data: {{ member_data|safe }},
+        borderColor: '#2979ff',
+        backgroundColor: 'rgba(41,121,255,0.08)',
+        borderWidth: 2,
+        pointBackgroundColor: '#2979ff',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        tension: 0.4,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: gridLines, ticks: tickStyle },
+        y: { grid: gridLines, ticks: tickStyle }
+      }
+    }
+  });
+
+  /* ── Payment Analytics (Doughnut) ── */
+  new Chart(document.getElementById('paymentChart'), {
+    type: 'doughnut',
+    data: {
+      labels: {{ payment_labels|safe }},
+      datasets: [{
+        data: {{ payment_data|safe }},
+        backgroundColor: [
+          'rgba(255,106,0,0.85)',
+          'rgba(0,230,118,0.85)',
+          'rgba(41,121,255,0.85)',
+          'rgba(170,0,255,0.85)',
+          'rgba(255,193,7,0.85)',
+        ],
+        borderColor: '#1a1a1a',
+        borderWidth: 3,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#888',
+            padding: 14,
+            font: { size: 12 },
+            usePointStyle: true,
+            pointStyleWidth: 10,
+          }
+        }
+      }
+    }
+  });
+</script>
+
+{% endblock %}

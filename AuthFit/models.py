@@ -2,10 +2,10 @@ import random
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from cloudinary.models import CloudinaryField
 
 
 # Create your models here.
-
 
 class Contact(models.Model):
     name = models.CharField(max_length=25)
@@ -44,92 +44,124 @@ class MembershipPlan(models.Model):
 
 
 class Enrollment(models.Model):
+
+    # ==============================
+    # CHOICES
+    # ==============================
     GENDER_CHOICES = [
         ('M', 'Male'),
         ('F', 'Female'),
     ]
+
     PAYMENT = [
         ("Done", 'Done'),
         ("Pending", 'Pending'),
     ]
+
     METHOD = [
         ('C', 'CASH'),
         ('U', 'UPI'),
         ('B', 'UPI + CASH'),
     ]
-    unique_id = models.CharField(max_length=4 , unique=True,editable=False ,db_index=True)
+
+    # ==============================
+    # BASIC INFO
+    # ==============================
+    unique_id = models.CharField(
+        max_length=4, unique=True, editable=False, db_index=True
+    )
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
     fullname = models.CharField(max_length=25)
     email = models.EmailField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    phone = models.CharField(max_length=10,db_index=True)
+    phone = models.CharField(max_length=10, db_index=True)
     dob = models.DateField()
-    selectPlan = models.ForeignKey(
-        MembershipPlan, on_delete=models.CASCADE, related_name="enrollments")
-    trainer = models.ForeignKey(
-        Trainer,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="enrollments"
-    )
-    Reference = models.CharField(max_length=30, null=True, blank=True)
+
     address = models.TextField()
+    reference = models.CharField(max_length=30, null=True, blank=True)
+
+    # ==============================
+    # MEMBERSHIP
+    # ==============================
+    selectPlan = models.ForeignKey(MembershipPlan, on_delete=models.CASCADE)
+    trainer = models.ForeignKey(
+        Trainer, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
     paymentStatus = models.CharField(
-        max_length=10, choices=PAYMENT, blank=True, null=True)
-    Amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+        max_length=10, choices=PAYMENT, default="Pending"
+    )
+    Amount = models.DecimalField(max_digits=10, decimal_places=2)
     paymentMethod = models.CharField(
-        max_length=1, choices=METHOD, blank=True, null=True)
-    doj = models.DateField(auto_now_add=True,null=True, blank=True)
+        max_length=1, choices=METHOD, blank=True, null=True
+    )
+
+    # ==============================
+    # DATES
+    # ==============================
+    doj = models.DateField(auto_now_add=True)
     DueDate = models.DateField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    # ==============================
+    # 🔥 FACE SYSTEM (CLEAN)
+    # ==============================
+    face_enrolled = models.BooleanField(default=False)
+
+    # Profile image
+    face_image = CloudinaryField('image', null=True, blank=True)
+
+    # Multiple embeddings
+    face_embeddings = models.JSONField(default=list, blank=True)
+
+    # Number of samples
+    face_samples = models.IntegerField(default=0)
+
+    # ==============================
+    # UNIQUE ID GENERATOR
+    # ==============================
     def generate_unique_id(self):
+        import random
         while True:
-            random_id = str(random.randint(1000,9999))
-            if not Enrollment.objects.filter(unique_id = random_id).exists():
-                return random_id
+            uid = str(random.randint(1000, 9999))
+            if not Enrollment.objects.filter(unique_id=uid).exists():
+                return uid
 
+    # ==============================
+    # SAVE METHOD (CLEAN)
+    # ==============================
+    def save(self, *args, **kwargs):
 
+        # Generate unique ID
+        if not self.unique_id:
+            self.unique_id = self.generate_unique_id()
+
+        # Set amount automatically
+        if self.selectPlan:
+            self.Amount = self.selectPlan.price
+
+        super().save(*args, **kwargs)
+
+    # ==============================
+    # EXPIRY LOGIC
+    # ==============================
     @property
     def is_expired(self):
         if self.DueDate:
             return timezone.now().date() >= self.DueDate
         return False
 
-
     @property
     def days_remaining(self):
         if self.DueDate:
-            remaining = (self.DueDate - timezone.now().date()).days
-            return remaining
+            return (self.DueDate - timezone.now().date()).days
         return None
-
-    def save(self,*args, **kwargs):
-        from django.utils import timezone
-
-        if not self.unique_id:
-            self.unique_id = self.generate_unique_id()
-
-        if self.selectPlan:
-            self.Amount = self.selectPlan.price
-
-        if self.DueDate and timezone.now().date() > self.DueDate:
-            self.paymentStatus = "Pending"
-
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.unique_id} - {self.fullname}"
 
-
-class Gallery(models.Model):
-    title = models.CharField(max_length=100)
-    images = models.ImageField(upload_to='gallery')
-    timestamp = models.DateTimeField(auto_now_add=True ,blank=True)
-
-    def __str__(self):
-        return self.title
-    
 
 class Attendence(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -137,7 +169,7 @@ class Attendence(models.Model):
     timestamp = models.TimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user','date')
+        unique_together = ('user', 'date')
 
     def __str__(self):
         if hasattr(self.user, "enrollment"):

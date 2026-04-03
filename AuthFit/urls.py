@@ -10,6 +10,9 @@ urlpatterns = [
     path('logout/',views.handlelogout , name = "logout"),
     path('contact/',views.contact , name = "contact"),
     path('enrollment/',views.enrollment , name = "enrollment"),
-    path('gallery/',views.gallery , name = "gallery"),
     path('attendence/',views.attendence , name = "attendence"),
+    path('api/mark-attendance/', views.mark_attendance_api),
+    path('api/get-users/', views.get_users),
+    path('api/save-embedding/', views.save_embedding),
+    path('api/upload-face-image/', views.upload_face_image),
 ]

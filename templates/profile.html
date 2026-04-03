@@ -1,13 +1,7 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}Profile{% endblock %}
-
-{% block link %}
+{% extends "base.html" %} {% load static %} {% block title %}Profile 
+{% endblock %} {% block link %}
 <link rel="stylesheet" href="{% static 'css/profile.css' %}" />
-{% endblock %}
-
-{% block message %}
+{% endblock %} {% block message %}
 <div id="message-container">
   {% for message in messages %}
   <div class="flash-message {{ message.tags }}">
@@ -16,16 +10,19 @@
   </div>
   {% endfor %}
 </div>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="page hero-animate">
   <div class="wrapper">
     <div class="main">
       <!-- LEFT SIDE -->
       <div class="profile-left">
         <div class="avatar-circle">
-          <img src="{% static 'images/profile.jpg' %}" alt="profile">
+          <span class="status-dot"></span>
+          {% if image_url %}
+          <img src="{{ image_url }}" width="150" height="150" style="border-radius: 50%; object-fit: cover;">
+          {% else %}
+          <div class="avatar-initial">{{ enrollment.fullname|slice:":1" }}</div>
+          {% endif %}
         </div>
 
         {% if enrollment %}
@@ -38,7 +35,6 @@
 
       <!-- RIGHT SIDE -->
       <div class="info-card">
-
         <div class="card-row top">
           <div class="card-cell side">
             <div class="cell-label">Phone Number</div>
@@ -100,10 +96,8 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 </div>
-<script src="{% static 'js/messages.js' %}"></script>
 {% endblock %}
