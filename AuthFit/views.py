@@ -271,7 +271,7 @@ def enrollment(request):
             selectPlan=selected_plan,
             trainer=selected_trainer,
             gender=gender,
-            Reference=reference,
+            reference=reference,
             address=address,
             user=request.user,
         )
