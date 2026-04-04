@@ -1,3 +1,11 @@
 media/
 face_service.py
 enroll_face_camera.py
+.env
+.env.*
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+staticfiles_build/

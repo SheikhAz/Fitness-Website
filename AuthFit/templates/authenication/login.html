@@ -24,7 +24,7 @@
     <!-- Phone Number -->
     <div class="form-group">
       <label>Phone Number</label>
-      <input type="tel" name="usernumber" class='text' required />
+      <input type="tel" name="usernumber" class='text' required maxlength= "10" pattern='\d{10}'/>
     </div>
 
     <!-- Password -->
@@ -32,7 +32,10 @@
       <label>Password</label>
       <input type="password" class='text' name="password" required />
     </div>
-
+    <p class="forget-text">
+      For password reset, please contact the
+      <a href="/contact/"> administrator.</a>
+    </p>
     <!-- Submit Button -->
     <button type="submit" class="submit-btn">
       LogIn

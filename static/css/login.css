@@ -64,6 +64,14 @@
 .close-btn:hover {
   transform: scale(1.1);
 }
+.forget-text{
+  font-size: 13px;
+  text-align: center;
+}
+.forget-text a {
+  color: #fb923c;
+  text-decoration: none;
+}
 /* ===== FORM (GLASS EFFECT) ===== */
 .glass-form {
   width: 90%;
