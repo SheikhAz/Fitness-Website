@@ -19,16 +19,15 @@
         class="flash-message {% if message.tags == 'success' %} success {% elif message.tags == 'error' %} error {% else %} default {% endif %}"
       >
         <span>{{ message }}</span>
-
         <button class="close-btn">×</button>
       </div>
       {% endfor %}
     </div>
+
     <!-- HERO -->
     <section class="hero" id="home">
       <!-- Background -->
       <img src="{% static 'images/Fitness.jpg' %}" class="hero-bg" />
-
       <div class="overlay"></div>
 
       <!-- TOP BAR -->
@@ -40,8 +39,44 @@
         <div class="divider"></div>
       </div>
 
+      <!-- ===================== NOTIFICATION BAR ===================== -->
+      <!-- Shown only if there are active gym notifications -->
+      {% if gym_notifications %}
+      <div class="notif-bar" id="notifBar">
+        <div class="notif-inner">
+          <!-- Label badge -->
+          <span class="notif-label">🔔 NOTICE</span>
+
+          <!-- Scrolling ticker -->
+          <div class="notif-ticker-wrap">
+            <div class="notif-ticker" id="notifTicker">
+              {% for notif in gym_notifications %}
+              <span class="notif-item">
+                {% if notif.icon %}{{ notif.icon }}{% endif %}
+                {{ notif.message }}
+                {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
+              </span>
+              {% endfor %}
+              <!-- Duplicate for seamless loop -->
+              {% for notif in gym_notifications %}
+              <span class="notif-item" aria-hidden="true">
+                {% if notif.icon %}{{ notif.icon }}{% endif %}
+                {{ notif.message }}
+                {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
+              </span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Close button -->
+          <button class="notif-close" id="notifClose" aria-label="Close">×</button>
+        </div>
+      </div>
+      {% endif %}
+      <!-- =================== END NOTIFICATION BAR =================== -->
+
       <!-- NAVBAR -->
-      <nav class="navbar">
+      <nav class="navbar" id="navbar">
         <div class="nav-container">
           <a href="/" class="logo">
             <span>EnterName</span>
@@ -62,13 +97,13 @@
 
                 <li><a href="/workout/">Workout</a></li>
 
-                {% if request.user.is_authenticated and enrolled %} 
+                {% if request.user.is_authenticated and enrolled %}
                 {% if isStaff %}
                 <li><a href="/admin/AuthFit/attendence/">Attendance List</a></li>
                 {% else %}
                 <li><a href="/attendence/">Attendance</a></li>
                 {% endif %}
-                {% endif %} 
+                {% endif %}
               </ul>
             </li>
 
@@ -79,11 +114,9 @@
 
           <div class="nav-right">
             {% if request.user.is_authenticated %} {% if isStaff %}
-            <!-- STAFF -->
             <a href="/admin/" class="btn">AdPanel</a>
             <a href="/admin/AuthFit/enrollment/" class="btn">Enroll List</a>
             {% else %}
-            <!-- USER -->
             <a href="/profile/" class="btn">My Profile</a>
 
             {% if enrolled %}
@@ -92,12 +125,7 @@
             <a href="/enrollment/" class="btn mobile-only">Enroll</a>
             {% endif %} {% endif %}
 
-            <!-- LOGOUT (for both staff + user) -->
-            <form
-              action="{% url 'logout' %}"
-              method="POST"
-              class="desktop-only"
-            >
+            <form action="{% url 'logout' %}" method="POST" class="desktop-only">
               {% csrf_token %}
               <button type="submit" class="btn">Logout</button>
             </form>
@@ -106,7 +134,6 @@
             <a href="/signup/" class="btn">SignUp/LogIn</a>
             {% endif %}
 
-            <!-- Hamburger -->
             <button id="menuBtn" class="hamburger-icon">
               <span></span>
               <span></span>
@@ -116,7 +143,7 @@
         </div>
       </nav>
 
-      <!-- ✅ HERO CONTENT (NOW INSIDE IMAGE) -->
+      <!-- HERO CONTENT -->
       <div id="heroContent" class="hero-content hero-animate">
         <h1 class="hero-title">
           Crush your health and <br class="break-line" />
@@ -162,7 +189,6 @@
     <!-- MOBILE POPUP MENU -->
     <div id="mobileMenu" class="mobile-menu">
       <div class="menu-box">
-        <!-- CLOSE BUTTON -->
         <span id="closeMenu" class="close-btn">×</span>
         <ul>
           {% if isSuperuser %}
@@ -188,17 +214,13 @@
         {% endif %}
       </div>
     </div>
+
     <section id="About" class="features-section">
       <div class="features-container">
-        <!-- SMALL HEADING -->
         <p class="small-heading">WHY CHOSE US?</p>
-
-        <!-- MAIN HEADING -->
         <h2 class="main-heading">PUSH YOUR LIMITS FORWARD</h2>
 
-        <!-- GRID -->
         <div class="features-grid">
-          <!-- FEATURE -->
           <div class="feature-card" onclick="toggleFeature(this)">
             <div class="icon-box">
               <img src="{% static 'images/features/barbell.png' %}" alt="" />
@@ -243,50 +265,39 @@
         </div>
       </div>
     </section>
-    <!-- WHAT WE CAN OFFER -->
+
     <section class="offer-section">
       <div class="offer-container">
-        <!-- HEADING -->
         <h2 class="offer-heading">
           <span class="white">WHAT WE CAN</span>
           <span class="orange"> OFFER</span>
         </h2>
 
-        <!-- GRID -->
         <div class="offer-grid">
-          <!-- CARD 1 -->
           <div class="offer-card">
             <img src="{% static 'images/offer/machine_1.jpg' %}" alt="" />
-
             <div class="overlay"></div>
             <div class="skew-box"></div>
-
             <div class="content">
               <p>STRENGTH</p>
               <h3>WEIGHTLIFTING</h3>
             </div>
           </div>
 
-          <!-- CARD 2 -->
           <div class="offer-card">
             <img src="{% static 'images/offer/machine_2.jpg' %}" alt="" />
-
             <div class="overlay"></div>
             <div class="skew-box"></div>
-
             <div class="content">
               <p>CARDIO</p>
               <h3>INDOOR CYCLING</h3>
             </div>
           </div>
 
-          <!-- CARD 3 -->
           <div class="offer-card center-card">
             <img src="{% static 'images/offer/trainer.jpg' %}" alt="" />
-
             <div class="overlay"></div>
             <div class="skew-box"></div>
-
             <div class="content">
               <p>PERSONAL TRAINER</p>
               <h3>Certified Trainer</h3>
@@ -295,31 +306,18 @@
         </div>
       </div>
     </section>
-    <!-- FREE TRIAL CTA SECTION -->
+
     <section id="Price" class="cta-section">
-      <!-- BACKGROUND IMAGE -->
-      <img
-        src="{% static 'images/Registration.jpg' %}"
-        class="cta-bg"
-        alt="Gym Training"
-      />
-
-      <!-- OVERLAY -->
+      <img src="{% static 'images/Registration.jpg' %}" class="cta-bg" alt="Gym Training" />
       <div class="cta-overlay"></div>
-
-      <!-- CONTENT -->
       <div class="cta-content">
         <p class="cta-top-text">ARE YOU READY TO</p>
-
         <h2 class="cta-title">
           <span>GET FIT</span>, STRONG <br class="break-line" />
           & MOTIVATED!
         </h2>
-
         <p class="cta-sub-text">Registration now to get</p>
-
         <p class="cta-highlight">WHERE HEALTH, BEAUTY AND FITNESS MEET.</p>
-
         <div class="cta-btn-wrapper">
           {% if request.user.is_authenticated %}
           <a href="/enrollment/" class="cta-btn">Start 2 Day Free Trial</a>
@@ -329,20 +327,17 @@
         </div>
       </div>
     </section>
-    <!-- PRICING SECTION -->
+
     <section class="pricing-section" id="pricing">
       <div class="pricing-container">
         <p class="pricing-subtitle">OUR PLANS</p>
         <h2 class="pricing-title">CHOOSE YOUR FITNESS PLAN</h2>
 
         <div class="pricing-grid">
-          <!-- PLAN 1 -->
           <div class="pricing-card" onclick="togglePricing(this)">
             <h3>Monthly Fitness</h3>
-
             <div class="price">₹500</div>
             <p class="duration">PER MONTH</p>
-
             <div class="pricing-desc">
               <ul>
                 <li>✔ Registration Fee included</li>
@@ -351,7 +346,6 @@
                 <li>✔ Diet Guidance</li>
                 <li>✔ No Time Restrictions</li>
               </ul>
-
               {% if request.user.is_authenticated %} {% if not enrolled %}
               <a href="/enrollment/" class="join-btn">JOIN NOW</a>
               {% endif %} {% else %}
@@ -360,15 +354,11 @@
             </div>
           </div>
 
-          <!-- PLAN 2 -->
           <div class="pricing-card popular" onclick="togglePricing(this)">
             <span class="badge">MOST POPULAR</span>
-
             <h3>3 Month Transformation</h3>
-
             <div class="price">₹1,300</div>
             <p class="duration">3 MONTHS</p>
-
             <div class="pricing-desc">
               <ul>
                 <li>✔ No Registration Fee</li>
@@ -377,7 +367,6 @@
                 <li>✔ Workout Plan</li>
                 <li>✔ Priority Support</li>
               </ul>
-
               {% if request.user.is_authenticated %} {% if not enrolled %}
               <a href="/enrollment/" class="join-btn">JOIN NOW</a>
               {% endif %} {% else %}
@@ -386,13 +375,10 @@
             </div>
           </div>
 
-          <!-- PLAN 3 -->
           <div class="pricing-card" onclick="togglePricing(this)">
             <h3>Annual Membership</h3>
-
             <div class="price">₹7,899</div>
             <p class="duration">12 MONTHS</p>
-
             <div class="pricing-desc">
               <ul>
                 <li>✔ All Gym Facilities</li>
@@ -411,25 +397,16 @@
         </div>
       </div>
     </section>
+
     <footer id="classes" class="footer">
-      <!-- TOP CONTACT BAR -->
       <div class="footer-top">
         <div class="footer-container footer-top-inner">
-          <!-- LOCATION -->
           <div class="footer-contact">
             <div class="footer-icon">
-              <img
-                src="{% static 'images/footer/placeholder.png' %}"
-                alt="Location"
-              />
+              <img src="{% static 'images/footer/placeholder.png' %}" alt="Location" />
             </div>
-            <p>
-              333 Middle Winchendon Rd,<br />
-              Rindge, NH 03461
-            </p>
+            <p>333 Middle Winchendon Rd,<br />Rindge, NH 03461</p>
           </div>
-
-          <!-- EMAIL -->
           <div class="footer-contact">
             <div class="footer-icon">
               <img src="{% static 'images/footer/email.png' %}" alt="Email" />
@@ -439,23 +416,16 @@
         </div>
       </div>
 
-      <!-- MAIN FOOTER -->
       <div class="footer-container footer-main">
-        <!-- BRAND -->
         <div class="footer-brand">
           <h2>GY<span>M</span></h2>
-          <p>
-            Transform your body and mind with professional training, modern
-            equipment and expert fitness coaching.
-          </p>
-
+          <p>Transform your body and mind with professional training, modern equipment and expert fitness coaching.</p>
           <div class="footer-social">
             <img src="{% static 'images/footer/instagram.png' %}" alt="" />
             <img src="{% static 'images/footer/email.png' %}" alt="" />
           </div>
         </div>
 
-        <!-- USEFUL LINKS -->
         <div class="footer-links useful">
           <h3>Useful Links</h3>
           <ul>
@@ -465,7 +435,6 @@
           </ul>
         </div>
 
-        <!-- SUPPORT -->
         <div class="footer-links support">
           <h3>Support</h3>
           <ul>
@@ -481,7 +450,6 @@
           </ul>
         </div>
 
-        <!-- EXTRA -->
         <div class="footer-extra hours">
           <h3>Opening Hours</h3>
           <ul>
@@ -493,12 +461,12 @@
         </div>
       </div>
 
-      <!-- COPYRIGHT -->
       <div class="footer-bottom">
         Copyright ©2026 All rights reserved
         <span>by Azzy</span>
       </div>
     </footer>
+
     <script src="{% static 'js/home.js' %}"></script>
   </body>
 </html>

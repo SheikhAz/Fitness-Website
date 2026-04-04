@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_log, logout
 from django.contrib.auth.models import User
-from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer,Attendence
+from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Attendence, GymNotification
 import calendar
 import json
 from django.http import JsonResponse
@@ -196,6 +196,7 @@ def homePage(request):
     enrolled = False
     isStaff = False
     isSuperuser = False
+    gym_notifications = GymNotification.objects.filter(is_active=True)
 
     if request.user.is_authenticated:
         enrolled = Enrollment.objects.filter(user=request.user).exists()
@@ -207,6 +208,7 @@ def homePage(request):
         "enrolled": enrolled,
         "isStaff": isStaff,
         "isSuperuser":isSuperuser,
+        "gym_notifications": gym_notifications,
     })
 
 

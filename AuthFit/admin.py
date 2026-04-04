@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Contact,Trainer ,MembershipPlan ,Attendence
+from .models import Contact, Trainer, MembershipPlan, Attendence, GymNotification
 from .models import Enrollment
 from django.urls import path
 from django.utils.html import format_html
@@ -9,7 +9,15 @@ from django.utils import timezone
 from django.template.response import TemplateResponse
 import json
 
+@admin.register(GymNotification)
+class GymNotificationAdmin(admin.ModelAdmin):
+      list_display  = ("icon", "message", "is_active", "order", "created_at")
+      list_editable = ("is_active", "order")
+      list_filter   = ("is_active",)
+      search_fields = ("message",)
 
+
+      
 def revenue_view(request):
     qs = Enrollment.objects.filter(paymentStatus="Done")
 

@@ -7,30 +7,40 @@ document.addEventListener("DOMContentLoaded", () => {
   if (menuBtn && mobileMenu && closeMenu) {
     mobileMenu.classList.remove("active");
 
-    // Open menu
-    menuBtn.addEventListener("click", () => {
-      mobileMenu.classList.add("active");
-    });
+    menuBtn.addEventListener("click", () => mobileMenu.classList.add("active"));
+    closeMenu.addEventListener("click", () =>
+      mobileMenu.classList.remove("active"),
+    );
 
-    // Close from X button
-    closeMenu.addEventListener("click", () => {
-      mobileMenu.classList.remove("active");
-    });
-
-    // Close when clicking outside (overlay)
     mobileMenu.addEventListener("click", (e) => {
-      if (e.target === mobileMenu) {
-        mobileMenu.classList.remove("active");
-      }
+      if (e.target === mobileMenu) mobileMenu.classList.remove("active");
     });
 
-    // Close when clicking ANY link/button inside menu
-    const menuItems = mobileMenu.querySelectorAll("a, button");
-    menuItems.forEach((item) => {
-      item.addEventListener("click", () => {
-        mobileMenu.classList.remove("active");
-      });
+    mobileMenu.querySelectorAll("a, button").forEach((item) => {
+      item.addEventListener("click", () =>
+        mobileMenu.classList.remove("active"),
+      );
     });
+  }
+
+  /* ========= NOTIFICATION BAR ========= */
+  const notifBar = document.getElementById("notifBar");
+  const notifClose = document.getElementById("notifClose");
+  const navbar = document.getElementById("navbar");
+
+  if (notifBar && notifClose && navbar) {
+    notifClose.addEventListener("click", () => {
+      // Collapse the bar
+      notifBar.classList.add("hidden");
+      // Shift navbar up so it sits right below topbar
+      navbar.classList.add("notif-hidden");
+    });
+
+    // Restore dismissed state on page reload
+    if (sessionStorage.getItem("notifDismissed") === "1") {
+      notifBar.classList.add("hidden");
+      navbar.classList.add("notif-hidden");
+    }
   }
 
   /* ========= REVIEW SLIDER ========= */
@@ -49,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const messages = document.querySelectorAll(".flash-message");
 
   messages.forEach((msg, i) => {
-    // Entry animation
     msg.style.opacity = "0";
     msg.style.transform = "translateY(-10px)";
 
@@ -59,56 +68,32 @@ document.addEventListener("DOMContentLoaded", () => {
       msg.style.transform = "translateY(0)";
     }, i * 150);
 
-    // Auto remove
-    setTimeout(
-      () => {
-        removeMessage(msg);
-      },
-      4000 + i * 200,
-    );
+    setTimeout(() => removeMessage(msg), 4000 + i * 200);
 
-    // Close button
     const closeBtn = msg.querySelector(".close-btn");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        removeMessage(msg);
-      });
-    }
+    if (closeBtn) closeBtn.addEventListener("click", () => removeMessage(msg));
   });
 
   function removeMessage(msg) {
     msg.style.transition = "all 0.3s ease";
     msg.style.opacity = "0";
     msg.style.transform = "translateY(-10px)";
-
-    setTimeout(() => {
-      msg.remove();
-    }, 300);
+    setTimeout(() => msg.remove(), 300);
   }
 });
 
 /* ========= FEATURE TOGGLE ========= */
 function toggleFeature(card) {
-  const allCards = document.querySelectorAll(".feature-card");
-
-  allCards.forEach((c) => {
-    if (c !== card) {
-      c.classList.remove("active");
-    }
+  document.querySelectorAll(".feature-card").forEach((c) => {
+    if (c !== card) c.classList.remove("active");
   });
-
   card.classList.toggle("active");
 }
 
 /* ========= PRICING TOGGLE ========= */
 function togglePricing(card) {
-  const allCards = document.querySelectorAll(".pricing-card");
-
-  allCards.forEach((c) => {
-    if (c !== card) {
-      c.classList.remove("active");
-    }
+  document.querySelectorAll(".pricing-card").forEach((c) => {
+    if (c !== card) c.classList.remove("active");
   });
-
   card.classList.toggle("active");
 }

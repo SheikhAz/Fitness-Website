@@ -175,3 +175,36 @@ class Attendence(models.Model):
         if hasattr(self.user, "enrollment"):
             return f"{self.user.enrollment.unique_id}"
         return f"{self.user.username} - {self.date}"
+
+class GymNotification(models.Model):
+    """
+    Admin-managed notification ticker on the homepage.
+    Each active entry scrolls across the notification bar.
+    """
+    ICON_CHOICES = [
+        ("🎉", "🎉 Party / Offer"),
+        ("💪", "💪 Training"),
+        ("🏖️", "🏖️ Summer / Season"),
+        ("⚡", "⚡ Alert / Closure"),
+        ("🏷️", "🏷️ Deal / Discount"),
+        ("📢", "📢 Announcement"),
+        ("", "No icon"),
+    ]
+
+    icon = models.CharField(
+        max_length=5, choices=ICON_CHOICES, blank=True, default="📢")
+    message = models.CharField(
+        max_length=200, help_text="Short notification text (max 200 chars)")
+    is_active = models.BooleanField(
+        default=True, help_text="Uncheck to hide from homepage")
+    created_at = models.DateTimeField(auto_now_add=True)
+    order = models.PositiveSmallIntegerField(
+        default=0, help_text="Lower number = shows first")
+
+    class Meta:
+        ordering = ["order", "created_at"]
+        verbose_name = "Gym Notification"
+        verbose_name_plural = "Gym Notifications"
+
+    def __str__(self):
+        return f"{self.icon} {self.message[:60]}"
