@@ -3,7 +3,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from cloudinary.models import CloudinaryField
-
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.core.cache import cache
 
 # Create your models here.
 
@@ -208,3 +210,14 @@ class GymNotification(models.Model):
 
     def __str__(self):
         return f"{self.icon} {self.message[:60]}"
+    
+@receiver([post_save, post_delete], sender=Enrollment)
+def clear_enrollment_cache(sender, **kwargs):
+    cache.delete("admin_revenue")
+    cache.delete("face_users")
+
+
+@receiver([post_save, post_delete], sender=GymNotification)
+def clear_notification_cache(sender, **kwargs):
+    cache.delete("notifications")
+ 

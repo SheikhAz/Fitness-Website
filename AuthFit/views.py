@@ -13,7 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .attendance import mark_attendance
 from cloudinary.utils import cloudinary_url
 from django.contrib.auth.decorators import user_passes_test
-
+from django.core.cache import cache
+from AuthFit.rate_limit import check_login_attempt, reset_attempt
 
 
 
@@ -84,9 +85,16 @@ def loginPage(request):
         phone = request.POST.get('usernumber')
         password = request.POST.get('password')
 
+        ip = request.META.get('HTTP_X_FORWARDED_FOR',request.META.get('REMOTE_ADDR'))
+
+        if not check_login_attempt(ip,phone):
+            messages.error(request, "Too many login attempts. Try again after 1 minute.")
+            return redirect('/login/')
+
         user = authenticate(request, username=phone, password=password)
         if user is not None:
             auth_log(request, user)
+            reset_attempt(ip,phone)
             return redirect('/')
         else:
             messages.error(request, "Invalid Phone or Password ")
@@ -151,16 +159,21 @@ def mark_attendance_api(request):
 # 👥 GET USERS (BONUS IMPROVEMENT)
 # ==============================
 def get_users(request):
-    users = Enrollment.objects.filter(face_embeddings__isnull=False)
 
-    data = []
+    data = cache.get("face_users")
 
-    for u in users:
-        data.append({
-            "unique_id": u.unique_id,
-            "name": u.fullname,
-            "embeddings": u.face_embeddings
-        })
+    if data is None:
+        users = Enrollment.objects.filter(face_embeddings__isnull=False)
+
+        data = []
+        for u in users:
+            data.append({
+                "unique_id": u.unique_id,
+                "name": u.fullname,
+                "embeddings": u.face_embeddings
+            })
+
+        cache.set("face_users", data, timeout=300)
 
     return JsonResponse(data, safe=False)
 
@@ -196,7 +209,13 @@ def homePage(request):
     enrolled = False
     isStaff = False
     isSuperuser = False
-    gym_notifications = GymNotification.objects.filter(is_active=True)
+    gym_notifications = cache.get("notifications")
+    if gym_notifications is None:
+        gym_notifications = list(
+            GymNotification.objects.filter(is_active=True)
+            .values("icon", "message")
+        )
+        cache.set("notifications", gym_notifications, timeout=300)
 
     if request.user.is_authenticated:
         enrolled = Enrollment.objects.filter(user=request.user).exists()

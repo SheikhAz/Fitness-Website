@@ -8,6 +8,7 @@ from django.db.models.functions import TruncMonth, TruncDay
 from django.utils import timezone
 from django.template.response import TemplateResponse
 import json
+from django.core.cache import cache
 
 @admin.register(GymNotification)
 class GymNotificationAdmin(admin.ModelAdmin):
@@ -19,71 +20,88 @@ class GymNotificationAdmin(admin.ModelAdmin):
 
       
 def revenue_view(request):
-    qs = Enrollment.objects.filter(paymentStatus="Done")
 
-    # 📊 Monthly Revenue
-    monthly = (
-        qs.annotate(month=TruncMonth('created_at'))
-        .values('month')
-        .annotate(total=Sum('Amount'))
-        .order_by('month')
-    )
+    data = cache.get("admin_revenue_data")
 
-    # 📅 Daily Revenue (last 7 days)
-    last_7_days = timezone.now() - timezone.timedelta(days=7)
+    if data is None:
 
-    daily = (
-        qs.filter(created_at__gte=last_7_days)
-        .annotate(day=TruncDay('created_at'))
-        .values('day')
-        .annotate(total=Sum('Amount'))
-        .order_by('day')
-    )
+        qs = Enrollment.objects.filter(paymentStatus="Done")
 
-    # 📈 Member Growth
-    members = (
-        Enrollment.objects.annotate(month=TruncMonth('created_at'))
-        .values('month')
-        .annotate(count=Count('id'))
-        .order_by('month')
-    )
+        # 📊 Monthly Revenue
+        monthly = (
+            qs.annotate(month=TruncMonth('created_at'))
+            .values('month')
+            .annotate(total=Sum('Amount'))
+            .order_by('month')
+        )
 
-    # 💳 Payment Analytics
-    payments = (
-        Enrollment.objects
-        .exclude(paymentStatus__isnull=True)
-        .values('paymentStatus')
-        .annotate(count=Count('id'))
-    )
+        # 📅 Daily Revenue
+        last_7_days = timezone.now() - timezone.timedelta(days=7)
 
-    # ✅ KPI CALCULATIONS (IMPORTANT)
-    total_revenue = sum([x['total'] or 0 for x in monthly])
-    today_revenue = sum([x['total'] or 0 for x in daily])
-    total_members = Enrollment.objects.count()
+        daily = (
+            qs.filter(created_at__gte=last_7_days)
+            .annotate(day=TruncDay('created_at'))
+            .values('day')
+            .annotate(total=Sum('Amount'))
+            .order_by('day')
+        )
 
+        # 📈 Member Growth
+        members = (
+            Enrollment.objects.annotate(month=TruncMonth('created_at'))
+            .values('month')
+            .annotate(count=Count('id'))
+            .order_by('month')
+        )
+
+        # 💳 Payment Analytics
+        payments = (
+            Enrollment.objects
+            .exclude(paymentStatus__isnull=True)
+            .values('paymentStatus')
+            .annotate(count=Count('id'))
+        )
+
+        # ✅ STORE CLEAN DATA ONLY
+        data = {
+            "monthly_labels": [x['month'].strftime("%b %Y") for x in monthly if x['month']],
+            "monthly_data": [float(x['total'] or 0) for x in monthly],
+
+            "daily_labels": [x['day'].strftime("%d %b") for x in daily if x['day']],
+            "daily_data": [float(x['total'] or 0) for x in daily],
+
+            "member_labels": [x['month'].strftime("%b %Y") for x in members if x['month']],
+            "member_data": [x['count'] for x in members],
+
+            "payment_labels": [x['paymentStatus'] for x in payments],
+            "payment_data": [x['count'] for x in payments],
+
+            "total_revenue": sum([x['total'] or 0 for x in monthly]),
+            "today_revenue": sum([x['total'] or 0 for x in daily]),
+            "total_members": Enrollment.objects.count(),
+        }
+
+        cache.set("admin_revenue_data", data, timeout=300)
+
+    # ✅ BUILD CONTEXT (DO NOT CACHE THIS)
     context = dict(
         admin.site.each_context(request),
 
-        # Charts
-        monthly_labels=json.dumps([x['month'].strftime("%b %Y")
-                                  for x in monthly if x['month']]),
-        monthly_data=json.dumps([float(x['total'] or 0) for x in monthly]),
+        monthly_labels=json.dumps(data["monthly_labels"]),
+        monthly_data=json.dumps(data["monthly_data"]),
 
-        daily_labels=json.dumps([x['day'].strftime("%d %b")
-                                for x in daily if x['day']]),
-        daily_data=json.dumps([float(x['total'] or 0) for x in daily]),
+        daily_labels=json.dumps(data["daily_labels"]),
+        daily_data=json.dumps(data["daily_data"]),
 
-        member_labels=json.dumps([x['month'].strftime("%b %Y")
-                                 for x in members if x['month']]),
-        member_data=json.dumps([x['count'] for x in members]),
+        member_labels=json.dumps(data["member_labels"]),
+        member_data=json.dumps(data["member_data"]),
 
-        payment_labels=json.dumps([x['paymentStatus'] for x in payments]),
-        payment_data=json.dumps([x['count'] for x in payments]),
+        payment_labels=json.dumps(data["payment_labels"]),
+        payment_data=json.dumps(data["payment_data"]),
 
-        # ✅ REAL VALUES (for KPI cards)
-        total_revenue=total_revenue,
-        today_revenue=today_revenue,
-        total_members=total_members,
+        total_revenue=data["total_revenue"],
+        today_revenue=data["today_revenue"],
+        total_members=data["total_members"],
     )
 
     return TemplateResponse(request, "admin/revenue.html", context)

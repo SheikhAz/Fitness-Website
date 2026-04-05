@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-v4j%xtb%9uk9+st0)5zy74g%nw#ac)@*(g2lawkcc&rn-kr_r8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
@@ -146,3 +146,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR , 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "rediss://default:gQAAAAAAAWp4AAIncDJmMzJjNGI0MWM2NDk0ZTk4ODE0NDFkNDA1NGFjYTQxOHAyOTI3OTI@stirring-redfish-92792.upstash.io:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {
+                "ssl_cert_reqs": None 
+            }
+        }
+    }
+}
