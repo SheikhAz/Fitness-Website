@@ -30,29 +30,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (notifBar && notifClose && navbar) {
     notifClose.addEventListener("click", () => {
-      // Collapse the bar
       notifBar.classList.add("hidden");
-      // Shift navbar up so it sits right below topbar
       navbar.classList.add("notif-hidden");
     });
 
-    // Restore dismissed state on page reload
     if (sessionStorage.getItem("notifDismissed") === "1") {
       notifBar.classList.add("hidden");
       navbar.classList.add("notif-hidden");
     }
-  }
-
-  /* ========= REVIEW SLIDER ========= */
-  let index = 0;
-  const reviews = document.getElementById("reviews");
-  const totalSlides = document.querySelectorAll(".review").length;
-
-  if (reviews && totalSlides > 0) {
-    setInterval(() => {
-      index = (index + 1) % totalSlides;
-      reviews.style.transform = `translateX(-${index * 100}%)`;
-    }, 4000);
   }
 
   /* ========= DJANGO FLASH MESSAGES ========= */
@@ -80,6 +65,38 @@ document.addEventListener("DOMContentLoaded", () => {
     msg.style.transform = "translateY(-10px)";
     setTimeout(() => msg.remove(), 300);
   }
+
+  /* ========= HERO STATS ========= */
+  function animateCount(el, target) {
+    if (!el) return;
+    let start = 0;
+    const dur = 1400;
+    const step = 16;
+    const inc = Math.ceil(target / (dur / step));
+    const t = setInterval(() => {
+      start += inc;
+      if (start >= target) {
+        start = target;
+        clearInterval(t);
+      }
+      el.textContent = start;
+    }, step);
+  }
+
+  animateCount(document.getElementById("statExercise"), 25);
+  animateCount(document.getElementById("statSatisfaction"), 90);
+
+  fetch("/api/stats/")
+    .then((r) => r.json())
+    .then((data) => {
+      const users = data.total_users || 0;
+      const display = users < 50 ? users : Math.ceil(users / 10) * 10 * 2;
+      animateCount(document.getElementById("statUsers"), display || 10);
+    })
+    .catch(() => {
+      const el = document.getElementById("statUsers");
+      if (el) animateCount(el, 10);
+    });
 });
 
 /* ========= FEATURE TOGGLE ========= */

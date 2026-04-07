@@ -230,6 +230,9 @@ def homePage(request):
         "gym_notifications": gym_notifications,
     })
 
+def stats_api(request):
+    total_users = Enrollment.objects.count()
+    return JsonResponse({"total_users": total_users})
 
 def contact(request):
     if request.method == "POST":
