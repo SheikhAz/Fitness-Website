@@ -1,9 +1,7 @@
 {% extends "base.html" %} {% load static %} 
-{% block title %}Enrollment for GYM{% endblock %} 
-{% block link %}
+{% block title %}Enrollment for GYM{% endblock %} {% block link %}
 <link rel="stylesheet" href="{% static 'css/enrollment.css' %}" />
-{% endblock %} 
-{% block heading %}
+{% endblock %} {% block heading %}
 <header class="hero-header">
   <h1>Gym Registration Form</h1>
   <p>
@@ -11,8 +9,7 @@
     all our fitness services.
   </p>
 </header>
-{% endblock %} 
-{% block message %}
+{% endblock %} {% block message %}
 <div id="message-container">
   {% for message in messages %}
   <div
@@ -24,8 +21,7 @@
   </div>
   {% endfor %}
 </div>
-{% endblock %} 
-{% block content %}
+{% endblock %} {% block content %}
 <!-- Page Body -->
 <div class="page-body hero-animate">
   <div class="form-card">
@@ -69,7 +65,21 @@
           <input type="hidden" name="gender" id="genderInput" required />
         </div>
         <div class="date-wrap" id="dobWrap">
-          <input class="field" type="date" name="dob" id="dobInput" required />
+          <input
+            class="field"
+            type="text"
+            id="dobDisplay"
+            placeholder="📅  Date of Birth"
+            readonly
+            style="cursor: pointer"
+          />
+          <input
+            type="date"
+            name="dob"
+            id="dobInput"
+            style="display: none"
+            required
+          />
         </div>
       </div>
 

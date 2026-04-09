@@ -67,21 +67,28 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-  /* ── Date of Birth — mobile placeholder fix ── */
+  /* ── Date of Birth — cross-platform fix ── */
+  const dobDisplay = document.getElementById("dobDisplay");
   const dobInput = document.getElementById("dobInput");
 
-  if (dobInput) {
-    const syncDobState = () => {
-      if (dobInput.value) {
-        dobInput.classList.add("has-value");
-      } else {
-        dobInput.classList.remove("has-value");
-      }
-    };
+  if (dobDisplay && dobInput) {
+    // Tapping the visible text field opens the hidden native date picker
+    dobDisplay.addEventListener(
+      "click",
+      () => dobInput.showPicker?.() || dobInput.click(),
+    );
 
-    dobInput.addEventListener("change", syncDobState);
-    dobInput.addEventListener("input", syncDobState);
-    syncDobState(); // run once on load
+    dobInput.addEventListener("change", () => {
+      if (dobInput.value) {
+        // Format date as DD/MM/YYYY for display
+        const [y, m, d] = dobInput.value.split("-");
+        dobDisplay.value = `${d}/${m}/${y}`;
+        dobDisplay.classList.add("has-value");
+      } else {
+        dobDisplay.value = "";
+        dobDisplay.classList.remove("has-value");
+      }
+    });
   }
 
   /* ── Submit loading state ── */
@@ -92,4 +99,4 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.disabled = true;
     }
   });
-});
+};);
