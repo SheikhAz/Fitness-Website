@@ -126,8 +126,13 @@ def signupPage(request):
             username=username,
             password=password,
         )
-        messages.success(request, "Account is created Successfully......")
-        return redirect('/login/')
+        user = authenticate(request, username=phone, password=password)
+        if user is not None:
+            auth_log(request, user)
+            messages.success(request, "Account is created Successfully......")
+            return redirect('/')
+        else:
+            return redirect('/signup/')
     return render(request, 'authenication/signup.html')
 
 

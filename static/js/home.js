@@ -83,8 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }, step);
   }
 
-  animateCount(document.getElementById("statExercise"), 25);
-  animateCount(document.getElementById("statSatisfaction"), 90);
+  animateCount(document.getElementById("statExercise"), 20);
+  animateCount(document.getElementById("statSatisfaction"), 92);
 
   fetch("/api/stats/")
     .then((r) => r.json())
