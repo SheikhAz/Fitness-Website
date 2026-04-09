@@ -80,12 +80,22 @@ def save_embedding(request):
 
     return JsonResponse({"error": "Invalid request"})
 
+
+def get_client_ip(request):
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if forwarded_for:
+        # Take the FIRST IP — that's the real client
+        ip = forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 def loginPage(request):
     if request.method == "POST":
         phone = request.POST.get('usernumber')
         password = request.POST.get('password')
 
-        ip = request.META.get('HTTP_X_FORWARDED_FOR',request.META.get('REMOTE_ADDR'))
+        ip = get_client_ip(request)
 
         if not check_login_attempt(ip,phone):
             messages.error(request, "Too many login attempts. Try again after 1 minute.")
