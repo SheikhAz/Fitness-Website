@@ -1,1 +1,172 @@
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}#message-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;width:100%;max-width:400px;padding:0 16px}.flash-message{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;margin-bottom:12px;border-radius:12px;font-size:14px;font-weight:500;color:#fff;box-shadow:0 10px 25px rgba(0,0,0,.3);backdrop-filter:blur(10px)}.flash-message.success{background:linear-gradient(to right,#22c55e,#059669)}.flash-message.error{background:linear-gradient(to right,#ef4444,#b91c1c)}.flash-message.default{background-color:#1f2937}.close-btn{margin-left:10px;font-size:18px;font-weight:700;border:none;background:none;color:#fff;cursor:pointer;transition:transform .2s ease}.close-btn:hover{transform:scale(1.1)}:root{--orange:#f97316;--orange-hover:#ea6c0a;--orange-dim:rgba(249,115,22,.4);--orange-glow:rgba(249,115,22,.2);--orange-subtle:rgba(249,115,22,.15);--bg-card:rgba(0,0,0,.6);--bg-input:rgba(0,0,0,.6);--border:rgba(249,115,22,.4);--text-muted:#9ca3af;--text-white:#fff}.navbar{font-size:15px}.hero-header h1{font-family:"Bebas Neue",sans-serif;font-size:45px;color:var(--orange);letter-spacing:3px;margin-top:8px;text-shadow:0 0 40px rgba(249,115,22,.4)}.hero-header p{color:var(--text-muted);font-size:13px;margin-top:10px;max-width:520px;margin-inline:auto}.page-body{position:relative;z-index:10;display:flex;justify-content:center;padding:28px 16px 60px}.hero-animate{opacity:0;transform:translateY(40px);animation:smoothFade .5s ease-out forwards}@keyframes smoothFade{to{opacity:1;transform:translateY(0)}}.form-card{width:100%;max-width:720px;background:var(--bg-card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(249,115,22,.2);border-radius:20px;padding:40px 36px;box-shadow:0 25px 70px rgba(0,0,0,.7),0 0 50px rgba(249,115,22,.12);animation:fadeSlideUp .6s ease both}@keyframes fadeSlideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}.section-title{font-size:18px;font-weight:600;color:var(--orange);letter-spacing:.5px;margin-bottom:20px}.color-price{color:var(--orange)}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.col-full{grid-column:1/-1}.field{width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-muted);border-radius:12px;padding:13px 16px;font-family:"Barlow",sans-serif;font-size:15px;outline:none;transition:border-color .3s,box-shadow .3s;appearance:none;-webkit-appearance:none}.field::placeholder{color:var(--text-muted)}.field:not(:placeholder-shown){color:var(--text-white)}.field:hover,.field:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-glow)}.field:read-only{cursor:default;opacity:.75}.field:read-only:hover{border-color:var(--border);box-shadow:none}.field:-webkit-autofill,.field:-webkit-autofill:hover,.field:-webkit-autofill:focus{-webkit-text-fill-color:var(--text-white);-webkit-box-shadow:0 0 0 1000px rgba(0,0,0,.6) inset;transition:background-color 5000s ease-in-out 0s}input[type="date"]{color-scheme:dark;color:var(--text-white)}input[type="date"]:not(:valid){color:var(--text-muted)}input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1) sepia(1) saturate(5) hue-rotate(10deg);cursor:pointer;opacity:.7}textarea.field{resize:vertical;min-height:90px}.dropdown-wrap{position:relative;width:100%}.dropdown-btn{width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-white);border-radius:12px;padding:13px 16px;font-family:"Barlow",sans-serif;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:border-color .3s,box-shadow .3s;text-align:left}.dropdown-btn:hover,.dropdown-btn.open{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-glow)}.dropdown-btn .placeholder{color:var(--text-muted)}.dropdown-btn span:not(.placeholder):not(.arrow){color:var(--text-white)}.dropdown-btn .arrow{color:var(--orange);font-size:11px;transition:transform .3s;flex-shrink:0}.dropdown-btn.open .arrow{transform:rotate(180deg)}.dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#111;border:1px solid var(--border);border-radius:12px;overflow:hidden;z-index:100;box-shadow:0 16px 40px rgba(0,0,0,.7);animation:fadeIn .18s ease}.dropdown-menu.open{display:block}@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}.dropdown-item{padding:12px 16px;font-size:14px;color:#d1d5db;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s,color .2s}.dropdown-item:hover{background:rgba(249,115,22,.12);color:var(--orange)}.dropdown-item .price{color:var(--orange);font-size:13px}.membership-section{margin-top:36px}.mt-field{margin-top:16px}.agree-row{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px;color:#d1d5db}.agree-row input[type="checkbox"]{accent-color:var(--orange);width:16px;height:16px;cursor:pointer;flex-shrink:0}.submit-btn{margin-top:28px;width:100%;background:var(--orange);color:#000;font-family:"Barlow",sans-serif;font-size:16px;font-weight:700;letter-spacing:.5px;border:none;border-radius:999px;padding:14px;cursor:pointer;transition:background .25s,transform .15s,box-shadow .25s;box-shadow:0 0 28px rgba(249,115,22,.5)}.submit-btn:hover{background:var(--orange-hover);box-shadow:0 0 40px rgba(249,115,22,.7);transform:translateY(-1px)}.submit-btn:active{transform:translateY(0)}.submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}@media(max-width:600px){.form-card{padding:28px 18px}.grid-2{grid-template-columns:1fr}.hero-header h1{font-size:28px}.col-full{grid-column:auto}nav{font-size:11px;padding:10px 16px}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ── Flash Messages ── */
+#message-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;width:100%;max-width:400px;padding:0 16px}
+.flash-message{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;margin-bottom:12px;border-radius:12px;font-size:14px;font-weight:500;color:#fff;box-shadow:0 10px 25px rgba(0,0,0,.3);backdrop-filter:blur(10px)}
+.flash-message.success{background:linear-gradient(to right,#22c55e,#059669)}
+.flash-message.error{background:linear-gradient(to right,#ef4444,#b91c1c)}
+.flash-message.default{background-color:#1f2937}
+.close-btn{margin-left:10px;font-size:18px;font-weight:700;border:none;background:none;color:#fff;cursor:pointer;transition:transform .2s ease}
+.close-btn:hover{transform:scale(1.1)}
+
+/* ── CSS Variables ── */
+:root{
+  --orange:#f97316;
+  --orange-hover:#ea6c0a;
+  --orange-dim:rgba(249,115,22,.4);
+  --orange-glow:rgba(249,115,22,.2);
+  --orange-subtle:rgba(249,115,22,.15);
+  --bg-card:rgba(0,0,0,.6);
+  --bg-input:rgba(0,0,0,.6);
+  --border:rgba(249,115,22,.4);
+  --text-muted:#9ca3af;
+  --text-white:#fff
+}
+
+/* ── Base ── */
+.navbar{font-size:15px}
+
+/* ── Hero Header ── */
+.hero-header h1{font-family:"Bebas Neue",sans-serif;font-size:45px;color:var(--orange);letter-spacing:3px;margin-top:8px;text-shadow:0 0 40px rgba(249,115,22,.4)}
+.hero-header p{color:var(--text-muted);font-size:13px;margin-top:10px;max-width:520px;margin-inline:auto}
+
+/* ── Page Body ── */
+.page-body{position:relative;z-index:10;display:flex;justify-content:center;padding:28px 16px 60px}
+.hero-animate{opacity:0;transform:translateY(40px);animation:smoothFade .5s ease-out forwards}
+@keyframes smoothFade{to{opacity:1;transform:translateY(0)}}
+
+/* ── Form Card ── */
+.form-card{width:100%;max-width:720px;background:var(--bg-card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(249,115,22,.2);border-radius:20px;padding:40px 36px;box-shadow:0 25px 70px rgba(0,0,0,.7),0 0 50px rgba(249,115,22,.12);animation:fadeSlideUp .6s ease both}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Section Title ── */
+.section-title{font-size:18px;font-weight:600;color:var(--orange);letter-spacing:.5px;margin-bottom:20px}
+.color-price{color:var(--orange)}
+
+/* ── Grid ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.col-full{grid-column:1/-1}
+
+/* ── Fields ── */
+.field{width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-muted);border-radius:12px;padding:13px 16px;font-family:"Barlow",sans-serif;font-size:15px;outline:none;transition:border-color .3s,box-shadow .3s;appearance:none;-webkit-appearance:none}
+.field::placeholder{color:var(--text-muted)}
+.field:not(:placeholder-shown){color:var(--text-white)}
+.field:hover,.field:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-glow)}
+.field:read-only{cursor:default;opacity:.75}
+.field:read-only:hover{border-color:var(--border);box-shadow:none}
+.field:-webkit-autofill,.field:-webkit-autofill:hover,.field:-webkit-autofill:focus{-webkit-text-fill-color:var(--text-white);-webkit-box-shadow:0 0 0 1000px rgba(0,0,0,.6) inset;transition:background-color 5000s ease-in-out 0s}
+
+/* ── Date Input — Desktop ── */
+input[type="date"]{
+  color-scheme:dark;
+  color:var(--text-white);
+  min-height:48px
+}
+
+/* ── Date Input — Mobile Fix ── */
+input[type="date"]::-webkit-datetime-edit{
+  color:var(--text-muted)
+}
+input[type="date"]::-webkit-datetime-edit-fields-wrapper{
+  color:var(--text-muted)
+}
+input[type="date"]::-webkit-datetime-edit-text{
+  color:var(--text-muted)
+}
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field{
+  color:var(--text-muted)
+}
+/* Once a value is selected, turn white */
+input[type="date"].has-value::-webkit-datetime-edit,
+input[type="date"].has-value::-webkit-datetime-edit-fields-wrapper,
+input[type="date"].has-value::-webkit-datetime-edit-month-field,
+input[type="date"].has-value::-webkit-datetime-edit-day-field,
+input[type="date"].has-value::-webkit-datetime-edit-year-field{
+  color:var(--text-white)
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator{
+  filter:invert(1) sepia(1) saturate(5) hue-rotate(10deg);
+  cursor:pointer;
+  opacity:1;
+  width:20px;
+  height:20px;
+  padding:4px
+}
+
+/* ── Date Wrapper (placeholder overlay for mobile) ── */
+.date-wrap{
+  position:relative;
+  width:100%
+}
+.date-placeholder{
+  position:absolute;
+  left:16px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--text-muted);
+  font-size:15px;
+  font-family:"Barlow",sans-serif;
+  pointer-events:none;
+  transition:opacity .15s ease;
+  white-space:nowrap
+}
+.date-wrap.filled .date-placeholder,
+.date-wrap.focused .date-placeholder{
+  opacity:0
+}
+
+/* ── Textarea ── */
+textarea.field{resize:vertical;min-height:90px}
+
+/* ── Dropdown ── */
+.dropdown-wrap{position:relative;width:100%}
+.dropdown-btn{width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-white);border-radius:12px;padding:13px 16px;font-family:"Barlow",sans-serif;font-size:14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:border-color .3s,box-shadow .3s;text-align:left}
+.dropdown-btn:hover,.dropdown-btn.open{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-glow)}
+.dropdown-btn .placeholder{color:var(--text-muted)}
+.dropdown-btn span:not(.placeholder):not(.arrow){color:var(--text-white)}
+.dropdown-btn .arrow{color:var(--orange);font-size:11px;transition:transform .3s;flex-shrink:0}
+.dropdown-btn.open .arrow{transform:rotate(180deg)}
+.dropdown-menu{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#111;border:1px solid var(--border);border-radius:12px;overflow:hidden;z-index:100;box-shadow:0 16px 40px rgba(0,0,0,.7);animation:fadeIn .18s ease}
+.dropdown-menu.open{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.dropdown-item{padding:12px 16px;font-size:14px;color:#d1d5db;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s,color .2s}
+.dropdown-item:hover{background:rgba(249,115,22,.12);color:var(--orange)}
+.dropdown-item .price{color:var(--orange);font-size:13px}
+
+/* ── Membership Section ── */
+.membership-section{margin-top:36px}
+.mt-field{margin-top:16px}
+
+/* ── Agree Row ── */
+.agree-row{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px;color:#d1d5db}
+.agree-row input[type="checkbox"]{accent-color:var(--orange);width:16px;height:16px;cursor:pointer;flex-shrink:0}
+
+/* ── Submit Button ── */
+.submit-btn{margin-top:28px;width:100%;background:var(--orange);color:#000;font-family:"Barlow",sans-serif;font-size:16px;font-weight:700;letter-spacing:.5px;border:none;border-radius:999px;padding:14px;cursor:pointer;transition:background .25s,transform .15s,box-shadow .25s;box-shadow:0 0 28px rgba(249,115,22,.5)}
+.submit-btn:hover{background:var(--orange-hover);box-shadow:0 0 40px rgba(249,115,22,.7);transform:translateY(-1px)}
+.submit-btn:active{transform:translateY(0)}
+.submit-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+  .form-card{padding:28px 18px}
+  .grid-2{grid-template-columns:1fr}
+  .hero-header h1{font-size:28px}
+  .col-full{grid-column:auto}
+  nav{font-size:11px;padding:10px 16px}
+
+  /* Larger tap targets on mobile */
+  .field,
+  .dropdown-btn,
+  input[type="date"]{
+    min-height:50px;
+    font-size:16px /* prevents iOS zoom on focus */
+  }
+  .submit-btn{
+    padding:16px;
+    font-size:17px
+  }
+}

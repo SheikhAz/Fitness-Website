@@ -20,61 +20,90 @@ function toggleDropdown(id) {
   }
 }
 
-/* ── Outside click ── */
+/* ── Outside click closes dropdowns ── */
 document.addEventListener("click", function (e) {
   if (!e.target.closest(".dropdown-wrap")) closeAll();
 });
 
-/* ── DOM Loaded ── */
+/* ── Plan select ── */
+function selectPlan(id, name, price) {
+  const label = document.getElementById("selectedPlan");
+  label.innerText = name + " - ₹" + price;
+  label.classList.remove("placeholder");
+  document.getElementById("planInput").value = id;
+  closeAll();
+}
+
+/* ── Trainer select ── */
+function selectTrainer(id, name) {
+  const label = document.getElementById("selectedTrainer");
+  label.innerText = name;
+  label.classList.remove("placeholder");
+  document.getElementById("trainerInput").value = id;
+  closeAll();
+}
+
+/* ── DOM Ready ── */
 document.addEventListener("DOMContentLoaded", () => {
-  /* ===== BUTTON TOGGLE ===== */
+  /* ── Dropdown button bindings ── */
   document.getElementById("genderBtn").onclick = () => toggleDropdown("gender");
-
   document.getElementById("planBtn").onclick = () => toggleDropdown("plan");
-
   document.getElementById("trainerBtn").onclick = () =>
     toggleDropdown("trainer");
 
-  /* ===== GENDER SELECT ===== */
+  /* ── Gender select ── */
   document
     .querySelectorAll("#genderDropdown .dropdown-item")
     .forEach((item) => {
       item.addEventListener("click", () => {
         const val = item.dataset.value;
+        const label = document.getElementById("selectedGender");
 
-        document.getElementById("selectedGender").textContent =
-          val === "M" ? "Male" : "Female";
-
-        document
-          .getElementById("selectedGender")
-          .classList.remove("placeholder");
-
+        label.textContent = val === "M" ? "Male" : "Female";
+        label.classList.remove("placeholder");
         document.getElementById("genderInput").value = val;
 
         closeAll();
       });
     });
-  /* ===== SUBMIT LOADING ===== */
+
+  /* ── Date of Birth — mobile placeholder fix ── */
+  const dobInput = document.getElementById("dobInput");
+  const dobWrap = document.getElementById("dobWrap");
+
+  if (dobInput && dobWrap) {
+    const syncDobState = () => {
+      if (dobInput.value) {
+        dobWrap.classList.add("filled");
+        dobInput.classList.add("has-value");
+      } else {
+        dobWrap.classList.remove("filled");
+        dobInput.classList.remove("has-value");
+      }
+    };
+
+    dobInput.addEventListener("focus", () => {
+      dobWrap.classList.add("focused");
+    });
+
+    dobInput.addEventListener("blur", () => {
+      dobWrap.classList.remove("focused");
+      syncDobState();
+    });
+
+    dobInput.addEventListener("change", syncDobState);
+    dobInput.addEventListener("input", syncDobState);
+
+    // Run once on load (e.g. browser autofill)
+    syncDobState();
+  }
+
+  /* ── Submit loading state ── */
   document.getElementById("enrollForm").addEventListener("submit", function () {
     const btn = document.getElementById("enrollBtn");
-
     if (this.checkValidity()) {
       btn.textContent = "Processing...";
       btn.disabled = true;
     }
   });
 });
-function selectPlan(id, name, price) {
-  console.log("Selected:", id, name, price); // debug
-
-  document.getElementById("selectedPlan").innerText = name + " - ₹" + price;
-
-  document.getElementById("planInput").value = id;
-
-  closeAll(); // better than hidden class
-}
-function selectTrainer(id, name) {
-  document.getElementById("selectedTrainer").innerText = name;
-  document.getElementById("trainerInput").value = id;
-  closeAll();
-}
