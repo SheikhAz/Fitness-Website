@@ -72,15 +72,24 @@ body {
 }
 
 .nav-inner {
-  margin-top: 20px;
-  margin-left: 15px;
+  max-width: 1200px;
+  margin: 0 auto;              /* center container */
+  display: flex;
+  justify-content: center;     /* center logo horizontally */
+  align-items: center;
+  height: 80px;                /* control navbar height */
 }
 
 .logo {
-  text-decoration: none;
-  color: white;
-  font-weight: bold;
-  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo img {
+  height: 70px;                /* adjust size */
+  width: auto;
+  filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.4));
 }
 .divider {
   height: 1px;

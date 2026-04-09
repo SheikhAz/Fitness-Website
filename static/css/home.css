@@ -234,10 +234,8 @@ body {
 .logo {
   display: flex;
   flex-direction: column;
-  font-weight: 700;
-  font-size: 14px;
-  text-decoration: none;
-  color: white;
+  height: 80px;
+  width: 80px;
 }
 
 /* NAV LINKS */
@@ -908,6 +906,10 @@ body {
   padding: 15px;
   font-size: 12px;
   color: rgba(255,255,255,0.6);
+}
+.footer-bottom a{
+  color:#f97316;
+  text-decoration: none; 
 }
 .footer-bottom span { color: #f97316; }
 .footer-links.support h3 { color: #ea580c; }
