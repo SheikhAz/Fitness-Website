@@ -69,33 +69,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* ── Date of Birth — mobile placeholder fix ── */
   const dobInput = document.getElementById("dobInput");
-  const dobWrap = document.getElementById("dobWrap");
 
-  if (dobInput && dobWrap) {
+  if (dobInput) {
     const syncDobState = () => {
       if (dobInput.value) {
-        dobWrap.classList.add("filled");
         dobInput.classList.add("has-value");
       } else {
-        dobWrap.classList.remove("filled");
         dobInput.classList.remove("has-value");
       }
     };
 
-    dobInput.addEventListener("focus", () => {
-      dobWrap.classList.add("focused");
-    });
-
-    dobInput.addEventListener("blur", () => {
-      dobWrap.classList.remove("focused");
-      syncDobState();
-    });
-
     dobInput.addEventListener("change", syncDobState);
     dobInput.addEventListener("input", syncDobState);
-
-    // Run once on load (e.g. browser autofill)
-    syncDobState();
+    syncDobState(); // run once on load
   }
 
   /* ── Submit loading state ── */
