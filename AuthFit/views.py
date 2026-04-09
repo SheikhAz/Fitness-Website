@@ -136,6 +136,14 @@ def signupPage(request):
     return render(request, 'authenication/signup.html')
 
 
+def cache_debug(request):
+    cache.set("test_key", "working", timeout=30)
+    val = cache.get("test_key")
+    return JsonResponse({
+        "cache_backend": str(type(cache._cache)),
+        "test_value": val,
+    })
+
 @csrf_exempt
 def mark_attendance_api(request):
     if request.method == "POST":

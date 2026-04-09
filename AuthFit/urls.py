@@ -16,4 +16,5 @@ urlpatterns = [
     path('api/save-embedding/', views.save_embedding),
     path('api/upload-face-image/', views.upload_face_image),
     path('api/stats/', views.stats_api, name='stats_api'),
+    path('cache-debug/',views.cache_debug)
 ]

@@ -7,13 +7,16 @@ def check_login_attempt(ip, phone):
     try:
         attempts = cache.get(key, 0)
     except Exception:
-        return True  # allow login if Redis fails
+        return True
 
     if attempts >= 3:
-        return False
+        return False  # blocked — don't touch the cache, let timeout expire naturally
 
     try:
-        cache.set(key, attempts + 1, timeout=60)
+        if attempts == 0:
+            cache.set(key, 1, timeout=60)  # start fresh 60s window
+        else:
+            cache.incr(key)  # atomic increment, preserves original timeout
     except Exception:
         pass
 
