@@ -23,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-v4j%xtb%9uk9+st0)5zy74g%nw#ac)@*(g2lawkcc&rn-kr_r8'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
@@ -89,9 +89,9 @@ WSGI_APPLICATION = 'Fitness.wsgi.application'
 # cloudinary details
 
 cloudinary.config(
-    cloud_name="dmmbswbj6",
-    api_key="791761418615415",
-    api_secret="KrVMDNpwLyLB3H1BKoGvrl5Oj8A",
+    cloud_name=os.environ['CLOUDINARY_CLOUD_NAME'],
+    api_key=os.environ['CLOUDINARY_API_KEY'],
+    api_secret=os.environ['CLOUDINARY_API_SECRET'],
 )
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
@@ -106,7 +106,7 @@ DATABASES = {
     }
 }
 
-DATABASES["default"] = dj_database_url.parse('postgresql://gym_database_9871_user:bEmZpd6HlLwXy9gYW5cTrsEvRNF7IgXC@dpg-d754r2c50q8c739smhi0-a.oregon-postgres.render.com/gym_database_9871')
+DATABASES["default"] = dj_database_url.parse(os.environ['DATABASE_URL'])
 
 
 # Password validation
@@ -150,7 +150,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build")
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "rediss://default:gQAAAAAAAWp4AAIncDJmMzJjNGI0MWM2NDk0ZTk4ODE0NDFkNDA1NGFjYTQxOHAyOTI3OTI@stirring-redfish-92792.upstash.io:6379",
+        "LOCATION": os.environ['REDIS_URL'],
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {
