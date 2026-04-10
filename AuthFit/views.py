@@ -31,54 +31,45 @@ def is_staff(user):
 # ✅ SAVE EMBEDDING (STAFF ONLY)
 # ==============================
 @csrf_exempt
-def save_embedding(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
+def save_embeddings_batch(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
 
-            # 🔐 API SECURITY
-            API_KEY = "mysecret123"
-            if data.get("api_key") != API_KEY:
-                return JsonResponse({"error": "Unauthorized"})
+    try:
+        data = json.loads(request.body)
 
-            unique_id = data.get("unique_id")
-            embedding = data.get("embedding")
+        if data.get("api_key") != "mysecret123":
+            return JsonResponse({"error": "Unauthorized"}, status=403)
 
-            if not unique_id or not embedding:
-                return JsonResponse({"error": "Missing data"})
+        unique_id = data.get("unique_id")
+        embeddings = data.get("embeddings", [])
 
-            enrollment = Enrollment.objects.get(unique_id=unique_id)
+        if not unique_id or not embeddings:
+            return JsonResponse({"error": "Missing data"}, status=400)
 
-            # 🔥 CONVERT STRING → LIST
-            new_emb = json.loads(embedding)
+        enrollment = Enrollment.objects.get(unique_id=unique_id)
 
-            # 🔥 INIT LIST IF EMPTY
-            if not enrollment.face_embeddings:
-                enrollment.face_embeddings = []
+        if not enrollment.face_embeddings:
+            enrollment.face_embeddings = []
 
-            # 🔥 LIMIT MAX EMBEDDINGS (IMPORTANT)
-            MAX_EMB = 7
+        MAX_EMB = 7
+        for emb in embeddings:
             if len(enrollment.face_embeddings) >= MAX_EMB:
-                enrollment.face_embeddings.pop(0)  # remove oldest
+                enrollment.face_embeddings.pop(0)
+            enrollment.face_embeddings.append(emb)
 
-            # 🔥 ADD NEW EMBEDDING
-            enrollment.face_embeddings.append(new_emb)
+        enrollment.face_enrolled = True
+        enrollment.save()
 
-            enrollment.face_enrolled = True
-            enrollment.save()
+        return JsonResponse({
+            "status": "success",
+            "total_embeddings": len(enrollment.face_embeddings)
+        })
 
-            return JsonResponse({
-                "status": "success",
-                "total_embeddings": len(enrollment.face_embeddings)
-            })
-
-        except Enrollment.DoesNotExist:
-            return JsonResponse({"error": "User not found"})
-
-        except Exception as e:
-            return JsonResponse({"error": str(e)})
-
-    return JsonResponse({"error": "Invalid request"})
+    except Enrollment.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 def get_client_ip(request):

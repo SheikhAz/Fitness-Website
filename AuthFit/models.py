@@ -220,4 +220,3 @@ def clear_enrollment_cache(sender, **kwargs):
 @receiver([post_save, post_delete], sender=GymNotification)
 def clear_notification_cache(sender, **kwargs):
     cache.delete("notifications")
- 
