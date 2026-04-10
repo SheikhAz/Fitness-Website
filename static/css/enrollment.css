@@ -31,7 +31,7 @@
 @keyframes smoothFade{to{opacity:1;transform:translateY(0)}}
 
 /* ── Form Card ── */
-.form-card{width:100%;max-width:720px;background:var(--bg-card);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(249,115,22,.2);border-radius:20px;padding:40px 36px;box-shadow:0 25px 70px rgba(0,0,0,.7),0 0 50px rgba(249,115,22,.12);animation:fadeSlideUp .6s ease both}
+.form-card{width:100%;max-width:720px;background:var(--bg-card);pointer-events: auto;border:1px solid rgba(249,115,22,.2);border-radius:20px;padding:40px 36px;box-shadow:0 25px 70px rgba(0,0,0,.7),0 0 50px rgba(249,115,22,.12);animation:fadeSlideUp .6s ease both}
 @keyframes fadeSlideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── Section Title ── */
@@ -51,13 +51,18 @@
 .field:-webkit-autofill,.field:-webkit-autofill:hover,.field:-webkit-autofill:focus{-webkit-text-fill-color:var(--text-white);-webkit-box-shadow:0 0 0 1000px rgba(0,0,0,.6) inset;transition:background-color 5000s ease-in-out 0s}
 
 /* ── Date Input ── */
-input[type="date"]{-webkit-appearance:auto;appearance:auto;width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-white);border-radius:12px;padding:13px 16px;font-family:"Barlow",sans-serif;font-size:16px;outline:none;cursor:pointer;color-scheme:dark}
+input[type="date"]{-webkit-appearance:auto;appearance:auto;width:100%;background:var(--bg-input);border:1px solid var(--border);color:var(--text-white);border-radius:12px;padding:13px 16px;font-family:"Barlow",sans-serif;font-size:16px;outline:none;position: relative;z-index: 10;cursor:pointer;color-scheme:dark}
 input[type="date"]:hover,input[type="date"]:focus{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-glow)}
 input[type="date"]::-webkit-datetime-edit{color:var(--text-white)}
 input[type="date"]:invalid{color:var(--text-muted)}
 input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1) sepia(1) saturate(5) hue-rotate(10deg);cursor:pointer;opacity:.7}
 input[type="date"]::-webkit-inner-spin-button,input[type="date"]::-webkit-clear-button{display:none}
-
+input,
+button {
+  touch-action: manipulation;
+}
+.dob-wrap{display:flex;flex-direction:column;gap:6px}
+.dob-label{font-size:12px;color:var(--text-muted);letter-spacing:.4px}
 /* ── Textarea ── */
 textarea.field{resize:vertical;min-height:90px}
 

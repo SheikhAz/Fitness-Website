@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% load static %} 
-{% block title %}Enrollment for GYM{% endblock %} {% block link %}
+{% extends "base.html" %} {% load static %} {% block title %}Enrollment for
+GYM{% endblock %} {% block link %}
 <link rel="stylesheet" href="{% static 'css/enrollment.css' %}" />
 {% endblock %} {% block heading %}
 <header class="hero-header">
@@ -64,7 +64,13 @@
           </div>
           <input type="hidden" name="gender" id="genderInput" required />
         </div>
-        <input class="field" type="date" name="dob" id="dobInput" required />
+
+        <!-- Date of Birth -->
+        <div class="dob-wrap">
+          <label class="dob-label" for="dobInput">Date of Birth</label>
+          <input class="field" type="date" name="dob" id="dobInput" required />
+        </div>
+
       </div>
 
       <div class="membership-section">
@@ -114,7 +120,7 @@
         </div>
 
         <input
-          class="field mt-field refer"
+          class="field mt-field"
           type="text"
           name="reference"
           placeholder="Referred By (Optional)"

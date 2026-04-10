@@ -87,4 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.disabled = true;
     }
   });
+  document.getElementById("dobInput").addEventListener("click", function () {
+    this.showPicker && this.showPicker();
+  });
 });
