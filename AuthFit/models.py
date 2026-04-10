@@ -118,9 +118,6 @@ class Enrollment(models.Model):
     # Multiple embeddings
     face_embeddings = models.JSONField(default=list, blank=True)
 
-    # Number of samples
-    face_samples = models.IntegerField(default=0)
-
     # ==============================
     # UNIQUE ID GENERATOR
     # ==============================

@@ -84,7 +84,14 @@
 
           <ul class="nav-links" id="navLinks">
             <li><a href="/">Home</a></li>
-
+            {% if isSuperuser %}
+            <li><a href="/admin/revenue/">Revenue</a></li>
+            {% endif %} 
+            {% if isStaff or isSuperuser %}
+            <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
+            <li><a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a></li>
+            <li><a href="/admin/AuthFit/contact/">User Queries</a></li>
+            {% else %}
             <li class="dropdown">
               <a href="#">Membership ▼</a>
               <ul class="dropdown-menu">
@@ -109,6 +116,7 @@
             <li><a href="#Price">Free Trial</a></li>
             <li><a href="#About">About</a></li>
             <li><a href="/contact/">Contact</a></li>
+            {% endif %}
           </ul>
 
           <div class="nav-right">
