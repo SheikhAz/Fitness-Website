@@ -58,28 +58,26 @@ document.addEventListener("DOMContentLoaded", () => {
       item.addEventListener("click", () => {
         const val = item.dataset.value;
         const label = document.getElementById("selectedGender");
-
         label.textContent = val === "M" ? "Male" : "Female";
         label.classList.remove("placeholder");
         document.getElementById("genderInput").value = val;
-
         closeAll();
       });
     });
 
-      const dobDisplay = document.getElementById("dobDisplay");
-      const dobInput = document.getElementById("dobInput");
+  /* ── Date of Birth ── */
+  const dobInput = document.getElementById("dobInput");
 
-      dobInput.addEventListener("change", () => {
-        if (dobInput.value) {
-          const [y, m, d] = dobInput.value.split("-");
-          dobDisplay.value = `${d}/${m}/${y}`;
-          dobDisplay.classList.add("has-value");
-        } else {
-          dobDisplay.value = "";
-          dobDisplay.classList.remove("has-value");
-        }
-      });
+  if (dobInput) {
+    // Set max date to today (no future dates)
+    const today = new Date().toISOString().split("T")[0];
+    dobInput.setAttribute("max", today);
+
+    // Set min date (e.g. 100 years ago)
+    const minYear = new Date();
+    minYear.setFullYear(minYear.getFullYear() - 100);
+    dobInput.setAttribute("min", minYear.toISOString().split("T")[0]);
+  }
 
   /* ── Submit loading state ── */
   document.getElementById("enrollForm").addEventListener("submit", function () {

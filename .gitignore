@@ -4,4 +4,5 @@ enroll_face_camera.py
 env/
 venv/
 ENV/
+.env
 staticfiles_build/
