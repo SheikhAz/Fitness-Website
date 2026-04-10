@@ -56,25 +56,28 @@
 .field:read-only:hover{border-color:var(--border);box-shadow:none}
 .field:-webkit-autofill,.field:-webkit-autofill:hover,.field:-webkit-autofill:focus{-webkit-text-fill-color:var(--text-white);-webkit-box-shadow:0 0 0 1000px rgba(0,0,0,.6) inset;transition:background-color 5000s ease-in-out 0s}
 
-/* ── Date Input — Desktop ── */
-input[type="date"]{
-  color-scheme:dark;
-  color:var(--text-white);
-  min-height:48px;
-  display: none;
+.date-wrap {
+  position: relative;
+  width: 100%;
 }
 
-#dobDisplay::placeholder {
-  color: var(--text-muted);
+/* Visible fake input */
+.fake-date {
+  position: relative;
+  z-index: 1;
 }
 
-#dobDisplay.has-value {
-  color: var(--text-white);
+/* REAL date input (hidden visually but clickable) */
+.real-date {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;        /* invisible but clickable */
+  z-index: 2;
+  cursor: pointer;
 }
-/* ── Date Wrapper (placeholder overlay for mobile) ── */
-.date-wrap{
-  width:100%
-}   
 
 /* ── Textarea ── */
 textarea.field{resize:vertical;min-height:90px}

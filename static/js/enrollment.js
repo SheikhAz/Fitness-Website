@@ -67,26 +67,19 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-      /* ── Date of Birth — cross-platform fix ── */
       const dobDisplay = document.getElementById("dobDisplay");
-      const dobInput   = document.getElementById("dobInput");
+      const dobInput = document.getElementById("dobInput");
 
-      if (dobDisplay && dobInput) {
-        // Tapping the visible text field opens the hidden native date picker
-        dobDisplay.addEventListener("click", () => dobInput.showPicker?.() || dobInput.click());
-
-        dobInput.addEventListener("change", () => {
-          if (dobInput.value) {
-            // Format date as DD/MM/YYYY for display
-            const [y, m, d] = dobInput.value.split("-");
-            dobDisplay.value = `${d}/${m}/${y}`;
-            dobDisplay.classList.add("has-value");
-          } else {
-            dobDisplay.value = "";
-            dobDisplay.classList.remove("has-value");
-          }
-        });
-      }
+      dobInput.addEventListener("change", () => {
+        if (dobInput.value) {
+          const [y, m, d] = dobInput.value.split("-");
+          dobDisplay.value = `${d}/${m}/${y}`;
+          dobDisplay.classList.add("has-value");
+        } else {
+          dobDisplay.value = "";
+          dobDisplay.classList.remove("has-value");
+        }
+      });
 
   /* ── Submit loading state ── */
   document.getElementById("enrollForm").addEventListener("submit", function () {
