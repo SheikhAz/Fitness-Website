@@ -19,7 +19,7 @@
         <div class="avatar-circle">
           <span class="status-dot"></span>
           {% if image_url %}
-          <img src="{{ image_url }}" width="150" height="150" style="border-radius: 50%; object-fit: cover;">
+          <img src="{{ image_url }}" width="130" height="130" loading="eager" decoding="async" fetchpriority="high" alt="Profile" style="border-radius: 50%; object-fit: cover;">
           {% else %}
           <div class="avatar-initial">{{ enrollment.fullname|slice:":1" }}</div>
           {% endif %}

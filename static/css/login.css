@@ -60,7 +60,13 @@
   cursor: pointer;
   transition: transform 0.2s ease;
 }
-
+.error-msg {
+  display: block;
+  color: #ef4444;
+  font-size: 13px;
+  margin-top: -12px;
+  margin-bottom: 16px;
+}
 .close-btn:hover {
   transform: scale(1.1);
 }

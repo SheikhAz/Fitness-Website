@@ -188,9 +188,10 @@ def homePage(request):
         cache.set("notifications", gym_notifications, timeout=3600)
 
     if request.user.is_authenticated:
-        enrolled = Enrollment.objects.filter(user=request.user).exists()
-        isStaff = request.user.is_staff
-        isSuperuser = request.user.is_superuser
+        enrolled = cache.get(f"enrolled_{request.user.id}")
+        if enrolled is None:
+            enrolled = Enrollment.objects.filter(user=request.user).exists()
+            cache.set(f"enrolled_{request.user.id}", enrolled, timeout=300)
 
 
     return render(request, "home.html", {
@@ -271,6 +272,11 @@ def enrollment(request):
         )
         enroll.save()
 
+        # ✅ Clear cache so profile shows fresh data
+        cache.delete(f"enrollment_{request.user.id}")
+        cache.delete(f"profile_image_{request.user.id}")
+        cache.delete(f"enrolled_{request.user.id}")
+        
         messages.success(
             request,
             "Welcome aboard! Your gym membership has been successfully activated."
@@ -289,21 +295,27 @@ def workout(request):
 
 @login_required
 def Profile(request):
-    enrollment = Enrollment.objects.filter(user=request.user).first()
+    cache_key = f"profile_image_{request.user.id}"
 
-    image_url = None
+    enrollment = cache.get(f"enrollment_{request.user.id}")
+    if enrollment is None:
+        enrollment = Enrollment.objects.filter(user=request.user).first()
+        cache.set(f"enrollment_{request.user.id}", enrollment, timeout=300)
 
-    if enrollment and enrollment.face_image:
+    image_url = cache.get(cache_key)
+    if image_url is None and enrollment and enrollment.face_image:
         image_url, _ = cloudinary_url(
             enrollment.face_image.public_id,
-            width=300,
-            height=300,
+            width=130, height=130,  # match actual display size
             crop="fill"
         )
+        cache.set(cache_key, image_url, timeout=300)  # cache 5 mins
 
     return render(request, 'profile.html', {
         'enrollment': enrollment,
-        'image_url': image_url
+        'image_url': image_url,
+        'is_expired': enrollment.is_expired if enrollment else False,
+        'days_remaining': enrollment.days_remaining if enrollment else 0,
     })
 
 
@@ -330,12 +342,9 @@ def attendence(request):
 
         return redirect('/attendence/')
 
-    attendence = Attendence.objects.filter(user = user).order_by('-date')
-    attended= Attendence.objects.filter(user = user).order_by('-date')[:7]
-    
-    
-
-    total_days = attendence.count()
+    all_attended = list(Attendence.objects.filter(user=user).order_by('-date'))
+    attended = all_attended[:7]
+    total_days = len(all_attended)
     monthly_days = calendar.monthrange(today.year ,today.month)[1]
 
     return render(request, 'attendence.html', {
