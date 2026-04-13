@@ -92,7 +92,7 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
-  padding: 10px 20px;
+  padding: 6px 20px;
   color: rgba(255, 255, 255, 0.9);
 }
 .flex-between .right-inner { text-align: right; }
@@ -234,8 +234,8 @@ body {
 .logo {
   display: flex;
   flex-direction: column;
-  height: 80px;
-  width: 80px;
+  height: 58px;
+  width: 58px;
 }
 
 /* NAV LINKS */
@@ -313,7 +313,7 @@ body {
 
 /* ===== DESKTOP ===== */
 @media (min-width: 1024px) {
-  .nav-container { padding: 15px 80px; }
+  .nav-container { padding: 8px 80px; }
 }
 
 /* ===== TABLET (768px – 1023px) ===== */
@@ -326,7 +326,7 @@ body {
   .notif-item  { font-size: 12px; }
 
   /* Navbar */
-  .nav-container { padding: 12px 24px; }
+  .nav-container { padding: 8px 24px; }
   .nav-links { gap: 20px; font-size: 13px; }
   .btn { height: 36px; font-size: 13px; padding: 8px 14px; }
 }
@@ -371,15 +371,15 @@ body {
   .nav-links { display: none !important; }
 
   /* Notification bar — slightly smaller on mobile */
-  .notif-bar { max-height: 40px; }
-  .notif-inner { height: 40px; padding: 0 8px; }
+  .notif-bar { max-height: 36px; }
+  .notif-inner { height: 36px; padding: 0 8px; }
   .notif-label { font-size: 9px; padding: 3px 6px; margin-right: 8px; }
   .notif-item  { font-size: 12px; }
   .notif-close { font-size: 18px; margin-left: 8px; }
 
   /* Navbar offset on mobile */
-  .navbar { top: 84px; }     /* topbar(44) + notif(40) */
-  .navbar.notif-hidden { top: 44px; }
+  .navbar { top: 72px; }     /* topbar(44) + notif(40) */
+  .navbar.notif-hidden { top: 36px; }
 
   /* POPUP MENU */
   .mobile-menu {

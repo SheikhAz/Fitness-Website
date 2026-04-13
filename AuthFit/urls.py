@@ -1,9 +1,9 @@
-from django.urls import path
+from django.urls import path ,include
 from AuthFit import views
 
 urlpatterns = [
-    path('',views.homePage , name = "home"),
-    path('login/',views.loginPage, name = "loginPage"),
+    path('',views.homePage , name = "home"),\
+    path('accounts/', include('django.contrib.auth.urls')),
     path('signup/',views.signupPage , name = "signPage"),
     path('workout/',views.workout , name = "workout"), 
     path('profile/',views.Profile , name = "Profile"),

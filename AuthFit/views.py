@@ -15,6 +15,7 @@ from cloudinary.utils import cloudinary_url
 from django.contrib.auth.decorators import user_passes_test
 from django.core.cache import cache
 from AuthFit.rate_limit import check_login_attempt, reset_attempt
+from .forms import UserLogin
 
 
 
@@ -81,60 +82,18 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
-def loginPage(request):
-    if request.method == "POST":
-        phone = request.POST.get('usernumber')
-        password = request.POST.get('password')
-
-        ip = get_client_ip(request)
-
-        if not check_login_attempt(ip,phone):
-            messages.error(request, "Too many login attempts. Try again after 1 minute.")
-            return redirect('/login/')
-
-        user = authenticate(request, username=phone, password=password)
-        if user is not None:
-            auth_log(request, user)
-            reset_attempt(ip,phone)
-            return redirect('/')
-        else:
-            messages.error(request, "Invalid Phone or Password ")
-            return redirect('/login/')
-    return render(request, 'authenication/login.html')
-
 
 def signupPage(request):
     if request.method == "POST":
-        phone = request.POST.get('phone')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-        username = phone
-        # Checking that Number is Valid or Not.
-        if len(username) > 10 or len(username) < 10:
-            messages.error(request, "Phone Number Must be 10 Digits")
-            return redirect('/signup')
-        # Checking the Password.
-        if password != confirm_password:
-            messages.error(request, "Password Do not Match")
-            return redirect('/signup')
-        # if User Already Exist in the Database
-        if User.objects.filter(username=phone).exists():
-            messages.error(
-                request, "Phone Number is Already Used By Other User")
-            return redirect('/signup/')
-
-        User.objects.create_user(
-            username=username,
-            password=password,
-        )
-        user = authenticate(request, username=phone, password=password)
-        if user is not None:
-            auth_log(request, user)
-            messages.success(request, "Account is created Successfully......")
+        form = UserLogin(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_log(request, user)  # log them in immediately
+            messages.success(request, "Account created successfully!")
             return redirect('/')
-        else:
-            return redirect('/signup/')
-    return render(request, 'authenication/signup.html')
+    else:
+        form = UserLogin()
+    return render(request, 'registration/signup.html', {'form': form})
 
 
 def cache_debug(request):
@@ -173,23 +132,20 @@ def mark_attendance_api(request):
 # 👥 GET USERS (BONUS IMPROVEMENT)
 # ==============================
 def get_users(request):
-
     data = cache.get("face_users")
-
     if data is None:
-        users = Enrollment.objects.filter(face_embeddings__isnull=False)
-
+        # Build the list from DB
+        enrollments = Enrollment.objects.filter(face_embeddings__isnull=False)
         data = []
-        for u in users:
+        for u in enrollments:
             data.append({
                 "unique_id": u.unique_id,
                 "name": u.fullname,
                 "embeddings": u.face_embeddings
             })
-
-        cache.set("face_users", data, timeout=300)
-
+        cache.set("face_users", data, timeout=300)  # ← save data, not users
     return JsonResponse(data, safe=False)
+
 
 
 @csrf_exempt
@@ -229,7 +185,7 @@ def homePage(request):
             GymNotification.objects.filter(is_active=True)
             .values("icon", "message")
         )
-        cache.set("notifications", gym_notifications, timeout=300)
+        cache.set("notifications", gym_notifications, timeout=3600)
 
     if request.user.is_authenticated:
         enrolled = Enrollment.objects.filter(user=request.user).exists()

@@ -18,30 +18,42 @@
 {% endblock %}
 {% block content %}
 <div class="hero-container hero-animate">
-  <form method="POST" action="" class="glass-form">
+  <form method="POST" action="/accounts/login/" class="glass-form">
     {% csrf_token %}
 
     <!-- Phone Number -->
     <div class="form-group">
       <label>Phone Number</label>
-      <input type="tel" name="usernumber" class='text' required maxlength= "10" pattern='\d{10}'/>
+      <input 
+        type="tel" 
+        name="username" 
+        class="text"
+        value="{{ form.username.value|default:'' }}"
+        required
+      />
+      {% if form.username.errors %}
+        <small class="error">{{ form.username.errors.0 }}</small>
+      {% endif %}
     </div>
 
     <!-- Password -->
     <div class="form-group">
       <label>Password</label>
-      <input type="password" class='text' name="password" required />
+      <input 
+        type="password" 
+        name="password" 
+        class="text" 
+        required 
+      />
     </div>
+
     <p class="forget-text">
       For password reset, please contact the
       <a href="/contact/"> administrator.</a>
     </p>
-    <!-- Submit Button -->
-    <button type="submit" class="submit-btn">
-      LogIn
-    </button>
 
-    <!-- Signup Link -->
+    <button type="submit" class="submit-btn">LogIn</button>
+
     <p class="bottom-text">
       Don't Have an account?
       <a href="/signup/">SignUp</a>
