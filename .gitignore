@@ -6,6 +6,3 @@ venv/
 ENV/
 .env
 staticfiles_build/
-celerybeat-schedule.bak
-celerybeat-schedule.dat
-celerybeat-schedule.dir
