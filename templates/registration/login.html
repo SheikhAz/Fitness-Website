@@ -31,6 +31,9 @@
         class="text"
         value="{{ form.username.value|default:'' }}"
         required
+        pattern="[0-9]{10}"
+        maxlength="10"
+        minlength="10"
       />
       {% if form.username.errors %}
         <small class="error">{{ form.username.errors.0 }}</small>

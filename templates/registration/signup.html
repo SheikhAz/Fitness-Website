@@ -44,7 +44,10 @@
         type="password" 
         name="password1" 
         class="text" 
-        required 
+        required
+        pattern="[0-9]{10}"
+        maxlength="10"
+        minlength="10"
       />
       <small class="password-hint">
         Must be <strong>8 characters</strong> long &nbsp;·&nbsp; letters &amp; numbers only

@@ -57,15 +57,20 @@
             <div class="notif-ticker" id="notifTicker">
               {% for notif in gym_notifications %}
               <span class="notif-item">
-                {% if notif.icon %}{{ notif.icon }}{% endif %} {{ notif.message
-                }} {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
+                {% if notif.icon %}
+                {{ notif.icon }}
+                {% endif %} 
+                {{ notif.message}} 
+                {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
               </span>
               {% endfor %}
               <!-- Duplicate for seamless loop -->
               {% for notif in gym_notifications %}
               <span class="notif-item" aria-hidden="true">
-                {% if notif.icon %}{{ notif.icon }}{% endif %} {{ notif.message
-                }} {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
+                {% if notif.icon %}
+                {{ notif.icon }}
+                {% endif %} {{ notif.message}} 
+                {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
               </span>
               {% endfor %}
             </div>
@@ -245,59 +250,114 @@
       </div>
     </div>
 
-    <section id="About" class="features-section">
+        <section id="About" class="features-section">
       <div class="features-container">
-        <p class="small-heading">WHY CHOSE US?</p>
-        <h2 class="main-heading">PUSH YOUR LIMITS FORWARD</h2>
-
+        <p class="small-heading">WHY CHOOSE US?</p>
+        <h2 class="main-heading">PUSH YOUR <span>LIMITS</span> FORWARD</h2>
+        <div class="cyber-divider"></div>
+    
         <div class="features-grid">
+    
+          <!-- Card 1 -->
           <div class="feature-card" onclick="toggleFeature(this)">
-            <div class="icon-box">
-              <img src="{% static 'images/features/barbell.png' %}" alt="" />
+            <span class="cyber-corner tl"></span>
+            <span class="cyber-corner br"></span>
+            <div class="card-top">
+              <div class="icon-box">
+                <img src="{% static 'images/features/barbell.png' %}" alt="Barbell" />
+              </div>
+              <div class="card-meta">
+                <p class="card-label">Equipment</p>
+                <h3>Modern Equipment</h3>
+              </div>
+              <span class="card-chevron">&#8964;</span>
             </div>
-            <h3>Modern Equipment</h3>
-            <p class="feature-desc">
-              We provide access to state-of-the-art fitness equipment designed
-              to enhance performance, ensure safety, and support all levels of
-              training—from beginners to advanced athletes.
-            </p>
+            <div class="feature-desc">
+              <div class="feature-desc-inner">
+                <ul class="feature-list">
+                  <li><span class="cyber-bullet"></span>State-of-the-art machines &amp; free weights</li>
+                  <li><span class="cyber-bullet"></span>Enhances performance and ensures safety</li>
+                  <li><span class="cyber-bullet"></span>Suitable for beginners to advanced athletes</li>
+                </ul>
+              </div>
+            </div>
           </div>
-
+    
+          <!-- Card 2 -->
           <div class="feature-card" onclick="toggleFeature(this)">
-            <div class="icon-box">
-              <img src="{% static 'images/features/vitamins.png' %}" alt="" />
+            <span class="cyber-corner tl"></span>
+            <span class="cyber-corner br"></span>
+            <div class="card-top">
+              <div class="icon-box">
+                <img src="{% static 'images/features/vitamins.png' %}" alt="Nutrition" />
+              </div>
+              <div class="card-meta">
+                <p class="card-label">Nutrition</p>
+                <h3>Healthy Nutrition Plan</h3>
+              </div>
+              <span class="card-chevron">&#8964;</span>
             </div>
-            <h3>Healthy Nutrition Plan</h3>
-            <p class="feature-desc">
-              Our customized nutrition programs are crafted to complement your
-              fitness goals, helping you maintain a balanced diet for optimal
-              energy, recovery, and overall well-being.
-            </p>
+            <div class="feature-desc">
+              <div class="feature-desc-inner">
+                <ul class="feature-list">
+                  <li><span class="cyber-bullet"></span>Customized programs aligned to your goals</li>
+                  <li><span class="cyber-bullet"></span>Balanced macros for energy &amp; recovery</li>
+                  <li><span class="cyber-bullet"></span>Micro-nutrient guidance included</li>
+                </ul>
+              </div>
+            </div>
           </div>
-
+    
+          <!-- Card 3 -->
           <div class="feature-card" onclick="toggleFeature(this)">
-            <div class="icon-box">
-              <img src="{% static 'images/features/trainer.png' %}" alt="" />
+            <span class="cyber-corner tl"></span>
+            <span class="cyber-corner br"></span>
+            <div class="card-top">
+              <div class="icon-box">
+                <img src="{% static 'images/features/trainer.png' %}" alt="Trainer" />
+              </div>
+              <div class="card-meta">
+                <p class="card-label">Training</p>
+                <h3>Professional Training Plan</h3>
+              </div>
+              <span class="card-chevron">&#8964;</span>
             </div>
-            <h3>Professional training plan</h3>
-            <p class="feature-desc">
-              Train with expert-designed workout programs tailored to your body
-              type, fitness level, and goals—ensuring efficient progress and
-              long-term results.
-            </p>
+            <div class="feature-desc">
+              <div class="feature-desc-inner">
+                <ul class="feature-list">
+                  <li><span class="cyber-bullet"></span>Expert-designed workouts for your body type</li>
+                  <li><span class="cyber-bullet"></span>Tailored to your current fitness level</li>
+                  <li><span class="cyber-bullet"></span>Structured for consistent, efficient progress</li>
+                </ul>
+              </div>
+            </div>
           </div>
-
+    
+          <!-- Card 4 -->
           <div class="feature-card" onclick="toggleFeature(this)">
-            <div class="icon-box">
-              <img src="{% static 'images/features/heart-beat.png' %}" alt="" />
+            <span class="cyber-corner tl"></span>
+            <span class="cyber-corner br"></span>
+            <div class="card-top">
+              <div class="icon-box">
+                <img src="{% static 'images/features/heart-beat.png' %}" alt="Heart" />
+              </div>
+              <div class="card-meta">
+                <p class="card-label">Personalized</p>
+                <h3>Unique to Your Needs</h3>
+              </div>
+              <span class="card-chevron">&#8964;</span>
             </div>
-            <h3>Unique to your needs</h3>
-            <p class="feature-desc">
-              Every individual is unique. We offer personalized fitness
-              solutions that adapt to your lifestyle, preferences, and specific
-              health objectives.
-            </p>
+            <div class="feature-desc">
+              <div class="feature-desc-inner">
+                <ul class="feature-list">
+                  <li><span class="cyber-bullet"></span>Personalized solutions for your lifestyle</li>
+                  <li><span class="cyber-bullet"></span>Adapts to your preferences &amp; health goals</li>
+                  <li><span class="cyber-bullet"></span>One-on-one assessments to find the right plan</li>
+                </ul>
+              </div>
+            </div>
           </div>
+    
         </div>
       </div>
     </section>
