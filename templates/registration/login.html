@@ -18,8 +18,9 @@
 {% endblock %}
 {% block content %}
 <div class="hero-container hero-animate">
-  <form method="POST" action="/accounts/login/" class="glass-form">
+  <form method="POST" action="/login/" class="glass-form">
     {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
 
     <!-- Phone Number -->
     <div class="form-group">

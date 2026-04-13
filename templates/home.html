@@ -4,9 +4,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.png' %}"
+    />
     <title>Dronacharya GYM</title>
-
 
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
@@ -36,7 +39,7 @@
       <div class="topbar">
         <div class="container flex-between">
           <span>Dronacharya Gym in Bhilai, Chhattisgarh</span>
-          <span class="right-inner">Join: (+91) 1000000000</span>
+          <span class="right-inner">Join: (+91) 8085292811</span>
         </div>
         <div class="divider"></div>
       </div>
@@ -54,24 +57,24 @@
             <div class="notif-ticker" id="notifTicker">
               {% for notif in gym_notifications %}
               <span class="notif-item">
-                {% if notif.icon %}{{ notif.icon }}{% endif %}
-                {{ notif.message }}
-                {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
+                {% if notif.icon %}{{ notif.icon }}{% endif %} {{ notif.message
+                }} {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
               </span>
               {% endfor %}
               <!-- Duplicate for seamless loop -->
               {% for notif in gym_notifications %}
               <span class="notif-item" aria-hidden="true">
-                {% if notif.icon %}{{ notif.icon }}{% endif %}
-                {{ notif.message }}
-                {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
+                {% if notif.icon %}{{ notif.icon }}{% endif %} {{ notif.message
+                }} {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
               </span>
               {% endfor %}
             </div>
           </div>
 
           <!-- Close button -->
-          <button class="notif-close" id="notifClose" aria-label="Close">×</button>
+          <button class="notif-close" id="notifClose" aria-label="Close">
+            ×
+          </button>
         </div>
       </div>
       {% endif %}
@@ -81,7 +84,11 @@
       <nav class="navbar" id="navbar">
         <div class="nav-container">
           <a href="/" class="logo">
-            <img src="{% static 'images/Logo1.png' %}" alt="EnterName Gym Logo" class="logo-img">
+            <img
+              src="{% static 'images/Logo1.png' %}"
+              alt="EnterName Gym Logo"
+              class="logo-img"
+            />
           </a>
 
           <ul class="nav-links" id="navLinks">
@@ -90,27 +97,33 @@
             <li><a href="/admin/revenue/">Revenue</a></li>
             {% endif %} 
             {% if isStaff or isSuperuser %}
-            <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
-            <li><a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a></li>
-            <li><a href="/admin/AuthFit/contact/">User Queries</a></li>
+              <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
+              <li>
+                <a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a>
+              </li>
+              <li><a href="/admin/AuthFit/contact/">User Queries</a></li>
             {% else %}
             <li class="dropdown">
               <a href="#">Membership ▼</a>
               <ul class="dropdown-menu">
-                {% if request.user.is_authenticated %} {% if not enrolled %}
-                <li><a href="/enrollment/">Enroll</a></li>
-                {% endif %} {% else %}
+                {% if request.user.is_authenticated %} 
+                  {% if not enrolled %}
+                    <li><a href="/enrollment/">Enroll</a></li>
+                  {% endif %} 
+                {% else %}
                 <li><a href="/signup/">Enroll</a></li>
                 {% endif %}
 
                 <li><a href="/workout/">Workout</a></li>
 
-                {% if request.user.is_authenticated and enrolled %}
-                {% if isStaff %}
-                <li><a href="/admin/AuthFit/attendence/">Attendance List</a></li>
-                {% else %}
-                <li><a href="/attendence/">Attendance</a></li>
-                {% endif %}
+                {% if request.user.is_authenticated and enrolled %} 
+                  {% if isStaff %}
+                    <li>
+                      <a href="/admin/AuthFit/attendence/">Attendance List</a>
+                    </li>
+                  {% else %}
+                  <li><a href="/attendence/">Attendance</a></li>
+                  {% endif %} 
                 {% endif %}
               </ul>
             </li>
@@ -134,7 +147,11 @@
             <a href="/enrollment/" class="btn mobile-only">Enroll</a>
             {% endif %} {% endif %}
 
-            <form action="{% url 'logout' %}" method="POST" class="desktop-only">
+            <form
+              action="{% url 'logout' %}"
+              method="POST"
+              class="desktop-only"
+            >
               {% csrf_token %}
               <button type="submit" class="btn">Logout</button>
             </form>
@@ -240,7 +257,9 @@
             </div>
             <h3>Modern Equipment</h3>
             <p class="feature-desc">
-              We provide access to state-of-the-art fitness equipment designed to enhance performance, ensure safety, and support all levels of training—from beginners to advanced athletes.
+              We provide access to state-of-the-art fitness equipment designed
+              to enhance performance, ensure safety, and support all levels of
+              training—from beginners to advanced athletes.
             </p>
           </div>
 
@@ -250,7 +269,9 @@
             </div>
             <h3>Healthy Nutrition Plan</h3>
             <p class="feature-desc">
-              Our customized nutrition programs are crafted to complement your fitness goals, helping you maintain a balanced diet for optimal energy, recovery, and overall well-being.
+              Our customized nutrition programs are crafted to complement your
+              fitness goals, helping you maintain a balanced diet for optimal
+              energy, recovery, and overall well-being.
             </p>
           </div>
 
@@ -260,7 +281,9 @@
             </div>
             <h3>Professional training plan</h3>
             <p class="feature-desc">
-              Train with expert-designed workout programs tailored to your body type, fitness level, and goals—ensuring efficient progress and long-term results.
+              Train with expert-designed workout programs tailored to your body
+              type, fitness level, and goals—ensuring efficient progress and
+              long-term results.
             </p>
           </div>
 
@@ -270,7 +293,9 @@
             </div>
             <h3>Unique to your needs</h3>
             <p class="feature-desc">
-              Every individual is unique. We offer personalized fitness solutions that adapt to your lifestyle, preferences, and specific health objectives.
+              Every individual is unique. We offer personalized fitness
+              solutions that adapt to your lifestyle, preferences, and specific
+              health objectives.
             </p>
           </div>
         </div>
@@ -319,7 +344,11 @@
     </section>
 
     <section id="Price" class="cta-section">
-      <img src="{% static 'images/Registration.jpg' %}" class="cta-bg" alt="Gym Training" />
+      <img
+        src="{% static 'images/Registration.jpg' %}"
+        class="cta-bg"
+        alt="Gym Training"
+      />
       <div class="cta-overlay"></div>
       <div class="cta-content">
         <p class="cta-top-text">ARE YOU READY TO</p>
@@ -414,9 +443,14 @@
         <div class="footer-container footer-top-inner">
           <div class="footer-contact">
             <div class="footer-icon">
-              <img src="{% static 'images/footer/placeholder.png' %}" alt="Location" />
+              <img
+                src="{% static 'images/footer/placeholder.png' %}"
+                alt="Location"
+              />
             </div>
-            <p>Infront of AL-Lazeez, Junwani Rd<br />Bhilai, Chhattisgarh 490023</p>
+            <p>
+              Infront of AL-Lazeez, Junwani Rd<br />Bhilai, Chhattisgarh 490023
+            </p>
           </div>
           <div class="footer-contact">
             <div class="footer-icon">
@@ -430,7 +464,10 @@
       <div class="footer-container footer-main">
         <div class="footer-brand">
           <h2>GY<span>M</span></h2>
-          <p>Transform your body and mind with professional training, modern equipment and expert fitness coaching.</p>
+          <p>
+            Transform your body and mind with professional training, modern
+            equipment and expert fitness coaching.
+          </p>
           <div class="footer-social">
             <img src="{% static 'images/footer/instagram.png' %}" alt="" />
             <img src="{% static 'images/footer/email.png' %}" alt="" />

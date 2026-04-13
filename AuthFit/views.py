@@ -96,6 +96,27 @@ def signupPage(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
+def loginPage(request):
+    if request.user.is_authenticated:
+        return redirect('/')
+
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        next_url = request.POST.get('next', '/')  # ✅ grab next
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            auth_log(request, user)
+            messages.success(request, "Logged in successfully!")
+            return redirect(next_url or '/')  # ✅ redirect to next
+        else:
+            messages.error(request, "Incorrect phone number or password.")
+            return redirect('/login/')
+
+    return render(request, 'registration/login.html')
+
 def cache_debug(request):
     cache.set("test_key", "working", timeout=30)
     val = cache.get("test_key")
@@ -175,10 +196,12 @@ def upload_face_image(request):
 
     return JsonResponse({"error": "Invalid request"})
 
+
 def homePage(request):
     enrolled = False
     isStaff = False
     isSuperuser = False
+
     gym_notifications = cache.get("notifications")
     if gym_notifications is None:
         gym_notifications = list(
@@ -188,16 +211,19 @@ def homePage(request):
         cache.set("notifications", gym_notifications, timeout=3600)
 
     if request.user.is_authenticated:
+        # ✅ Set staff/superuser flags HERE inside the authenticated block
+        isStaff = request.user.is_staff
+        isSuperuser = request.user.is_superuser
+
         enrolled = cache.get(f"enrolled_{request.user.id}")
         if enrolled is None:
             enrolled = Enrollment.objects.filter(user=request.user).exists()
             cache.set(f"enrolled_{request.user.id}", enrolled, timeout=300)
 
-
     return render(request, "home.html", {
         "enrolled": enrolled,
         "isStaff": isStaff,
-        "isSuperuser":isSuperuser,
+        "isSuperuser": isSuperuser,
         "gym_notifications": gym_notifications,
     })
 
@@ -276,7 +302,7 @@ def enrollment(request):
         cache.delete(f"enrollment_{request.user.id}")
         cache.delete(f"profile_image_{request.user.id}")
         cache.delete(f"enrolled_{request.user.id}")
-        
+
         messages.success(
             request,
             "Welcome aboard! Your gym membership has been successfully activated."
