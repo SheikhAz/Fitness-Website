@@ -214,9 +214,12 @@ class GymNotification(models.Model):
         return f"{self.icon} {self.message[:60]}"
     
 @receiver([post_save, post_delete], sender=Enrollment)
-def clear_enrollment_cache(sender, **kwargs):
+def clear_enrollment_cache(sender, instance, **kwargs):
     cache.delete("admin_revenue")
     cache.delete("face_users")
+    cache.delete(f"enrollment_{instance.user.id}")
+    cache.delete(f"profile_image_{instance.user.id}")
+    cache.delete(f"enrolled_{instance.user.id}")
 
 
 @receiver([post_save, post_delete], sender=GymNotification)
