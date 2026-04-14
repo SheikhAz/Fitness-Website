@@ -136,7 +136,12 @@
 .form-group input:focus {
   border-color: #f97316;
 }
-
+.submit-btn:disabled {
+  background: #c2550f;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+}
 /* ===== BUTTON ===== */
 .submit-btn {
   width: 100%;

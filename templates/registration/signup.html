@@ -72,7 +72,7 @@
       {% endif %}
     </div>
 
-    <button type="submit" class="submit-btn">
+    <button type="submit" class="submit-btn" id="signup-btn">
       Create Account
     </button>
 
@@ -83,5 +83,14 @@
   </form>
 </div>
 <script src="{% static 'js/messages.js' %}"></script>
+<script>
+  document.querySelector('.signup-form').addEventListener('submit', function () {
+    const btn = document.getElementById('signup-btn');
+    btn.disabled = true;
+    btn.textContent = 'Creating Account...';
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+  });
+</script>
 {% endblock %}
 

@@ -56,7 +56,7 @@
       <a href="/contact/"> administrator.</a>
     </p>
 
-    <button type="submit" class="submit-btn">LogIn</button>
+    <button type="submit" class="submit-btn" id="signup-btn">LogIn</button>
 
     <p class="bottom-text">
       Don't Have an account?
@@ -65,4 +65,13 @@
   </form>
 </div>
 <script src="{% static 'js/messages.js' %}"></script>
+<script>
+  document.querySelector('.glass-form').addEventListener('submit', function () {
+    const btn = document.getElementById('signup-btn');
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+  });
+</script>
 {% endblock %}
