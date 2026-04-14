@@ -186,6 +186,8 @@ def upload_face_image(request):
             enrollment = Enrollment.objects.get(unique_id=unique_id)
             enrollment.face_image = face_image  # Cloudinary handles upload automatically
             enrollment.save()
+            cache.delete(f"profile_image_{enrollment.user.id}")
+            cache.delete(f"enrollment_{enrollment.user.id}")
 
             return JsonResponse({"status": "success", "image_url": enrollment.face_image.url})
 

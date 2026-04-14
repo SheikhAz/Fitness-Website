@@ -5,6 +5,7 @@ from cloudinary.models import CloudinaryField
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.core.cache import cache
+from datetime import timedelta
 
 # Create your models here.
 
@@ -39,6 +40,7 @@ class Trainer(models.Model):
 class MembershipPlan(models.Model):
     plan = models.CharField(max_length=100)
     price = models.IntegerField()
+    duration_days = models.IntegerField(default=30)
 
     def __str__(self):
         return f"{self.plan} - ₹{self.price}"
@@ -139,6 +141,10 @@ class Enrollment(models.Model):
         # Set amount automatically
         if self.selectPlan:
             self.Amount = self.selectPlan.price
+
+            if not self.DueDate and self.selectPlan.duration_days:
+                today = timezone.now().date()
+                self.DueDate = today + timedelta(days=self.selectPlan.duration_days)
 
         super().save(*args, **kwargs)
 
