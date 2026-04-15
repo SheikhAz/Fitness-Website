@@ -1,35 +1,52 @@
-from django.contrib.auth.decorators import login_required
-from .models import Attendence
+import os
+import json
+import calendar
+
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_log, logout
 from django.contrib.auth.models import User
-from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Attendence, GymNotification
-import calendar
-import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .attendance import mark_attendance
-from cloudinary.utils import cloudinary_url
-from django.contrib.auth.decorators import user_passes_test
 from django.core.cache import cache
+
+from cloudinary.utils import cloudinary_url
+
+from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Attendence, GymNotification
 from AuthFit.rate_limit import check_login_attempt, reset_attempt
+from .attendance import mark_attendance
 from .forms import UserLogin
 
 
+# ==============================
+# API KEY (from environment)
+# ==============================
+INTERNAL_API_KEY = os.environ.get("INTERNAL_API_KEY", "")
 
-# Create your views here.
 
 # ==============================
-# 🔐 STAFF CHECK
+# STAFF CHECK
 # ==============================
 def is_staff(user):
     return user.is_staff or user.is_superuser
 
 
 # ==============================
-# ✅ SAVE EMBEDDING (STAFF ONLY)
+# GET CLIENT IP
+# ==============================
+def get_client_ip(request):
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if forwarded_for:
+        ip = forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
+# ==============================
+# SAVE EMBEDDING (STAFF ONLY)
 # ==============================
 @csrf_exempt
 def save_embeddings_batch(request):
@@ -39,7 +56,7 @@ def save_embeddings_batch(request):
     try:
         data = json.loads(request.body)
 
-        if data.get("api_key") != "mysecret123":
+        if not INTERNAL_API_KEY or data.get("api_key") != INTERNAL_API_KEY:
             return JsonResponse({"error": "Unauthorized"}, status=403)
 
         unique_id = data.get("unique_id")
@@ -73,50 +90,66 @@ def save_embeddings_batch(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-def get_client_ip(request):
-    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if forwarded_for:
-        # Take the FIRST IP — that's the real client
-        ip = forwarded_for.split(',')[0].strip()
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
-
-
+# ==============================
+# SIGNUP PAGE
+# ==============================
 def signupPage(request):
+    # Redirect already authenticated users
+    if request.user.is_authenticated:
+        return redirect('/')
+
     if request.method == "POST":
         form = UserLogin(request.POST)
         if form.is_valid():
             user = form.save()
-            auth_log(request, user)  # log them in immediately
+            auth_log(request, user)
             messages.success(request, "Account created successfully!")
             return redirect('/')
     else:
         form = UserLogin()
+
     return render(request, 'registration/signup.html', {'form': form})
 
 
+# ==============================
+# LOGIN PAGE
+# ==============================
 def loginPage(request):
     if request.user.is_authenticated:
         return redirect('/')
 
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        next_url = request.POST.get('next', '/')  # ✅ grab next
+        ip = get_client_ip(request)
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        next_url = request.POST.get('next', '/')
+
+        # ✅ Rate limiting check before authentication
+        allowed, attempts = check_login_attempt(ip)
+        if not allowed:
+            messages.error(
+                request,
+                "Too many failed login attempts. Please try again later."
+            )
+            return redirect('/login/')
 
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
+            reset_attempt(ip)  # ✅ Clear rate limit on success
             auth_log(request, user)
             messages.success(request, "Logged in successfully!")
-            return redirect(next_url or '/')  # ✅ redirect to next
+            return redirect(next_url or '/')
         else:
             messages.error(request, "Incorrect phone number or password.")
             return redirect('/login/')
 
     return render(request, 'registration/login.html')
 
+
+# ==============================
+# CACHE DEBUG (dev only)
+# ==============================
 def cache_debug(request):
     cache.set("test_key", "working", timeout=30)
     val = cache.get("test_key")
@@ -125,80 +158,90 @@ def cache_debug(request):
         "test_value": val,
     })
 
+
+# ==============================
+# MARK ATTENDANCE API
+# ==============================
 @csrf_exempt
 def mark_attendance_api(request):
-    if request.method == "POST":
-        import json
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
 
-        try:
-            data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
 
-            API_KEY = "mysecret123"
-            if data.get("api_key") != API_KEY:
-                return JsonResponse({"error": "Unauthorized"})
+        if not INTERNAL_API_KEY or data.get("api_key") != INTERNAL_API_KEY:
+            return JsonResponse({"error": "Unauthorized"}, status=403)
 
-            unique_id = data.get("unique_id")
+        unique_id = data.get("unique_id")
+        if not unique_id:
+            return JsonResponse({"error": "Missing unique_id"}, status=400)
 
-            result = mark_attendance(unique_id)
+        result = mark_attendance(unique_id)
+        return JsonResponse(result)
 
-            return JsonResponse(result)
-
-        except Exception as e:
-            return JsonResponse({"error": str(e)})
-
-    return JsonResponse({"error": "Invalid request"})
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 # ==============================
-# 👥 GET USERS (BONUS IMPROVEMENT)
+# GET USERS (face embeddings)
 # ==============================
 def get_users(request):
     data = cache.get("face_users")
     if data is None:
-        # Build the list from DB
         enrollments = Enrollment.objects.filter(face_embeddings__isnull=False)
-        data = []
-        for u in enrollments:
-            data.append({
+        data = [
+            {
                 "unique_id": u.unique_id,
                 "name": u.fullname,
-                "embeddings": u.face_embeddings
-            })
-        cache.set("face_users", data, timeout=300)  # ← save data, not users
+                "embeddings": u.face_embeddings,
+            }
+            for u in enrollments
+        ]
+        cache.set("face_users", data, timeout=300)
     return JsonResponse(data, safe=False)
 
 
-
+# ==============================
+# UPLOAD FACE IMAGE
+# ==============================
 @csrf_exempt
 def upload_face_image(request):
-    if request.method == "POST":
-        try:
-            api_key = request.POST.get("api_key")
-            if api_key != "mysecret123":
-                return JsonResponse({"error": "Unauthorized"})
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
 
-            unique_id = request.POST.get("unique_id")
-            face_image = request.FILES.get("face_image")
+    try:
+        api_key = request.POST.get("api_key")
+        if not INTERNAL_API_KEY or api_key != INTERNAL_API_KEY:
+            return JsonResponse({"error": "Unauthorized"}, status=403)
 
-            if not unique_id or not face_image:
-                return JsonResponse({"error": "Missing data"})
+        unique_id = request.POST.get("unique_id")
+        face_image = request.FILES.get("face_image")
 
-            enrollment = Enrollment.objects.get(unique_id=unique_id)
-            enrollment.face_image = face_image  # Cloudinary handles upload automatically
-            enrollment.save()
-            cache.delete(f"profile_image_{enrollment.user.id}")
-            cache.delete(f"enrollment_{enrollment.user.id}")
+        if not unique_id or not face_image:
+            return JsonResponse({"error": "Missing data"}, status=400)
 
-            return JsonResponse({"status": "success", "image_url": enrollment.face_image.url})
+        enrollment = Enrollment.objects.get(unique_id=unique_id)
+        enrollment.face_image = face_image  # Cloudinary handles upload
+        enrollment.save()
 
-        except Enrollment.DoesNotExist:
-            return JsonResponse({"error": "User not found"})
-        except Exception as e:
-            return JsonResponse({"error": str(e)})
+        cache.delete(f"profile_image_{enrollment.user.id}")
+        cache.delete(f"enrollment_{enrollment.user.id}")
 
-    return JsonResponse({"error": "Invalid request"})
+        return JsonResponse({"status": "success", "image_url": enrollment.face_image.url})
+
+    except Enrollment.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
+# ==============================
+# HOME PAGE
+# ==============================
 def homePage(request):
     enrolled = False
     isStaff = False
@@ -207,13 +250,12 @@ def homePage(request):
     gym_notifications = cache.get("notifications")
     if gym_notifications is None:
         gym_notifications = list(
-            GymNotification.objects.filter(is_active=True)
-            .values("icon", "message")
+            GymNotification.objects.filter(
+                is_active=True).values("icon", "message")
         )
         cache.set("notifications", gym_notifications, timeout=3600)
 
     if request.user.is_authenticated:
-        # ✅ Set staff/superuser flags HERE inside the authenticated block
         isStaff = request.user.is_staff
         isSuperuser = request.user.is_superuser
 
@@ -229,62 +271,90 @@ def homePage(request):
         "gym_notifications": gym_notifications,
     })
 
+
+# ==============================
+# STATS API
+# ==============================
 def stats_api(request):
     total_users = Enrollment.objects.count()
     return JsonResponse({"total_users": total_users})
 
+
+# ==============================
+# CONTACT PAGE
+# ==============================
 def contact(request):
     if request.method == "POST":
-        name = request.POST.get('name')
-        number = request.POST.get('number')
-        email = request.POST.get('email')
-        message = request.POST.get('description')
+        name = request.POST.get('name', '').strip()
+        number = request.POST.get('number', '').strip()
+        email = request.POST.get('email', '').strip()
+        message = request.POST.get('description', '').strip()
 
-        # Checking that Phone Number is 10 digits only
-
-        if len(number) > 10 or len(number) < 10:
-            messages.error(request, "Please Enter a Valid Number")
+        # ✅ Validate: exactly 10 digits, numeric only
+        if not number.isdigit() or len(number) != 10:
+            messages.error(
+                request, "Please enter a valid 10-digit phone number.")
             return redirect('/contact/')
 
-        query = Contact(name=name, email=email, phonenumber=number,
-                        description=message)
+        query = Contact(
+            name=name,
+            email=email,
+            phonenumber=number,
+            description=message
+        )
         query.save()
         messages.success(
-            request, "Thanks for Contacting us we will get back you soon")
+            request, "Thanks for contacting us — we'll get back to you soon!")
         return redirect('/contact/')
+
     return render(request, 'contact.html')
 
 
+# ==============================
+# LOGOUT
+# ==============================
 def handlelogout(request):
     logout(request)
-    messages.success(request, "Logout Successfully......")
+    messages.success(request, "Logged out successfully.")
     return redirect('/')
 
 
+# ==============================
+# ENROLLMENT
+# ==============================
 @login_required
 def enrollment(request):
-    plans = MembershipPlan.objects.all()
-    trainers = Trainer.objects.all()
-
-    # If user already has enrollment
+    # Redirect if already enrolled
     if Enrollment.objects.filter(user=request.user).exists():
         return redirect('/profile/')
 
+    plans = MembershipPlan.objects.all()
+    trainers = Trainer.objects.all()
+
     if request.method == "POST":
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
         gender = request.POST.get('gender')
         dob = request.POST.get('dob')
         plan_id = request.POST.get('plan')
-        trainer = request.POST.get('trainer')
-        selected_trainer = None
-        if trainer:
-            selected_trainer = Trainer.objects.get(id=trainer)
-        reference = request.POST.get('reference')
-        address = request.POST.get('address')
+        trainer_id = request.POST.get('trainer')
+        reference = request.POST.get('reference', '').strip()
+        address = request.POST.get('address', '').strip()
 
-        selected_plan = MembershipPlan.objects.get(id=plan_id)
+        selected_trainer = None
+        if trainer_id:
+            try:
+                selected_trainer = Trainer.objects.get(id=trainer_id)
+            except Trainer.DoesNotExist:
+                messages.error(request, "Selected trainer does not exist.")
+                return redirect('/enrollment/')
+
+        try:
+            selected_plan = MembershipPlan.objects.get(id=plan_id)
+        except MembershipPlan.DoesNotExist:
+            messages.error(request, "Selected plan does not exist.")
+            return redirect('/enrollment/')
 
         enroll = Enrollment(
             fullname=name,
@@ -300,7 +370,7 @@ def enrollment(request):
         )
         enroll.save()
 
-        # ✅ Clear cache so profile shows fresh data
+        # Clear relevant caches
         cache.delete(f"enrollment_{request.user.id}")
         cache.delete(f"profile_image_{request.user.id}")
         cache.delete(f"enrolled_{request.user.id}")
@@ -313,31 +383,39 @@ def enrollment(request):
 
     return render(request, 'enrollment.html', {
         "plans": plans,
-        "trainers": trainers
+        "trainers": trainers,
     })
 
 
+# ==============================
+# WORKOUT PAGE
+# ==============================
 def workout(request):
     return render(request, 'workout.html')
 
 
+# ==============================
+# 👤 PROFILE PAGE
+# ==============================
 @login_required
 def Profile(request):
-    cache_key = f"profile_image_{request.user.id}"
-
     enrollment = cache.get(f"enrollment_{request.user.id}")
     if enrollment is None:
         enrollment = Enrollment.objects.filter(user=request.user).first()
         cache.set(f"enrollment_{request.user.id}", enrollment, timeout=300)
 
-    image_url = cache.get(cache_key)
-    if image_url is None and enrollment and enrollment.face_image:
-        image_url, _ = cloudinary_url(
-            enrollment.face_image.public_id,
-            width=130, height=130,  # match actual display size
-            crop="fill"
-        )
-        cache.set(cache_key, image_url, timeout=300)  # cache 5 mins
+    image_url = None
+    if enrollment and enrollment.face_image:
+        image_url = cache.get(f"profile_image_{request.user.id}")
+        if image_url is None:
+            image_url, _ = cloudinary_url(
+                enrollment.face_image.public_id,
+                width=130,
+                height=130,
+                crop="fill",
+            )
+            cache.set(f"profile_image_{request.user.id}",
+                      image_url, timeout=300)
 
     return render(request, 'profile.html', {
         'enrollment': enrollment,
@@ -347,24 +425,21 @@ def Profile(request):
     })
 
 
+# ==============================
+# ATTENDANCE PAGE
+# ==============================
+@login_required  # ✅ Fixed: was missing login_required
 def attendence(request):
-
     today = timezone.localdate()
     user = request.user
 
-    already_mark = Attendence.objects.filter(
-        user=user,
-        date=today
-    ).exists()
+    already_mark = Attendence.objects.filter(user=user, date=today).exists()
 
     if request.method == "POST":
-        obj, created = Attendence.objects.get_or_create(
-            user=user,
-            date=today
-        )
+        obj, created = Attendence.objects.get_or_create(user=user, date=today)
 
         if created:
-            messages.success(request, "Attendance Successfully Marked.")
+            messages.success(request, "Attendance successfully marked.")
         else:
             messages.error(request, "Attendance already marked today.")
 
@@ -373,12 +448,12 @@ def attendence(request):
     all_attended = list(Attendence.objects.filter(user=user).order_by('-date'))
     attended = all_attended[:7]
     total_days = len(all_attended)
-    monthly_days = calendar.monthrange(today.year ,today.month)[1]
+    monthly_days = calendar.monthrange(today.year, today.month)[1]
 
     return render(request, 'attendence.html', {
         'already_mark': already_mark,
-        'attended':attended,
-        'total_days':total_days,
-        'monthly_days':monthly_days,
-        'today':today
+        'attended': attended,
+        'total_days': total_days,
+        'monthly_days': monthly_days,
+        'today': today,
     })

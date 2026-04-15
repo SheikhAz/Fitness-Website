@@ -1,4 +1,3 @@
-import ssl
 import os
 import dj_database_url
 from pathlib import Path
@@ -11,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-
+API_KEY = os.environ.get("INTERNAL_API_KEY", "")
 
 
 ALLOWED_HOSTS = ["*"]
