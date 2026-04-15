@@ -128,7 +128,7 @@ admin.site.register(MembershipPlan)
 @admin.register(Attendence)
 class AttendenceAdmin(admin.ModelAdmin):
 
-    list_display = ('member_id', 'member_name', 'date', 'timestamp')
+    list_display = ('member_id', 'member_name','pendingamount','remainingday','date', 'timestamp')
     search_fields = ('user__enrollment__fullname',
                      'user__enrollment__unique_id')
     list_filter = ('date',)
@@ -140,6 +140,13 @@ class AttendenceAdmin(admin.ModelAdmin):
     def member_name(self, obj):
         return obj.user.enrollment.fullname
     member_name.short_description = "NAME"
+    def pendingamount(self, obj):
+        return obj.user.enrollment.PendingAmount
+    pendingamount.short_description = "PENDING Rs"
+
+    def remainingday(self, obj):
+        return obj.user.enrollment.DueDate
+    remainingday.short_description = "REMAINING DAYS"
 
 
 @admin.register(Enrollment)
@@ -149,6 +156,7 @@ class EnrollmentAdmin(admin.ModelAdmin):
         "fullname",
         "phone",
         "selectPlan",
+        "PendingAmount",
         "paymentStatus",
         "days_remaining",
         "face_preview",  
