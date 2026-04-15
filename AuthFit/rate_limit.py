@@ -1,21 +1,22 @@
 from django.core.cache import cache
 
+MAX_ATTEMPTS = 3
+LOCKOUT_SECONDS = 60
 
-def check_login_attempt(ip, phone):
-    # Use phone as primary key — reliable across proxies
-    key = f"login:{phone}"   # ← remove IP dependency
 
+def check_login_attempt(ip: str, phone: str) -> bool:
+    key = f"login:{phone}"
     try:
         attempts = cache.get(key, 0)
     except Exception:
-        return True
+        return True  # Fail open on cache error
 
-    if attempts >= 3:
+    if attempts >= MAX_ATTEMPTS:
         return False
 
     try:
         if attempts == 0:
-            cache.set(key, 1, timeout=60)
+            cache.set(key, 1, timeout=LOCKOUT_SECONDS)
         else:
             cache.incr(key)
     except Exception:
@@ -24,8 +25,8 @@ def check_login_attempt(ip, phone):
     return True
 
 
-def reset_attempt(ip, phone):
-    key = f"login:{ip}:{phone}"
+def reset_attempt(ip: str, phone: str) -> None:
+    key = f"login:{phone}"  # ← must match check_login_attempt
     try:
         cache.delete(key)
     except Exception:

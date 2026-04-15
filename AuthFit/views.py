@@ -18,6 +18,7 @@ from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Attende
 from AuthFit.rate_limit import check_login_attempt, reset_attempt
 from .attendance import mark_attendance
 from .forms import UserLogin
+from urllib.parse import urlparse
 
 
 # ==============================
@@ -118,33 +119,46 @@ def loginPage(request):
     if request.user.is_authenticated:
         return redirect('/')
 
-    if request.method == "POST":
-        ip = get_client_ip(request)
-        username = request.POST.get('username', '').strip()
-        password = request.POST.get('password', '')
-        next_url = request.POST.get('next', '/')
+    # Preserve `next` across GET and POST
+    next_url = request.GET.get('next') or request.POST.get('next', '/')
 
-        # ✅ Rate limiting check before authentication
-        allowed, attempts = check_login_attempt(ip)
-        if not allowed:
+    if request.method == "POST":
+        ip       = get_client_ip(request)
+        phone    = request.POST.get('phone', '').strip()
+        password = request.POST.get('password', '')
+
+        # Rate limit keyed on phone (primary) — consistent with check_login_attempt
+        if not check_login_attempt(ip, phone):
             messages.error(
                 request,
                 "Too many failed login attempts. Please try again later."
             )
-            return redirect('/login/')
+            return redirect(f'/login/?next={next_url}')
 
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=phone, password=password)
 
         if user is not None:
-            reset_attempt(ip)  # ✅ Clear rate limit on success
+            reset_attempt(ip, phone)          
+            auth_login(request, user)         
             auth_log(request, user)
             messages.success(request, "Logged in successfully!")
-            return redirect(next_url or '/')
+            return redirect(_safe_next(next_url, request))
         else:
             messages.error(request, "Incorrect phone number or password.")
-            return redirect('/login/')
+            return redirect(f'/login/?next={next_url}')
 
-    return render(request, 'registration/login.html')
+    return render(request, 'registration/login.html', {'next': next_url})
+
+
+def _safe_next(next_url: str, request) -> str:
+    """
+    Allow only same-origin redirects to prevent open-redirect attacks.
+    Falls back to '/' for external or malformed URLs.
+    """
+    parsed = urlparse(next_url)
+    if parsed.netloc and parsed.netloc != request.get_host():
+        return '/'
+    return next_url or '/'
 
 
 # ==============================
