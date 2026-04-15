@@ -10,15 +10,15 @@ from django.template.response import TemplateResponse
 import json
 from django.core.cache import cache
 
+
 @admin.register(GymNotification)
 class GymNotificationAdmin(admin.ModelAdmin):
-      list_display  = ("icon", "message", "is_active", "order", "created_at")
-      list_editable = ("is_active", "order")
-      list_filter   = ("is_active",)
-      search_fields = ("message",)
+    list_display = ("icon", "message", "is_active", "order", "created_at")
+    list_editable = ("is_active", "order")
+    list_filter = ("is_active",)
+    search_fields = ("message",)
 
 
-      
 def revenue_view(request):
 
     data = cache.get("admin_revenue_data")
@@ -125,10 +125,11 @@ admin.site.register(Contact)
 admin.site.register(Trainer)
 admin.site.register(MembershipPlan)
 
+
 @admin.register(Attendence)
 class AttendenceAdmin(admin.ModelAdmin):
-
-    list_display = ('member_id', 'member_name','pendingamount','remainingday','date', 'timestamp')
+    list_display = ('member_id', 'member_name', 'pending_amount',
+                    'remaining_day', 'date', 'timestamp')
     search_fields = ('user__enrollment__fullname',
                      'user__enrollment__unique_id')
     list_filter = ('date',)
@@ -140,13 +141,14 @@ class AttendenceAdmin(admin.ModelAdmin):
     def member_name(self, obj):
         return obj.user.enrollment.fullname
     member_name.short_description = "NAME"
-    def pendingamount(self, obj):
-        return obj.user.enrollment.PendingAmount
-    pendingamount.short_description = "PENDING Rs"
 
-    def remainingday(self, obj):
+    def pending_amount(self, obj):          
+        return obj.user.enrollment.pendingAmount   
+    pending_amount.short_description = "PENDING Rs"
+
+    def remaining_day(self, obj):
         return obj.user.enrollment.DueDate
-    remainingday.short_description = "REMAINING DAYS"
+    remaining_day.short_description = "REMAINING DAYS"
 
 
 @admin.register(Enrollment)
@@ -156,10 +158,10 @@ class EnrollmentAdmin(admin.ModelAdmin):
         "fullname",
         "phone",
         "selectPlan",
-        "PendingAmount",
+        "pendingAmount",
         "paymentStatus",
         "days_remaining",
-        "face_preview",  
+        "face_preview",
     )
 
     search_fields = ("unique_id", "fullname", "phone", "email")
