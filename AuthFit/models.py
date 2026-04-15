@@ -97,7 +97,7 @@ class Enrollment(models.Model):
         max_length=10, choices=PAYMENT, default="Pending"
     )
     Amount = models.DecimalField(max_digits=10, decimal_places=2)
-    PendingAmount = models.DecimalField(max_digits=10,decimal_places=2)
+    PendingAmount = models.DecimalField(default=0,max_digits=10,decimal_places=2)
     paymentMethod = models.CharField(
         max_length=1, choices=METHOD, blank=True, null=True
     )
