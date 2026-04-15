@@ -19,6 +19,7 @@ from AuthFit.rate_limit import check_login_attempt, reset_attempt
 from .attendance import mark_attendance
 from .forms import UserLogin
 from urllib.parse import urlparse
+from AuthFit.rate_limit import check_login_attempt, reset_attempt, record_failed_attempt
 
 
 # ==============================
@@ -119,31 +120,28 @@ def loginPage(request):
     if request.user.is_authenticated:
         return redirect('/')
 
-    # Preserve `next` across GET and POST
     next_url = request.GET.get('next') or request.POST.get('next', '/')
 
     if request.method == "POST":
-        ip       = get_client_ip(request)
-        phone    = request.POST.get('phone', '').strip()
+        ip = get_client_ip(request)
+        phone = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
 
-        # Rate limit keyed on phone (primary) — consistent with check_login_attempt
+        # ✅ Only check if locked out — don't increment yet
         if not check_login_attempt(ip, phone):
             messages.error(
-                request,
-                "Too many failed login attempts. Please try again later."
-            )
+                request, "Too many failed login attempts. Please try again later.")
             return redirect(f'/login/?next={next_url}')
 
         user = authenticate(request, username=phone, password=password)
 
         if user is not None:
-            reset_attempt(ip, phone)          
-            auth_login(request, user)         
+            reset_attempt(ip, phone)
             auth_log(request, user)
             messages.success(request, "Logged in successfully!")
             return redirect(_safe_next(next_url, request))
         else:
+            record_failed_attempt(ip, phone)   # ✅ Only increment on failure
             messages.error(request, "Incorrect phone number or password.")
             return redirect(f'/login/?next={next_url}')
 

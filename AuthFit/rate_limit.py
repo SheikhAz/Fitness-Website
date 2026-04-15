@@ -5,28 +5,30 @@ LOCKOUT_SECONDS = 60
 
 
 def check_login_attempt(ip: str, phone: str) -> bool:
+    """Returns False if the phone is currently locked out."""
     key = f"login:{phone}"
     try:
         attempts = cache.get(key, 0)
+        return attempts < MAX_ATTEMPTS
     except Exception:
         return True  # Fail open on cache error
 
-    if attempts >= MAX_ATTEMPTS:
-        return False
 
+def record_failed_attempt(ip: str, phone: str) -> None:
+    """Increments the failure counter. Call only after a failed authenticate()."""
+    key = f"login:{phone}"
     try:
-        if attempts == 0:
+        if not cache.get(key):
             cache.set(key, 1, timeout=LOCKOUT_SECONDS)
         else:
             cache.incr(key)
     except Exception:
         pass
 
-    return True
-
 
 def reset_attempt(ip: str, phone: str) -> None:
-    key = f"login:{phone}"  # ← must match check_login_attempt
+    """Clears the counter after a successful login."""
+    key = f"login:{phone}"
     try:
         cache.delete(key)
     except Exception:
