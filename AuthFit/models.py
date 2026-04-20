@@ -92,14 +92,17 @@ class Enrollment(models.Model):
     trainer = models.ForeignKey(
         Trainer, on_delete=models.SET_NULL, null=True, blank=True
     )
-
-    paymentStatus = models.CharField(
-        max_length=10, choices=PAYMENT, default="Pending"
-    )
     Amount = models.DecimalField(max_digits=10, decimal_places=2)
-    pendingAmount = models.DecimalField(default=0,max_digits=10,decimal_places=2)
+    
     paymentMethod = models.CharField(
         max_length=1, choices=METHOD, blank=True, null=True
+    )
+    pendingAmount = models.DecimalField(default=0,max_digits=10,decimal_places=2)
+    pendingpaymentMethod = models.CharField(
+        max_length=1, choices=METHOD, blank=True, null=True
+    )
+    paymentStatus = models.CharField(
+        max_length=10, choices=PAYMENT, default="Pending"
     )
 
     # ==============================
