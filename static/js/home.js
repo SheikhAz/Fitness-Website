@@ -30,16 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const navbar = document.getElementById("navbar");
 
   if (notifBar && notifClose && navbar) {
-    // restore dismissed state across page loads
-    if (sessionStorage.getItem("notifDismissed") === "1") {
-      notifBar.classList.add("hidden");
-      navbar.classList.add("notif-hidden");
-    }
-
     notifClose.addEventListener("click", () => {
       notifBar.classList.add("hidden");
       navbar.classList.add("notif-hidden");
-      sessionStorage.setItem("notifDismissed", "1");
     });
   }
 

@@ -120,7 +120,7 @@ body {
 .notif-bar {
   position: absolute;
   /* sits right below topbar (~44px) */
-  top: 44px;
+  top: 30px;
   left: 0;
   width: 100%;
   z-index: 29;
@@ -131,7 +131,7 @@ body {
   transition:
     max-height 0.4s ease,
     opacity 0.4s ease;
-  max-height: 44px;
+  max-height: 100px;
 }
 
 .notif-bar.hidden {
@@ -153,7 +153,7 @@ body {
   flex-shrink: 0;
   background: #f97316;
   color: black;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: 1.5px;
   padding: 4px 10px;
@@ -185,7 +185,7 @@ body {
 }
 
 .notif-item {
-  font-size: 13px;
+  font-size: 18px;
   color: rgba(255, 255, 255, 0.88);
   padding-right: 6px;
 }
@@ -436,19 +436,20 @@ body {
 
   /* Notification bar — slightly smaller on mobile */
   .notif-bar {
-    max-height: 36px;
+    position: absolute;
+    top: 44px;
   }
   .notif-inner {
     height: 36px;
     padding: 0 8px;
   }
   .notif-label {
-    font-size: 9px;
+    font-size: 12px;
     padding: 3px 6px;
     margin-right: 8px;
   }
   .notif-item {
-    font-size: 12px;
+    font-size: 17px;
   }
   .notif-close {
     font-size: 18px;
@@ -457,10 +458,11 @@ body {
 
   /* Navbar offset on mobile */
   .navbar {
-    top: 72px;
+    position: absolute;
+    top: 88px;
   } /* topbar(44) + notif(40) */
   .navbar.notif-hidden {
-    top: 36px;
+    top: 44px;
   }
 
   /* POPUP MENU */
