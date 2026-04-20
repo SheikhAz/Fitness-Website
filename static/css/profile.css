@@ -133,7 +133,10 @@
   color: #3dd870;
   font-weight: 100;
 }
-
+.red {
+  color: #f90404;
+  font-weight: 500;
+}
 .danger {
   color: red;
 }

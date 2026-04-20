@@ -61,7 +61,16 @@
 
           <div class="card-cell">
             <div class="cell-label">Payment Status</div>
-            <div class="cell-value green">
+
+            <div class="cell-value 
+              {% if enrollment.paymentStatus == 'Pending' %}
+                  red
+              {% elif enrollment.paymentStatus == 'Done' %}
+                  green
+              {% else %}
+                  default
+              {% endif %}
+            ">
               {{ enrollment.paymentStatus|default:"Not Provided" }}
             </div>
           </div>
@@ -87,12 +96,18 @@
             {% endif %}
           </div>
         </div>
-
-        <div class="card-row single">
+        <div class="card-row">
           <div class="card-cell side">
             <div class="cell-label">Trainer</div>
             <div class="cell-value orange">
               {{ enrollment.trainer|default:"Not Provided" }}
+            </div>
+          </div>
+
+          <div class="card-cell">
+            <div class="cell-label">Pending Amount</div>
+            <div class="cell-value red">
+              {{ enrollment.pendingAmount|default:"Not Provided" }}
             </div>
           </div>
         </div>
