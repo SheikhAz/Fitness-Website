@@ -21,6 +21,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -31,6 +32,11 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
 ]
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "flatly",
+    "dark_mode_theme": "darkly",
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -59,6 +65,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -66,7 +73,6 @@ TEMPLATES = [
         },
     }
 ]
-
 WSGI_APPLICATION = 'Fitness.wsgi.application'
 
 cloudinary.config(
@@ -119,3 +125,4 @@ LOGOUT_REDIRECT_URL = '/'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
