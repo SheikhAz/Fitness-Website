@@ -379,6 +379,7 @@ def enrollment(request):
             reference=reference,
             address=address,
             user=request.user,
+            paidAmount=0,
         )
         enroll.save()
 

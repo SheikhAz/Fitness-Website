@@ -93,7 +93,8 @@ class Enrollment(models.Model):
         Trainer, on_delete=models.SET_NULL, null=True, blank=True
     )
     Amount = models.DecimalField(max_digits=10, decimal_places=2)
-    
+    paidAmount = models.DecimalField(default=0,max_digits=10,decimal_places=2,null=False)
+    paymentDate = models.DateField(blank=True, null=True)
     paymentMethod = models.CharField(
         max_length=1, choices=METHOD, blank=True, null=True
     )
@@ -101,6 +102,7 @@ class Enrollment(models.Model):
     pendingpaymentMethod = models.CharField(
         max_length=1, choices=METHOD, blank=True, null=True
     )
+    pendingpaymentDate =  models.DateField(blank=True, null=True)
     paymentStatus = models.CharField(
         max_length=10, choices=PAYMENT, default="Pending"
     )
