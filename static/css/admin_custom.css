@@ -1,0 +1,33 @@
+/* ===== TABLE COMPACT MODE ===== */
+
+/* Reduce font size */
+.table, .table th, .table td {
+    font-size: 12px !important;
+}
+
+/* Reduce padding */
+.table th, .table td {
+    padding: 6px 8px !important;
+}
+
+/* Prevent breaking into vertical letters */
+th, td {
+    white-space: nowrap !important;
+}
+
+/* Slightly reduce header size */
+.table thead th {
+    font-size: 11px !important;
+    letter-spacing: 0.3px;
+}
+
+/* Make container use more width */
+.content-wrapper .content {
+    padding: 10px !important;
+}
+
+/* Optional: shrink buttons */
+.btn {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+}

@@ -126,3 +126,79 @@ LOGOUT_REDIRECT_URL = '/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "EnterGYM Admin",
+    "site_header": "EnterGYM Dashboard",
+    "site_brand": "EnterGYM",
+    "welcome_sign": "Welcome to EnterGYM Control Panel",
+    "site_logo": "images/Logo.png",
+    "site_icon": "images/Logo.png",
+    "copyright": "EnterGYM",
+
+    # 🔝 Top Menu
+    "topmenu_links": [
+        {"name": "Support", "url": "https://wa.me/917000032565", "new_window": True},
+    ],
+
+    # 👤 User menu
+    "usermenu_links": [
+        {"name": "Support", "url": "https://wa.me/917000032565", "new_window": True},
+    ],
+
+    # 📊 Sidebar
+    "show_sidebar": True,
+    "navigation_expanded": True,
+
+    # 🎯 Order your apps (important for clean UI)
+    "order_with_respect_to": [
+        "AuthFit",
+        "AuthFit.enrollment",
+        "AuthFit.attendance",
+        "AuthFit.membershipplan",
+        "AuthFit.trainer",
+        "AuthFit.contact",
+        "AuthFit.gymnotification",
+        "auth",
+    ],
+
+    # 🎨 Icons (VERY IMPORTANT for modern UI)
+    "icons": {
+        "AuthFit": "fas fa-dumbbell",
+
+        "AuthFit.attendence": "fas fa-clipboard-user",
+        "AuthFit.contact": "fas fa-address-book",
+        "AuthFit.enrollment": "fas fa-id-card",
+        "AuthFit.gymnotification": "fas fa-bell",
+        "AuthFit.membershipplan": "fas fa-layer-group",
+        "AuthFit.trainer": "fas fa-user-tie",
+
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.group": "fas fa-users",
+    },
+
+    # ⚡ UI Enhancements
+    "changeform_format": "horizontal_tabs",
+    "related_modal_active": False,
+
+    # 🎨 Custom Styling
+    "custom_css": "css/admin_custom.css",
+    "custom_links": {
+    "EnterGYM": [
+        {
+            "name": "Visit Website",
+            "url": "https://entergym.onrender.com/",
+            "icon": "fas fa-globe",
+            "new_window": True,
+        },
+        {
+            "name": "Support",
+            "url": "https://wa.me/917000032565",
+            "icon": "fas fa-headset",
+            "new_window": True
+        }
+        ]
+    }
+}
