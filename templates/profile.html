@@ -115,5 +115,53 @@
     </div>
   </div>
 </div>
+{% if enrollment and not is_expired and days_remaining <= 4 and days_remaining >= 0 %}
+<script>
+  (function () {
+    const TODAY = new Date().toDateString();
+    const STORAGE_KEY = "expiry_alert_played";
+
+    if (localStorage.getItem(STORAGE_KEY) === TODAY) return;
+
+    function playAlert() {
+      localStorage.setItem(STORAGE_KEY, TODAY);
+
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+      function beep(startTime, frequency, duration) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(frequency, startTime);
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(0.4, startTime + 0.05);
+        gain.gain.setValueAtTime(0.4, startTime + duration - 0.08);
+        gain.gain.linearRampToValueAtTime(0, startTime + duration);
+        osc.start(startTime);
+        osc.stop(startTime + duration);
+      }
+
+      const now = ctx.currentTime + 0.1;
+      beep(now + 0.0, 880, 0.6);
+      beep(now + 0.8, 660, 0.6);
+      beep(now + 1.6, 880, 1.0);
+    }
+
+    // Try immediately (works if user already interacted with browser)
+    try {
+      playAlert();
+    } catch (e) {
+      // Autoplay blocked — wait for first user interaction
+      document.addEventListener("click", function playOnce() {
+        playAlert();
+        document.removeEventListener("click", playOnce);
+      }, { once: true });
+    }
+
+  })();
+</script>
+{% endif %}
 <script src="{% static 'js/messages.js' %}"></script>
 {% endblock %}
