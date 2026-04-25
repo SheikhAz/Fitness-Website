@@ -12,6 +12,7 @@ urlpatterns = [
     path('contact/',views.contact , name = "contact"),
     path('enrollment/',views.enrollment , name = "enrollment"),
     path('attendence/',views.attendence , name = "attendence"),
+    
     path('api/mark-attendance/', views.mark_attendance_api),
     path('api/get-users/', views.get_users),
     path('api/upload-face-image/', views.upload_face_image),

@@ -5,77 +5,136 @@
 {% block heading %}Attendance{% endblock %}
 {% block link %}
 <link rel="stylesheet" href="{% static 'css/attendence.css' %}" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 {% endblock %}
+
 {% block message %}
 <div id="message-container">
   {% for message in messages %}
-  <div
-    class="flash-message {% if message.tags == 'success' %} success {% elif message.tags == 'error' %} error {% else %} default {% endif %}"
-  >
+  <div class="flash-message {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}default{% endif %}">
+    <span class="msg-icon">{% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}✕{% else %}◈{% endif %}</span>
     <span>{{ message }}</span>
-
     <button class="close-btn">×</button>
   </div>
   {% endfor %}
 </div>
 {% endblock %}
+
 {% block content %}
+
+<!-- Pass attended dates to JS -->
+<script>
+  const ATTENDED_DATES = [
+    {% for a in attended %}"{{ a.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}{% endfor %}
+  ];
+</script>
+
 <div class="attendance-container hero-animate">
 
-  <!-- DATE -->
-  <div class="date-box">
-    <h2>{{ today }}</h2>
+  <!-- HUD HEADER -->
+  <div class="hud-header">
+    <div class="hud-line"></div>
+    <div class="date-display">
+      <span class="date-label">SYS DATE</span>
+      <span class="date-value">{{ today }}</span>
+    </div>
+    <div class="hud-line"></div>
   </div>
 
-  <!-- CARD -->
-  <div class="card">
-
-    <!-- BUTTON -->
+  <!-- MARK ATTENDANCE BUTTON -->
+  <div class="mark-section">
     <form method="POST">
       {% csrf_token %}
-      <button type="submit" {% if already_mark %}disabled{% endif %} class="btn">
-        {% if already_mark %}
-          Attendance Already Marked
-        {% else %}
-          Mark Attendance
-        {% endif %}
+      <button type="submit" {% if already_mark %}disabled{% endif %} class="btn-mark {% if already_mark %}marked{% endif %}">
+        <span class="btn-glow"></span>
+        <span class="btn-text">
+          {% if already_mark %}
+            <span class="check-icon">✓</span> ATTENDANCE LOGGED
+          {% else %}
+            <span class="pulse-ring"></span>◈ MARK ATTENDANCE
+          {% endif %}
+        </span>
+        <span class="btn-scanline"></span>
       </button>
     </form>
+  </div>
 
-    <h2 class="heading">Attendance Card</h2>
+  <!-- STATS ROW -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">TOTAL DAYS</div>
+      <div class="stat-value green" data-target="{{ total_days }}">{{ total_days }}</div>
+      <div class="stat-bar"><div class="stat-bar-fill green-fill" style="width:{{ total_days }}%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">THIS MONTH</div>
+      <div class="stat-value cyan" data-target="{{ monthly_days }}">{{ monthly_days }}</div>
+      <div class="stat-bar"><div class="stat-bar-fill cyan-fill" style="width:{{ monthly_days }}%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">STREAK</div>
+      <div class="stat-value orange" id="streak-val">0</div>
+      <div class="stat-bar"><div class="stat-bar-fill orange-fill" id="streak-bar" style="width:0%"></div></div>
+    </div>
+  </div>
 
-    <!-- STATS -->
-    <div class="stats">
-      <div class="stat-box">
-        <p>Total Days</p>
-        <h2 class="green">{{ total_days }}</h2>
+  <!-- HEATMAP -->
+  <div class="heatmap-section">
+    <div class="section-header">
+      <span class="section-tag">◈</span>
+      <h2 class="section-title">ATTENDANCE MATRIX</h2>
+      <span class="section-tag">◈</span>
+    </div>
+
+    <div class="heatmap-wrap">
+      <div class="heatmap-months" id="heatmap-months"></div>
+      <div class="heatmap-body">
+        <div class="heatmap-days">
+          <span>M</span><span></span><span>W</span><span></span><span>F</span><span></span><span>S</span>
+        </div>
+        <div class="heatmap-grid" id="heatmap-grid"></div>
       </div>
-
-      <div class="stat-box">
-        <p>This Month</p>
-        <h2 class="red">{{ monthly_days }}</h2>
+      <div class="heatmap-legend">
+        <span>LESS</span>
+        <div class="legend-box l0"></div>
+        <div class="legend-box l1"></div>
+        <div class="legend-box l2"></div>
+        <span>MORE</span>
       </div>
     </div>
   </div>
 
   <!-- TIMELINE -->
-  <div class="timeline">
-    <h2 class="heading">Attendance Timeline</h2>
+  <div class="timeline-section">
+    <div class="section-header">
+      <span class="section-tag">◈</span>
+      <h2 class="section-title">LOG HISTORY</h2>
+      <span class="section-tag">◈</span>
+    </div>
 
     <div class="timeline-list">
       {% for a in attended %}
-      <div class="timeline-item">
-        <p>
-          {{ a.date }}
-          <span class="time">{{ a.timestamp }}</span>
-        </p>
+      <div class="timeline-item" style="animation-delay: {{ forloop.counter0 }}00ms">
+        <div class="tl-dot"></div>
+        <div class="tl-connector"></div>
+        <div class="tl-content">
+          <span class="tl-date">{{ a.date|date:"D, d M Y" }}</span>
+          <span class="tl-time">{{ a.timestamp|time:"H:i:s" }}</span>
+        </div>
+        <div class="tl-badge">PRESENT</div>
       </div>
       {% empty %}
-      <div class="empty">No attendance history yet</div>
+      <div class="empty-state">
+        <div class="empty-icon">◌</div>
+        <p>NO ATTENDANCE RECORDS FOUND</p>
+      </div>
       {% endfor %}
     </div>
   </div>
 
 </div>
+
 <script src="{% static 'js/messages.js' %}"></script>
+<script src="{% static 'js/attendance_heatmap.js' %}"></script>
 {% endblock %}

@@ -97,7 +97,9 @@
           </a>
 
           <ul class="nav-links" id="navLinks">
-            <li><a href="/">Home</a></li>
+            {% if isSuperuser %}
+            <li><a href="/admin/attendance/">Attendance Analysis</a></li>
+            {% endif %}
             {% if isSuperuser %}
             <li><a href="/admin/revenue/">Revenue</a></li>
             {% endif %} 
@@ -228,6 +230,7 @@
         <ul>
           {% if isSuperuser %}
           <li><a href="/admin/revenue/">Revenue</a></li>
+          <li><a href="/admin/attendance/">Attendance Analysis</a></li>
           {% endif %} {% if isStaff or isSuperuser %}
           <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
           <li><a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a></li>

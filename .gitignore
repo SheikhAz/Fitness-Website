@@ -7,3 +7,4 @@ ENV/
 .env
 staticfiles_build/
 pc_access.mp3
+Application
