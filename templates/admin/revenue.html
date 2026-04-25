@@ -2,9 +2,6 @@
 
 {% block content %}
 <style>
-  /* =========================================================
-     ENTERGYM DASHBOARD — matches entergym-admin.css tokens
-  ========================================================= */
   @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@700;800&display=swap');
 
   :root {
@@ -32,7 +29,6 @@
     --r-lg:              16px;
   }
 
-  /* ── Wrapper ── */
   #dash-root {
     font-family: 'Barlow', system-ui, sans-serif;
     color: var(--text-primary);
@@ -40,12 +36,11 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── Staggered entry animation ── */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(18px); }
     to   { opacity: 1; transform: translateY(0);    }
   }
-  .anim { animation: fadeUp 0.5s var(--ease-out) both; }
+  .anim   { animation: fadeUp 0.5s var(--ease-out) both; }
   .anim-1 { animation-delay: 0.05s; }
   .anim-2 { animation-delay: 0.10s; }
   .anim-3 { animation-delay: 0.15s; }
@@ -54,7 +49,7 @@
   .anim-6 { animation-delay: 0.30s; }
   .anim-7 { animation-delay: 0.35s; }
 
-  /* ── Page header ── */
+  /* ── Page Header ── */
   .dash-header {
     display: flex;
     align-items: flex-end;
@@ -63,7 +58,6 @@
     flex-wrap: wrap;
     gap: 10px;
   }
-  .dash-title-block {}
   .dash-title {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 30px;
@@ -79,12 +73,10 @@
   }
   .dash-title span.accent { color: var(--accent-orange); }
 
-  /* Live pill */
   .dash-live {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    font-family: 'Barlow', sans-serif;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.18em;
@@ -94,7 +86,6 @@
     color: var(--accent-hot);
     padding: 3px 9px;
     border-radius: 20px;
-    vertical-align: middle;
   }
   .dash-live::before {
     content: '';
@@ -105,7 +96,7 @@
   }
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1);    box-shadow: 0 0 0 0 rgba(240,64,5,0.4); }
-    50%       { opacity: 0.8; transform: scale(1.2); box-shadow: 0 0 0 4px rgba(240,64,5,0);  }
+    50%       { opacity: 0.8; transform: scale(1.2); box-shadow: 0 0 0 4px rgba(240,64,5,0); }
   }
 
   .dash-subtitle {
@@ -115,8 +106,6 @@
     text-transform: uppercase;
     color: var(--text-muted);
   }
-
-  /* Timestamp */
   .dash-timestamp {
     font-size: 11px;
     color: var(--text-muted);
@@ -131,7 +120,7 @@
   /* ── KPI Strip ── */
   .kpi-strip {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     margin-bottom: 16px;
   }
@@ -140,29 +129,23 @@
     background: var(--glass-base);
     backdrop-filter: var(--blur-md);
     -webkit-backdrop-filter: var(--blur-md);
-
     border: 1px solid var(--glass-border);
     border-top-color: var(--glass-border-lit);
     border-radius: var(--r-lg);
     box-shadow: var(--shadow-card);
-
     padding: 18px 20px;
     position: relative;
     overflow: hidden;
     cursor: default;
-
     transition: transform 0.22s var(--ease-spring),
                 box-shadow 0.2s var(--ease-out),
                 border-color 0.2s;
   }
-
   .kpi-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-card), 0 12px 30px rgba(0,0,0,0.4);
     border-color: rgba(255,255,255,0.14);
   }
-
-  /* Accent top bar */
   .kpi-card::before {
     content: '';
     position: absolute;
@@ -171,8 +154,6 @@
     background: var(--kpi-accent, var(--accent-orange));
     box-shadow: 0 0 12px var(--kpi-glow, var(--accent-glow));
   }
-
-  /* Subtle background tint */
   .kpi-card::after {
     content: '';
     position: absolute;
@@ -189,7 +170,6 @@
     color: var(--text-muted);
     margin-bottom: 8px;
   }
-
   .kpi-value {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 34px;
@@ -199,14 +179,12 @@
     line-height: 1;
     margin-bottom: 5px;
   }
-
   .kpi-sub {
     font-size: 11px;
     font-weight: 500;
     color: var(--text-secondary);
     letter-spacing: 0.02em;
   }
-
   .kpi-icon {
     position: absolute;
     right: 16px; top: 50%;
@@ -221,34 +199,68 @@
     transform: translateY(-50%) scale(1.08);
   }
 
+  /* ── Pending Alert Banner ── */
+  .pending-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.30);
+    border-radius: var(--r-lg);
+    padding: 13px 20px;
+    margin-bottom: 16px;
+    backdrop-filter: var(--blur-sm);
+  }
+  .pending-banner-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .pending-banner-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fcd34d;
+    letter-spacing: 0.02em;
+  }
+  .pending-banner-text span {
+    color: #fbbf24;
+    font-weight: 800;
+  }
+  .pending-banner-badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #f59e0b;
+    border: 1px solid rgba(245,158,11,0.4);
+    background: rgba(245,158,11,0.12);
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
   /* ── Chart Grid ── */
   .chart-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
   }
-
   .chart-card {
     background: var(--glass-base);
     backdrop-filter: var(--blur-md);
     -webkit-backdrop-filter: var(--blur-md);
-
     border: 1px solid var(--glass-border);
     border-top-color: var(--glass-border-lit);
     border-radius: var(--r-lg);
     box-shadow: var(--shadow-card);
-
     padding: 18px 20px;
     overflow: hidden;
-    transition: box-shadow 0.2s var(--ease-out),
-                border-color 0.2s;
+    transition: box-shadow 0.2s var(--ease-out), border-color 0.2s;
   }
-
   .chart-card:hover {
     border-color: rgba(255,255,255,0.13);
     box-shadow: var(--shadow-card), 0 0 0 1px var(--glass-border-lit);
   }
-
   .chart-card.wide { grid-column: span 2; }
 
   .chart-card-header {
@@ -259,7 +271,6 @@
     padding-bottom: 12px;
     border-bottom: 1px solid var(--glass-border);
   }
-
   .chart-card-title {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 16px;
@@ -269,7 +280,6 @@
     color: var(--text-primary);
   }
 
-  /* Chart type badges — matches admin badge style */
   .chart-badge {
     font-size: 9.5px;
     font-weight: 700;
@@ -286,7 +296,6 @@
 
   canvas { max-height: 240px; }
 
-  /* ── Divider line ── */
   .section-divider {
     height: 1px;
     background: linear-gradient(to right, transparent, var(--glass-border), transparent);
@@ -294,15 +303,17 @@
   }
 
   /* ── Responsive ── */
+  @media (max-width: 1100px) {
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 960px) {
-    .kpi-strip     { grid-template-columns: 1fr 1fr; }
-    .chart-grid    { grid-template-columns: 1fr; }
+    .chart-grid  { grid-template-columns: 1fr; }
     .chart-card.wide { grid-column: span 1; }
   }
   @media (max-width: 540px) {
-    .kpi-strip    { grid-template-columns: 1fr 1fr; }
-    .kpi-value    { font-size: 26px; }
-    .dash-title   { font-size: 22px; }
+    .kpi-strip  { grid-template-columns: 1fr 1fr; }
+    .kpi-value  { font-size: 26px; }
+    .dash-title { font-size: 22px; }
   }
 </style>
 
@@ -353,9 +364,32 @@
       <span class="kpi-icon">👥</span>
     </div>
 
+    <div class="kpi-card anim anim-5"
+         style="--kpi-accent:#f59e0b;
+                --kpi-glow:rgba(245,158,11,0.25);
+                --kpi-tint:rgba(245,158,11,0.07)">
+      <div class="kpi-label">Pending Dues</div>
+      <div class="kpi-value">₹{{ pending_amount|default:"0" }}</div>
+      <div class="kpi-sub">{{ pending_count|default:"0" }} member{{ pending_count|pluralize }} overdue</div>
+      <span class="kpi-icon">⚠️</span>
+    </div>
+
   </div>
 
-  <div class="section-divider anim anim-4"></div>
+  <!-- ── Pending Alert Banner ── -->
+  {% if pending_count %}
+  <div class="pending-banner anim anim-5">
+    <span class="pending-banner-icon">🔔</span>
+    <span class="pending-banner-text">
+      <span>{{ pending_count }} member{{ pending_count|pluralize }}</span>
+      have outstanding dues totalling
+      <span>₹{{ pending_amount }}</span> — follow up required.
+    </span>
+    <span class="pending-banner-badge">Action Required</span>
+  </div>
+  {% endif %}
+
+  <div class="section-divider anim anim-5"></div>
 
   <!-- ── Charts ── -->
   <div class="chart-grid">
@@ -410,14 +444,13 @@
   })();
 
   /* ── Shared Chart.js defaults ── */
-  Chart.defaults.color          = '#8b95a8';
-  Chart.defaults.borderColor    = 'rgba(255,255,255,0.06)';
-  Chart.defaults.font.family    = "'Barlow', sans-serif";
-  Chart.defaults.font.size      = 11;
+  Chart.defaults.color       = '#8b95a8';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+  Chart.defaults.font.family = "'Barlow', sans-serif";
+  Chart.defaults.font.size   = 11;
 
-  const grid  = { color: 'rgba(255,255,255,0.05)', drawBorder: false };
-  const ticks = { color: '#4a5568', font: { size: 11 } };
-
+  const grid    = { color: 'rgba(255,255,255,0.05)', drawBorder: false };
+  const ticks   = { color: '#4a5568', font: { size: 11 } };
   const tooltip = {
     backgroundColor: 'rgba(12,18,32,0.92)',
     borderColor:     'rgba(255,255,255,0.10)',
@@ -438,11 +471,11 @@
       datasets: [{
         label: 'Revenue ₹',
         data:   {{ monthly_data|safe }},
-        backgroundColor: 'rgba(249,115,22,0.65)',
-        borderColor:     '#f97316',
-        borderWidth:     1,
-        borderRadius:    6,
-        borderSkipped:   false,
+        backgroundColor:      'rgba(249,115,22,0.65)',
+        borderColor:          '#f97316',
+        borderWidth:          1,
+        borderRadius:         6,
+        borderSkipped:        false,
         hoverBackgroundColor: 'rgba(249,115,22,0.9)',
       }]
     },
@@ -536,9 +569,9 @@
           'rgba(192,132,252,0.82)',
           'rgba(251,191,36,0.82)',
         ],
-        borderColor:  'rgba(12,18,32,0.9)',
-        borderWidth:  3,
-        hoverOffset:  10,
+        borderColor:      'rgba(12,18,32,0.9)',
+        borderWidth:      3,
+        hoverOffset:      10,
         hoverBorderColor: 'rgba(255,255,255,0.15)',
       }]
     },

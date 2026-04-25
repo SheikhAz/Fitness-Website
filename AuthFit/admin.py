@@ -25,7 +25,7 @@ def revenue_view(request):
 
     if data is None:
 
-        qs = Enrollment.objects.filter(paymentStatus="Done")
+        qs = Enrollment.objects.all()
 
         # 📊 Monthly Revenue
         monthly = (
@@ -62,26 +62,37 @@ def revenue_view(request):
             .annotate(count=Count('id'))
         )
 
+        # 💸 Pending Dues
+        pending_qs = Enrollment.objects.filter(
+            pendingAmount__gt=0,
+            paymentStatus="Pending"
+        )
+        pending_count  = pending_qs.count()
+        pending_amount = pending_qs.aggregate(total=Sum('pendingAmount'))['total'] or 0
+
         # ✅ STORE CLEAN DATA ONLY
         data = {
             "monthly_labels": [x['month'].strftime("%b %Y") for x in monthly if x['month']],
-            "monthly_data": [float(x['total'] or 0) for x in monthly],
+            "monthly_data":   [float(x['total'] or 0) for x in monthly],
 
             "daily_labels": [x['day'].strftime("%d %b") for x in daily if x['day']],
-            "daily_data": [float(x['total'] or 0) for x in daily],
+            "daily_data":   [float(x['total'] or 0) for x in daily],
 
             "member_labels": [x['month'].strftime("%b %Y") for x in members if x['month']],
-            "member_data": [x['count'] for x in members],
+            "member_data":   [x['count'] for x in members],
 
             "payment_labels": [x['paymentStatus'] for x in payments],
-            "payment_data": [x['count'] for x in payments],
+            "payment_data":   [x['count'] for x in payments],
 
-            "total_revenue": sum([x['total'] or 0 for x in monthly]),
-            "today_revenue": sum([x['total'] or 0 for x in daily]),
-            "total_members": Enrollment.objects.count(),
+            "total_revenue":  sum([x['total'] or 0 for x in monthly]),
+            "today_revenue":  sum([x['total'] or 0 for x in daily]),
+            "total_members":  Enrollment.objects.count(),
+
+            "pending_count":  pending_count,
+            "pending_amount": float(pending_amount),
         }
 
-        cache.set("admin_revenue_data", data, timeout=300)
+        cache.set("admin_revenue_data", data, timeout=60)
 
     # ✅ BUILD CONTEXT (DO NOT CACHE THIS)
     context = dict(
@@ -102,6 +113,9 @@ def revenue_view(request):
         total_revenue=data["total_revenue"],
         today_revenue=data["today_revenue"],
         total_members=data["total_members"],
+
+        pending_count=data["pending_count"],
+        pending_amount=data["pending_amount"],
     )
 
     return TemplateResponse(request, "admin/revenue.html", context)
