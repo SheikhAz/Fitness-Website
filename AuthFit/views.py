@@ -258,7 +258,7 @@ def homePage(request):
     enrolled = False
     isStaff = False
     isSuperuser = False
-
+ 
     gym_notifications = cache.get("notifications")
     if gym_notifications is None:
         gym_notifications = list(
@@ -266,23 +266,31 @@ def homePage(request):
                 is_active=True).values("icon", "message")
         )
         cache.set("notifications", gym_notifications, timeout=3600)
-
+ 
+    # ── NEW: pass live membership plans to template ──
+    plans = cache.get("membership_plans")
+    if plans is None:
+        plans = list(MembershipPlan.objects.all().values(
+            "id", "plan", "price", "duration_days"
+        ))
+        cache.set("membership_plans", plans, timeout=3600)  # cache 1 hr
+ 
     if request.user.is_authenticated:
         isStaff = request.user.is_staff
         isSuperuser = request.user.is_superuser
-
+ 
         enrolled = cache.get(f"enrolled_{request.user.id}")
         if enrolled is None:
             enrolled = Enrollment.objects.filter(user=request.user).exists()
             cache.set(f"enrolled_{request.user.id}", enrolled, timeout=300)
-
+ 
     return render(request, "home.html", {
         "enrolled": enrolled,
         "isStaff": isStaff,
         "isSuperuser": isSuperuser,
         "gym_notifications": gym_notifications,
+        "plans": plans,          
     })
-
 
 # ==============================
 # STATS API

@@ -231,3 +231,7 @@ def clear_enrollment_cache(sender, instance, **kwargs):
 @receiver([post_save, post_delete], sender=GymNotification)
 def clear_notification_cache(sender, **kwargs):
     cache.delete("notifications")
+
+@receiver([post_save, post_delete], sender=MembershipPlan)
+def clear_plan_cache(sender, **kwargs):
+    cache.delete("membership_plans")

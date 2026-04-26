@@ -435,12 +435,46 @@
       <div class="pricing-container">
         <p class="pricing-subtitle">OUR PLANS</p>
         <h2 class="pricing-title">CHOOSE YOUR FITNESS PLAN</h2>
-
+    
         <div class="pricing-grid">
-          <div class="pricing-card" onclick="togglePricing(this)">
-            <h3>Monthly Fitness</h3>
-            <div class="price">₹500</div>
-            <p class="duration">PER MONTH</p>
+          {% for plan in plans %}
+          <div class="pricing-card {% if forloop.counter == 2 %}popular{% endif %}"
+              onclick="togglePricing(this)">
+    
+            {# ── Badge: "MOST POPULAR" on 2nd plan, "BEST VALUE" on last ── #}
+            {% if forloop.counter == 2 %}
+              <span class="badge">MOST POPULAR</span>
+            {% elif forloop.last and plans|length > 1 %}
+              <span class="badge best">BEST VALUE</span>
+            {% endif %}
+    
+            <h3>{{ plan.plan }}</h3>
+    
+            <div class="price">₹{{ plan.price }}</div>
+    
+            {# ── Duration label derived from duration_days ── #}
+            <p class="duration">
+              {% if plan.duration_days == 1 %}
+                PER DAY
+              {% elif plan.duration_days <= 7 %}
+                {{ plan.duration_days }} DAYS
+              {% elif plan.duration_days <= 14 %}
+                {{ plan.duration_days }} DAYS
+              {% elif plan.duration_days == 30 or plan.duration_days == 31 %}
+                PER MONTH
+              {% elif plan.duration_days == 60 %}
+                2 MONTHS
+              {% elif plan.duration_days == 90 or plan.duration_days == 91 %}
+                3 MONTHS
+              {% elif plan.duration_days == 180 or plan.duration_days == 182 %}
+                6 MONTHS
+              {% elif plan.duration_days == 365 or plan.duration_days == 366 %}
+                12 MONTHS
+              {% else %}
+                {{ plan.duration_days }} DAYS
+              {% endif %}
+            </p>
+    
             <div class="pricing-desc">
               <ul>
                 <li>✔ Registration Fee included</li>
@@ -449,54 +483,20 @@
                 <li>✔ Diet Guidance</li>
                 <li>✔ No Time Restrictions</li>
               </ul>
-              {% if request.user.is_authenticated %} {% if not enrolled %}
-              <a href="/enrollment/" class="join-btn">JOIN NOW</a>
-              {% endif %} {% else %}
-              <a href="/signup/" class="join-btn">JOIN NOW</a>
+              {% if request.user.is_authenticated %}
+                {% if not enrolled %}
+                  <a href="/enrollment/" class="join-btn">JOIN NOW</a>
+                {% endif %}
+              {% else %}
+                <a href="/signup/" class="join-btn">JOIN NOW</a>
               {% endif %}
             </div>
           </div>
-
-          <div class="pricing-card popular" onclick="togglePricing(this)">
-            <span class="badge">MOST POPULAR</span>
-            <h3>3 Month Transformation</h3>
-            <div class="price">₹1,300</div>
-            <p class="duration">3 MONTHS</p>
-            <div class="pricing-desc">
-              <ul>
-                <li>✔ No Registration Fee</li>
-                <li>✔ Unlimited Equipment</li>
-                <li>✔ Weight Loss Program</li>
-                <li>✔ Workout Plan</li>
-                <li>✔ Priority Support</li>
-              </ul>
-              {% if request.user.is_authenticated %} {% if not enrolled %}
-              <a href="/enrollment/" class="join-btn">JOIN NOW</a>
-              {% endif %} {% else %}
-              <a href="/signup/" class="join-btn">JOIN NOW</a>
-              {% endif %}
-            </div>
-          </div>
-
-          <div class="pricing-card" onclick="togglePricing(this)">
-            <h3>Annual Membership</h3>
-            <div class="price">₹7,899</div>
-            <p class="duration">12 MONTHS</p>
-            <div class="pricing-desc">
-              <ul>
-                <li>✔ All Gym Facilities</li>
-                <li>✔ Personal Coaching</li>
-                <li>✔ Diet & Nutrition Plan</li>
-                <li>✔ Free Fitness Assessment</li>
-                <li>✔ Locker Facility</li>
-              </ul>
-              {% if request.user.is_authenticated %} {% if not enrolled %}
-              <a href="/enrollment/" class="join-btn">JOIN NOW</a>
-              {% endif %} {% else %}
-              <a href="/signup/" class="join-btn">JOIN NOW</a>
-              {% endif %}
-            </div>
-          </div>
+          {% empty %}
+            <p style="color:rgba(255,255,255,0.5); grid-column:1/-1; text-align:center; padding:40px 0;">
+              No membership plans available right now. Check back soon!
+            </p>
+          {% endfor %}
         </div>
       </div>
     </section>
