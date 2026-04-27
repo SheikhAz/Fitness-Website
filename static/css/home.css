@@ -1475,7 +1475,8 @@ body {
 .footer-top-inner {
   display: flex;
   flex-direction: row;
-  gap: 600px;
+  justify-content: space-between;
+  gap: 40px;
   padding: 40px 0;
 }
 .footer-contact {
@@ -1654,7 +1655,8 @@ body {
     text-align: center;
   }
   .footer-social {
-    margin-left: 160px;
+    justify-content: center;
+    margin-left: 0;
   }
 }
 

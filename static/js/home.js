@@ -7,20 +7,28 @@ document.addEventListener("DOMContentLoaded", () => {
   if (menuBtn && mobileMenu && closeMenu) {
     mobileMenu.classList.remove("active");
 
-    menuBtn.addEventListener("click", () => mobileMenu.classList.add("active"));
+    menuBtn.addEventListener("click", () => {
+      mobileMenu.classList.add("active");
+      menuBtn.setAttribute("aria-expanded", "true"); // ✅ set TRUE when opening
+    });
 
-    closeMenu.addEventListener("click", () =>
-      mobileMenu.classList.remove("active"),
-    );
+    closeMenu.addEventListener("click", () => {
+      mobileMenu.classList.remove("active");
+      menuBtn.setAttribute("aria-expanded", "false"); // ✅ set FALSE when closing
+    });
 
     mobileMenu.addEventListener("click", (e) => {
-      if (e.target === mobileMenu) mobileMenu.classList.remove("active");
+      if (e.target === mobileMenu) {
+        mobileMenu.classList.remove("active");
+        menuBtn.setAttribute("aria-expanded", "false"); // ✅ set FALSE when closing
+      }
     });
 
     mobileMenu.querySelectorAll("a, button").forEach((item) => {
-      item.addEventListener("click", () =>
-        mobileMenu.classList.remove("active"),
-      );
+      item.addEventListener("click", () => {
+        mobileMenu.classList.remove("active");
+        menuBtn.setAttribute("aria-expanded", "false"); // ✅ set FALSE when closing
+      });
     });
   }
 

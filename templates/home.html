@@ -9,13 +9,23 @@
       type="image/png"
       href="{% static 'images/favicons.png' %}"
     />
-    <title>EnterGYM</title>
+    <!-- ✅ ADD THESE SEO TAGS -->
+    <title>EnterGYM | Fitness Center in Bhilai, Chhattisgarh</title>
+    <meta name="description" content="EnterGYM Bhilai - Transform your body with expert coaches, modern equipment & personalized plans. Start your 2-day free trial today!" />
+    <meta name="keywords" content="gym Bhilai, fitness center Chhattisgarh, personal trainer Bhilai, EnterGym" />
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+    <!-- ✅ WhatsApp/Facebook preview -->
+    <meta property="og:title" content="EnterGYM | Fitness Center Bhilai" />
+    <meta property="og:description" content="Crush your health and fitness goals with EnterGYM. Start a 2-day free trial!" />
+    <meta property="og:url" content="https://entergym.com" />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    </noscript>
+    <link rel="stylesheet" media="print" onload="this.media='all'" href="{% static 'css/home.css' %}" />
   </head>
   <body>
     <div id="message-container">
@@ -32,7 +42,15 @@
     <!-- HERO -->
     <section class="hero" id="home">
       <!-- Background -->
-      <img src="{% static 'images/Fitness.jpg' %}" class="hero-bg" />
+      <img 
+      src="{% static 'images/Fitness.webp' %}" 
+      class="hero-bg" 
+      loading="eager"
+      fetchpriority="high"
+      width="1920" 
+      height="1080"
+      />
+      
       <div class="overlay"></div>
 
       <!-- TOP BAR -->
@@ -91,7 +109,7 @@
           <a href="/" class="logo">
             <img
               src="{% static 'images/Logo1s.png' %}"
-              alt="EnterName Gym Logo"
+              alt="EnterGYM Fitness Center Logo"
               class="logo-img"
             />
           </a>
@@ -167,7 +185,7 @@
             <a href="/signup/" class="btn">SignUp/LogIn</a>
             {% endif %}
 
-            <button id="menuBtn" class="hamburger-icon">
+            <button id="menuBtn" class="hamburger-icon" aria-label="Open navigation menu" aria-expanded="false">
               <span></span>
               <span></span>
               <span></span>
@@ -224,7 +242,7 @@
     </section>
 
     <!-- MOBILE POPUP MENU -->
-    <div id="mobileMenu" class="mobile-menu">
+    <div id="mobileMenu" class="mobile-menu" >
       <div class="menu-box">
         <span id="closeMenu" class="close-btn">×</span>
         <ul>
@@ -267,7 +285,7 @@
             <span class="cyber-corner br"></span>
             <div class="card-top">
               <div class="icon-box">
-                <img src="{% static 'images/features/barbell.png' %}" alt="Barbell" />
+                <img src="{% static 'images/features/barbell.png' %}" alt="Modern gym barbells and free weights at EnterGYM" loading="lazy" />
               </div>
               <div class="card-meta">
                 <p class="card-label">Equipment</p>
@@ -292,7 +310,8 @@
             <span class="cyber-corner br"></span>
             <div class="card-top">
               <div class="icon-box">
-                <img src="{% static 'images/features/vitamins.png' %}" alt="Nutrition" />
+                <img src="{% static 'images/features/vitamins.png' %}" alt="Healthy nutrition plan supplements"
+                loading="lazy" />
               </div>
               <div class="card-meta">
                 <p class="card-label">Nutrition</p>
@@ -317,7 +336,8 @@
             <span class="cyber-corner br"></span>
             <div class="card-top">
               <div class="icon-box">
-                <img src="{% static 'images/features/trainer.png' %}" alt="Trainer" />
+                <img src="{% static 'images/features/trainer.png' %}" alt="Professional personal trainer at EnterGYM Bhilai" 
+                loading="lazy"/>
               </div>
               <div class="card-meta">
                 <p class="card-label">Training</p>
@@ -342,7 +362,8 @@
             <span class="cyber-corner br"></span>
             <div class="card-top">
               <div class="icon-box">
-                <img src="{% static 'images/features/heart-beat.png' %}" alt="Heart" />
+                <img src="{% static 'images/features/heart-beat.png' %}" alt="Personalized fitness heart rate monitoring" 
+                loading="lazy"/>
               </div>
               <div class="card-meta">
                 <p class="card-label">Personalized</p>
@@ -374,7 +395,7 @@
 
         <div class="offer-grid">
           <div class="offer-card">
-            <img src="{% static 'images/offer/machine_1.jpg' %}" alt="" />
+            <img src="{% static 'images/offer/machine_1.webp' %}" alt="Weightlifting machines at EnterGYM" />
             <div class="overlay"></div>
             <div class="skew-box"></div>
             <div class="content">
@@ -384,7 +405,7 @@
           </div>
 
           <div class="offer-card">
-            <img src="{% static 'images/offer/machine_2.jpg' %}" alt="" />
+            <img src="{% static 'images/offer/machine_2.webp' %}" alt="Indoor cycling cardio equipment at EnterGYM" />
             <div class="overlay"></div>
             <div class="skew-box"></div>
             <div class="content">
@@ -394,7 +415,7 @@
           </div>
 
           <div class="offer-card center-card">
-            <img src="{% static 'images/offer/trainer.jpg' %}" alt="" />
+            <img src="{% static 'images/offer/trainer.webp' %}" alt="Certified personal trainer at EnterGYM Bhilai" />
             <div class="overlay"></div>
             <div class="skew-box"></div>
             <div class="content">
@@ -408,9 +429,9 @@
 
     <section id="Price" class="cta-section">
       <img
-        src="{% static 'images/Registration.jpg' %}"
+        src="{% static 'images/Registration.webp' %}"
         class="cta-bg"
-        alt="Gym Training"
+        alt="Join EnterGYM fitness center Bhilai"
       />
       <div class="cta-overlay"></div>
       <div class="cta-content">
@@ -508,7 +529,7 @@
             <div class="footer-icon">
               <img
                 src="{% static 'images/footer/placeholder.png' %}"
-                alt="Location"
+                alt="EnterGYM location Bhilai Chhattisgarh"
               />
             </div>
             <p>
@@ -517,7 +538,7 @@
           </div>
           <div class="footer-contact">
             <div class="footer-icon">
-              <img src="{% static 'images/footer/email.png' %}" alt="Email" />
+              <img src="{% static 'images/footer/email.png' %}" alt="Email EnterGYM support" />
             </div>
             <p>support@gymcenter.com</p>
           </div>
@@ -532,8 +553,8 @@
             equipment and expert fitness coaching.
           </p>
           <div class="footer-social">
-            <img src="{% static 'images/footer/instagram.png' %}" alt="" />
-            <img src="{% static 'images/footer/email.png' %}" alt="" />
+            <img src="{% static 'images/footer/instagram.png' %}" alt="EnterGYM Instagram" />
+            <img src="{% static 'images/footer/email.png' %}" alt="EnterGYM Email" />
           </div>
         </div>
 
@@ -586,6 +607,6 @@
       </div>
     </footer>
 
-    <script src="{% static 'js/home.js' %}"></script>
+    <script src="{% static 'js/home.js' %}" defer ></script>
   </body>
 </html>
