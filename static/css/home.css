@@ -1667,3 +1667,22 @@ body {
     gap: 60px;
   }
 }
+
+@media (max-width:768px){
+    .notif-ticker{
+        animation:none;
+    }
+
+    .hero-content{
+        animation:none;
+    }
+
+    .hero-animate{
+        animation:none;
+        opacity:1;
+        transform:none;
+    }
+    .offer-card:hover img{
+      transform:none;
+   }
+}

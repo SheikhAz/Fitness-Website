@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  /* ========= MOBILE MENU ========= */
+  /* =========================
+     MOBILE MENU
+  ========================= */
   const menuBtn = document.getElementById("menuBtn");
   const mobileMenu = document.getElementById("mobileMenu");
   const closeMenu = document.getElementById("closeMenu");
@@ -7,32 +9,34 @@ document.addEventListener("DOMContentLoaded", () => {
   if (menuBtn && mobileMenu && closeMenu) {
     mobileMenu.classList.remove("active");
 
+    const closeMobileMenu = () => {
+      mobileMenu.classList.remove("active");
+      menuBtn.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    };
+
     menuBtn.addEventListener("click", () => {
       mobileMenu.classList.add("active");
-      menuBtn.setAttribute("aria-expanded", "true"); // ✅ set TRUE when opening
+      menuBtn.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
     });
 
-    closeMenu.addEventListener("click", () => {
-      mobileMenu.classList.remove("active");
-      menuBtn.setAttribute("aria-expanded", "false"); // ✅ set FALSE when closing
-    });
+    closeMenu.addEventListener("click", closeMobileMenu);
 
     mobileMenu.addEventListener("click", (e) => {
       if (e.target === mobileMenu) {
-        mobileMenu.classList.remove("active");
-        menuBtn.setAttribute("aria-expanded", "false"); // ✅ set FALSE when closing
+        closeMobileMenu();
       }
     });
 
     mobileMenu.querySelectorAll("a, button").forEach((item) => {
-      item.addEventListener("click", () => {
-        mobileMenu.classList.remove("active");
-        menuBtn.setAttribute("aria-expanded", "false"); // ✅ set FALSE when closing
-      });
+      item.addEventListener("click", closeMobileMenu);
     });
   }
 
-  /* ========= NOTIFICATION BAR ========= */
+  /* =========================
+     NOTIFICATION BAR
+  ========================= */
   const notifBar = document.getElementById("notifBar");
   const notifClose = document.getElementById("notifClose");
   const navbar = document.getElementById("navbar");
@@ -44,79 +48,112 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /* ========= DJANGO FLASH MESSAGES ========= */
+  /* =========================
+     FLASH MESSAGES
+  ========================= */
   const messages = document.querySelectorAll(".flash-message");
 
   messages.forEach((msg, i) => {
     msg.style.opacity = "0";
     msg.style.transform = "translateY(-10px)";
 
-    // staggered entrance
     setTimeout(() => {
       msg.style.transition = "all 0.4s ease";
       msg.style.opacity = "1";
       msg.style.transform = "translateY(0)";
     }, i * 150);
 
-    // auto-dismiss after 4 s
     setTimeout(() => removeMessage(msg), 4000 + i * 200);
 
     const closeBtn = msg.querySelector(".close-btn");
-    if (closeBtn) closeBtn.addEventListener("click", () => removeMessage(msg));
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => removeMessage(msg));
+    }
   });
 
   function removeMessage(msg) {
-    if (!msg.isConnected) return; // already removed — skip
+    if (!msg || !msg.isConnected) return;
+
     msg.style.transition = "all 0.3s ease";
     msg.style.opacity = "0";
     msg.style.transform = "translateY(-10px)";
-    setTimeout(() => msg.remove(), 300);
+
+    setTimeout(() => {
+      if (msg.isConnected) {
+        msg.remove();
+      }
+    }, 300);
   }
 
-  /* ========= HERO STATS ========= */
+  /* =========================
+     HERO COUNTERS
+  ========================= */
   function animateCount(el, target) {
     if (!el) return;
+
     let current = 0;
-    const dur = 1400; // total animation ms
-    const step = 16; // ~60 fps
-    const inc = Math.ceil(target / (dur / step));
+    const duration = 1200;
+    const stepTime = 16;
+    const increment = Math.ceil(target / (duration / stepTime));
 
     const timer = setInterval(() => {
-      current += inc;
+      current += increment;
+
       if (current >= target) {
         current = target;
         clearInterval(timer);
       }
+
       el.textContent = current;
-    }, step);
+    }, stepTime);
   }
 
-  // static counters
+  // Static counters
   animateCount(document.getElementById("statExercise"), 20);
   animateCount(document.getElementById("statSatisfaction"), 92);
 
-  // dynamic user count from API
-  fetch("/api/stats/")
-    .then((r) => {
-      if (!r.ok) throw new Error("Network response was not ok");
-      return r.json();
-    })
-    .then((data) => {
-      const users = data.total_users || 0;
-      // show rounded-up double if >= 50, else raw count (minimum 10)
-      const display = users < 50 ? users : Math.ceil(users / 10) * 10 * 2;
-      animateCount(document.getElementById("statUsers"), display || 10);
-    })
-    .catch(() => {
-      // fallback if API is unavailable
-      animateCount(document.getElementById("statUsers"), 10);
-    });
+  /* =========================
+     DELAY API CALL
+  ========================= */
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      fetch("/api/stats/")
+        .then((res) => {
+          if (!res.ok) throw new Error("API failed");
+          return res.json();
+        })
+        .then((data) => {
+          const users = data.total_users || 10;
 
-  /* ========= SCROLL-TRIGGERED ANIMATIONS ========= */
-  // Animate elements with class "hero-animate" when they enter the viewport
+          const display =
+            users < 50
+              ? users
+              : Math.ceil(users / 10) * 10 * 2;
+
+          animateCount(
+            document.getElementById("statUsers"),
+            display
+          );
+        })
+        .catch(() => {
+          animateCount(
+            document.getElementById("statUsers"),
+            10
+          );
+        });
+    }, 2000); // delayed by 2 sec
+  });
+
+  /* =========================
+     HERO ANIMATION OPTIMIZATION
+  ========================= */
   const animatedEls = document.querySelectorAll(".hero-animate");
 
-  if ("IntersectionObserver" in window && animatedEls.length) {
+  if (
+    "IntersectionObserver" in window &&
+    animatedEls.length &&
+    window.innerWidth > 768
+  ) {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -126,46 +163,78 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
       },
-      { threshold: 0.15 },
+      {
+        threshold: 0.15,
+      }
     );
 
     animatedEls.forEach((el) => {
       el.style.animationPlayState = "paused";
       observer.observe(el);
     });
+  } else {
+    // Disable animation on mobile
+    animatedEls.forEach((el) => {
+      el.style.opacity = "1";
+      el.style.transform = "none";
+    });
   }
 
-  /* ========= NAVBAR SCROLL SHADOW ========= */
-  // Adds a subtle bottom border to the navbar once the user scrolls
+  /* =========================
+     OPTIMIZED SCROLL EVENT
+  ========================= */
   const navbarEl = document.getElementById("navbar");
+  let ticking = false;
 
-  if (navbarEl) {
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (window.scrollY > 10) {
-          navbarEl.style.borderBottom = "1px solid rgba(249,115,22,0.25)";
-        } else {
-          navbarEl.style.borderBottom = "";
-        }
-      },
-      { passive: true },
-    );
+  function updateNavbar() {
+    if (!navbarEl) return;
+
+    if (window.scrollY > 10) {
+      navbarEl.style.borderBottom =
+        "1px solid rgba(249,115,22,0.25)";
+    } else {
+      navbarEl.style.borderBottom = "";
+    }
+
+    ticking = false;
   }
 
-  /* ========= SMOOTH SCROLL FOR ANCHOR LINKS ========= */
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (!ticking) {
+        requestAnimationFrame(updateNavbar);
+        ticking = true;
+      }
+    },
+    { passive: true }
+  );
+
+  /* =========================
+     SMOOTH SCROLL LINKS
+  ========================= */
   document.querySelectorAll('a[href^="#"]').forEach((link) => {
     link.addEventListener("click", (e) => {
-      const target = document.querySelector(link.getAttribute("href"));
+      const target = document.querySelector(
+        link.getAttribute("href")
+      );
+
       if (!target) return;
+
       e.preventDefault();
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     });
   });
 });
 
-/* ========= FEATURE CARDS TOGGLE ========= */
-// Accordion: one card open at a time; clicking the open card closes it
+
+/* =========================
+   FEATURE CARD TOGGLE
+========================= */
 function toggleFeature(card) {
   const isActive = card.classList.contains("active");
 
@@ -176,21 +245,23 @@ function toggleFeature(card) {
   if (!isActive) {
     card.classList.add("active");
 
-    // smooth scroll so the opened card is fully visible on small screens
     setTimeout(() => {
       const rect = card.getBoundingClientRect();
-      const bottom = rect.bottom + window.scrollY;
-      const viewH = window.innerHeight;
 
-      if (rect.bottom > viewH - 20) {
-        window.scrollBy({ top: rect.bottom - viewH + 40, behavior: "smooth" });
+      if (rect.bottom > window.innerHeight - 20) {
+        window.scrollBy({
+          top: rect.bottom - window.innerHeight + 40,
+          behavior: "smooth",
+        });
       }
-    }, 460); // wait for CSS transition to finish
+    }, 400);
   }
 }
 
-/* ========= PRICING CARDS TOGGLE ========= */
-// Same accordion pattern as feature cards
+
+/* =========================
+   PRICING CARD TOGGLE
+========================= */
 function togglePricing(card) {
   const isActive = card.classList.contains("active");
 
@@ -203,12 +274,13 @@ function togglePricing(card) {
 
     setTimeout(() => {
       const rect = card.getBoundingClientRect();
+
       if (rect.bottom > window.innerHeight - 20) {
         window.scrollBy({
           top: rect.bottom - window.innerHeight + 40,
           behavior: "smooth",
         });
       }
-    }, 460);
+    }, 400);
   }
 }
