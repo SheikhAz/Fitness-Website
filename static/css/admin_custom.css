@@ -55,7 +55,7 @@
 }
 
 body {
-    background: url('/static/images/adminbg.jpg') no-repeat center center fixed !important;
+    background: url('/static/images/adminbg.webp') no-repeat center center fixed !important;
     background-size: cover !important;
     color: var(--text-primary) !important;
     font-family: 'Barlow', 'DM Sans', system-ui, sans-serif !important;

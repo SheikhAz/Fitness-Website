@@ -1,6 +1,128 @@
-{% extends "base.html" %} {% load static %} {% block title %}Profile 
+{% extends "base.html" %} {% load static %} {% block title %}Profile
 {% endblock %} {% block link %}
 <link rel="stylesheet" href="{% static 'css/profile.css' %}" />
+<style>
+  /* ── Upload overlay on avatar ── */
+  .avatar-wrapper {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    cursor: pointer;
+  }
+
+  .avatar-wrapper .avatar-circle {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Dark overlay + camera icon on hover */
+  .avatar-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+    gap: 4px;
+  }
+
+  .avatar-wrapper:hover .avatar-overlay {
+    opacity: 1;
+  }
+
+  .avatar-overlay svg {
+    width: 28px;
+    height: 28px;
+    fill: #fff;
+  }
+
+  .avatar-overlay span {
+    font-size: 11px;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* Camera badge (always visible, bottom-right) */
+  .camera-badge {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: #e05c14;
+    border: 2px solid #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background 0.2s ease, transform 0.2s ease;
+    pointer-events: all;
+  }
+
+  .camera-badge:hover {
+    background: #c44d0f;
+    transform: scale(1.12);
+  }
+
+  .camera-badge svg {
+    width: 14px;
+    height: 14px;
+    fill: #fff;
+  }
+
+  /* Upload loading spinner overlay */
+  .upload-spinner {
+    display: none;
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+  }
+
+  .upload-spinner.active {
+    display: flex;
+  }
+
+  .spinner-ring {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: #e05c14;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Mobile: smaller avatar wrapper */
+  @media (max-width: 768px) {
+    .avatar-wrapper {
+      width: 90px;
+      height: 90px;
+    }
+    .camera-badge {
+      width: 24px;
+      height: 24px;
+    }
+    .camera-badge svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+</style>
 {% endblock %} {% block message %}
 <div id="message-container">
   {% for message in messages %}
@@ -14,16 +136,74 @@
 <div class="page hero-animate">
   <div class="wrapper">
     <div class="main">
-      <!-- LEFT SIDE -->
+
+      <!-- ══════════════ LEFT SIDE ══════════════ -->
       <div class="profile-left">
-        <div class="avatar-circle">
-          <span class="status-dot"></span>
-          {% if image_url %}
-          <img src="{{ image_url }}" width="130" height="130" loading="eager" decoding="async" fetchpriority="high" alt="Profile" style="border-radius: 50%; object-fit: cover;">
-          {% else %}
-          <div class="avatar-initial">{{ enrollment.fullname|slice:":1" }}</div>
-          {% endif %}
-        </div>
+
+        <!-- Avatar with upload -->
+        <div class="avatar-wrapper" id="avatar-wrapper" title="Change profile picture">
+
+          <div class="avatar-circle">
+            <span class="status-dot"></span>
+
+            {% if image_url %}
+            <img
+              id="profile-img"
+              src="{{ image_url }}"
+              width="130" height="130"
+              loading="eager" decoding="async" fetchpriority="high"
+              alt="Profile"
+              style="border-radius:50%; object-fit:cover;">
+            {% else %}
+            <div class="avatar-initial" id="avatar-initial">
+              {{ enrollment.fullname|slice:":1" }}
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Hover overlay -->
+          <div class="avatar-overlay">
+            <!-- Camera SVG -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4z"/>
+              <path d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2
+                       2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15
+                       3H9zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+            </svg>
+            <span>Change</span>
+          </div>
+
+          <!-- Always-visible camera badge -->
+          <div class="camera-badge" id="camera-badge" title="Upload photo">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4z"/>
+              <path d="M9 3L7.17 5H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2
+                       2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.17L15
+                       3H9zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+            </svg>
+          </div>
+
+          <!-- Spinner (shown while uploading) -->
+          <div class="upload-spinner" id="upload-spinner">
+            <div class="spinner-ring"></div>
+          </div>
+
+        </div><!-- /.avatar-wrapper -->
+
+        <!-- Hidden upload form -->
+        <form
+          method="POST"
+          action="{% url 'upload_profile_pic' %}"
+          enctype="multipart/form-data"
+          id="pic-upload-form"
+          style="display:none;">
+          {% csrf_token %}
+          <input
+            type="file"
+            name="profile_pic"
+            id="profile-pic-input"
+            accept="image/jpeg,image/png,image/webp,image/gif">
+        </form>
 
         {% if enrollment %}
         <div class="member-name">{{ enrollment.fullname }}</div>
@@ -31,9 +211,9 @@
         {% endif %}
 
         <div class="welcome-msg">Welcome to your profile</div>
-      </div>
+      </div><!-- /.profile-left -->
 
-      <!-- RIGHT SIDE -->
+      <!-- ══════════════ RIGHT SIDE ══════════════ -->
       <div class="info-card">
         <div class="card-row top">
           <div class="card-cell side">
@@ -42,7 +222,6 @@
               {{ enrollment.phone|default:"Not Provided" }}
             </div>
           </div>
-
           <div class="card-cell">
             <div class="cell-label">Email Address</div>
             <div class="cell-value orange">
@@ -58,19 +237,12 @@
               {{ enrollment.selectPlan|default:"Not Provided" }}
             </div>
           </div>
-
           <div class="card-cell">
             <div class="cell-label">Payment Status</div>
-
-            <div class="cell-value 
-              {% if enrollment.paymentStatus == 'Pending' %}
-                  red
-              {% elif enrollment.paymentStatus == 'Done' %}
-                  green
-              {% else %}
-                  default
-              {% endif %}
-            ">
+            <div class="cell-value
+              {% if enrollment.paymentStatus == 'Pending' %}red
+              {% elif enrollment.paymentStatus == 'Done' %}green
+              {% else %}default{% endif %}">
               {{ enrollment.paymentStatus|default:"Not Provided" }}
             </div>
           </div>
@@ -83,10 +255,8 @@
               {{ enrollment.doj|date:"F d, Y"|default:"Not Provided" }}
             </div>
           </div>
-
           <div class="card-cell">
             <div class="cell-label">Membership Status</div>
-
             {% if enrollment.is_expired %}
             <div class="cell-value danger">Expired</div>
             {% else %}
@@ -96,6 +266,7 @@
             {% endif %}
           </div>
         </div>
+
         <div class="card-row">
           <div class="card-cell side">
             <div class="cell-label">Trainer</div>
@@ -103,7 +274,6 @@
               {{ enrollment.trainer|default:"Not Provided" }}
             </div>
           </div>
-
           <div class="card-cell">
             <div class="cell-label">Pending Amount</div>
             <div class="cell-value red">
@@ -111,21 +281,22 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
+      </div><!-- /.info-card -->
+
+    </div><!-- /.main -->
+  </div><!-- /.wrapper -->
+</div><!-- /.page -->
+
+<!-- ══════════════ EXPIRY ALERT ══════════════ -->
 {% if enrollment and not is_expired and days_remaining <= 4 and days_remaining >= 0 %}
 <script>
   (function () {
     const TODAY = new Date().toDateString();
     const STORAGE_KEY = "expiry_alert_played";
-
     if (localStorage.getItem(STORAGE_KEY) === TODAY) return;
 
     function playAlert() {
       localStorage.setItem(STORAGE_KEY, TODAY);
-
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
       function beep(startTime, frequency, duration) {
@@ -149,19 +320,77 @@
       beep(now + 1.6, 880, 1.0);
     }
 
-    // Try immediately (works if user already interacted with browser)
     try {
       playAlert();
     } catch (e) {
-      // Autoplay blocked — wait for first user interaction
       document.addEventListener("click", function playOnce() {
         playAlert();
         document.removeEventListener("click", playOnce);
       }, { once: true });
     }
-
   })();
 </script>
 {% endif %}
+
+<!-- ══════════════ UPLOAD SCRIPT ══════════════ -->
+<script>
+  (function () {
+    const wrapper   = document.getElementById('avatar-wrapper');
+    const badge     = document.getElementById('camera-badge');
+    const fileInput = document.getElementById('profile-pic-input');
+    const form      = document.getElementById('pic-upload-form');
+    const spinner   = document.getElementById('upload-spinner');
+
+    const MAX_MB = 10; // reject files larger than 10 MB before even uploading
+
+    function triggerPicker() {
+      fileInput.click();
+    }
+
+    // Clicking anywhere on the avatar or the badge opens the picker
+    wrapper.addEventListener('click', triggerPicker);
+
+    // When a file is chosen — validate then submit
+    fileInput.addEventListener('change', function () {
+      if (!this.files || !this.files[0]) return;
+
+      const file = this.files[0];
+
+      // Basic client-side size guard
+      if (file.size > MAX_MB * 1024 * 1024) {
+        alert(`Please choose an image smaller than ${MAX_MB} MB.`);
+        this.value = '';
+        return;
+      }
+
+      // Show spinner over avatar while uploading
+      spinner.classList.add('active');
+
+      // Optional: preview locally before server responds
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = document.getElementById('profile-img');
+        const initial = document.getElementById('avatar-initial');
+        if (img) {
+          img.src = e.target.result;
+        } else if (initial) {
+          // Replace initial letter with the new image preview
+          const newImg = document.createElement('img');
+          newImg.id = 'profile-img';
+          newImg.src = e.target.result;
+          newImg.width = 130;
+          newImg.height = 130;
+          newImg.alt = 'Profile';
+          newImg.style.cssText = 'border-radius:50%; object-fit:cover; width:100%; height:100%;';
+          initial.replaceWith(newImg);
+        }
+      };
+      reader.readAsDataURL(file);
+
+      form.submit();
+    });
+  })();
+</script>
+
 <script src="{% static 'js/messages.js' %}"></script>
 {% endblock %}

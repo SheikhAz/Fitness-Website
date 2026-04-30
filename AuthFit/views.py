@@ -20,6 +20,9 @@ from .attendance import mark_attendance
 from .forms import UserLogin
 from urllib.parse import urlparse
 from AuthFit.rate_limit import check_login_attempt, reset_attempt, record_failed_attempt
+import cloudinary.uploader
+from PIL import Image
+import io
 
 
 # ==============================
@@ -250,6 +253,91 @@ def upload_face_image(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
+@login_required
+def upload_profile_pic(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    enrollment = Enrollment.objects.filter(user=request.user).first()
+    if not enrollment:
+        messages.error(request, "You are not enrolled yet.")
+        return redirect('/profile/')
+
+    pic = request.FILES.get("profile_pic")
+    if not pic:
+        messages.error(request, "No image selected.")
+        return redirect('/profile/')
+
+    # ── 1. Delete OLD image from Cloudinary ──────────────────────────────
+    # face_image may be a CloudinaryField resource OR a plain public_id string
+    if enrollment.face_image:
+        try:
+            # CloudinaryField exposes .public_id; plain string is the id itself
+            old_id = (
+                enrollment.face_image.public_id
+                if hasattr(enrollment.face_image, "public_id")
+                else str(enrollment.face_image)
+            )
+            if old_id:
+                cloudinary.uploader.destroy(old_id)
+        except Exception:
+            pass  # never block the upload if delete fails
+
+    # ── 2. Compress with Pillow ───────────────────────────────────────────
+    try:
+        img = Image.open(pic)
+
+        if img.mode not in ("RGB", "L"):
+            img = img.convert("RGB")
+
+        # Cap longest side at 800 px
+        max_side = 800
+        w, h = img.size
+        if max(w, h) > max_side:
+            ratio = max_side / max(w, h)
+            img = img.resize((int(w * ratio), int(h * ratio)), Image.LANCZOS)
+
+        # Step quality down until ≤ 100 KB
+        buffer = io.BytesIO()
+        quality = 85
+        while quality >= 30:
+            buffer.seek(0)
+            buffer.truncate()
+            img.save(buffer, format="JPEG", optimize=True, quality=quality)
+            if buffer.tell() / 1024 <= 100:
+                break
+            quality -= 10
+
+        buffer.seek(0)
+    except Exception as e:
+        messages.error(request, f"Image processing failed: {e}")
+        return redirect('/profile/')
+
+    # ── 3. Upload to Cloudinary & save public_id string ──────────────────
+    # We always store the raw public_id string so both this view and
+    # enroll_face.py (which also ends up storing via CloudinaryField)
+    # resolve the same way in the Profile view.
+    try:
+        result = cloudinary.uploader.upload(
+            buffer,
+            folder="profile_pics",
+            resource_type="image",
+        )
+        public_id = result["public_id"]
+
+        # Assign as string — Django's CloudinaryField accepts a public_id
+        # string and stores it correctly without re-uploading.
+        enrollment.face_image = public_id
+        enrollment.save(update_fields=["face_image"])
+
+        cache.delete(f"profile_image_{request.user.id}")
+        cache.delete(f"enrollment_{request.user.id}")
+
+        messages.success(request, "Profile picture updated successfully!")
+    except Exception as e:
+        messages.error(request, f"Upload failed: {e}")
+
+    return redirect('/profile/')
 
 # ==============================
 # HOME PAGE
@@ -429,14 +517,28 @@ def Profile(request):
     if enrollment and enrollment.face_image:
         image_url = cache.get(f"profile_image_{request.user.id}")
         if image_url is None:
-            image_url, _ = cloudinary_url(
-                enrollment.face_image.public_id,
-                width=130,
-                height=130,
-                crop="fill",
-            )
-            cache.set(f"profile_image_{request.user.id}",
-                      image_url, timeout=300)
+            try:
+                # Works whether face_image is a CloudinaryField object
+                # (set by enroll_face.py) or a plain public_id string
+                # (set by upload_profile_pic view).
+                public_id = (
+                    enrollment.face_image.public_id
+                    if hasattr(enrollment.face_image, "public_id")
+                    else str(enrollment.face_image)
+                )
+                image_url, _ = cloudinary_url(
+                    public_id,
+                    width=130,
+                    height=130,
+                    crop="fill",
+                )
+                cache.set(
+                    f"profile_image_{request.user.id}",
+                    image_url,
+                    timeout=300,
+                )
+            except Exception:
+                image_url = None
 
     return render(request, 'profile.html', {
         'enrollment': enrollment,
