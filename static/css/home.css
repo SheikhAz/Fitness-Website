@@ -797,6 +797,7 @@ body {
   display: grid;
   grid-template-columns: 1fr;
   gap: 14px;
+  align-items: start;
 }
 
 /* ===== CARD ===== */
@@ -812,7 +813,7 @@ body {
   text-align: left;
   position: relative;
   overflow: hidden;
-  min-height:220px;
+  min-height:auto;
 }
 
 .feature-card::before {
@@ -1078,6 +1079,7 @@ body {
   .features-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 22px;
+    align-items: start;
   }
 
   .feature-card {
@@ -1374,7 +1376,7 @@ body {
   cursor: pointer;
   transition: 0.3s;
   position: relative;
-   min-height: 400px;
+  min-height: auto;
 }
 .pricing-card:hover {
   border-color: #f97316;
@@ -1409,9 +1411,14 @@ body {
   opacity: 0;
   transition: 0.4s ease;
 }
+.pricing-card .pricing-desc {
+  display: none;  /* or max-height: 0; overflow: hidden; */
+}
+
 .pricing-card.active .pricing-desc {
   max-height: 300px;
   opacity: 1;
+  display: block;
 }
 .pricing-desc ul {
   margin-bottom: 20px;

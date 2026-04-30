@@ -496,23 +496,6 @@
                 {{ plan.duration_days }} DAYS
               {% endif %}
             </p>
-    
-            <div class="pricing-desc">
-              <ul>
-                <li>✔ Registration Fee included</li>
-                <li>✔ Unlimited Gym Access</li>
-                <li>✔ Personal Trainer Support</li>
-                <li>✔ Diet Guidance</li>
-                <li>✔ No Time Restrictions</li>
-              </ul>
-              {% if request.user.is_authenticated %}
-                {% if not enrolled %}
-                  <a href="/enrollment/" class="join-btn">JOIN NOW</a>
-                {% endif %}
-              {% else %}
-                <a href="/signup/" class="join-btn">JOIN NOW</a>
-              {% endif %}
-            </div>
           </div>
           {% empty %}
             <p style="color:rgba(255,255,255,0.5); grid-column:1/-1; text-align:center; padding:40px 0;">

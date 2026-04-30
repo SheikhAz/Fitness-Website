@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
+
+  /* =========================
+     RESET: no card open on load
+  ========================= */
+  document.querySelectorAll(".feature-card, .pricing-card").forEach((c) => {
+    c.classList.remove("active");
+  });
+
   /* =========================
      MOBILE MENU
   ========================= */
@@ -141,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
             10
           );
         });
-    }, 2000); // delayed by 2 sec
+    }, 2000);
   });
 
   /* =========================
