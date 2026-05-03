@@ -19,4 +19,5 @@ urlpatterns = [
     path('api/stats/', views.stats_api, name='stats_api'),
     path('api/save-embeddings-batch/', views.save_embeddings_batch,
          name='save-embeddings-batch'),
+    path('admin-tools/whatsapp/', views.whatsapp_pending_users, name='whatsapp_pending'),
 ]

@@ -23,6 +23,7 @@ from AuthFit.rate_limit import check_login_attempt, reset_attempt, record_failed
 import cloudinary.uploader
 from PIL import Image
 import io
+from urllib.parse import quote
 
 
 # ==============================
@@ -579,4 +580,33 @@ def attendence(request):
         'total_days': total_days,
         'monthly_days': monthly_days,
         'today': today,
+    })
+
+# ==============================
+# WHATSAPP PAYMENT REMINDER
+# ==============================
+@login_required
+@user_passes_test(is_staff)
+def whatsapp_pending_users(request):
+    pending = Enrollment.objects.filter(
+        paymentStatus="Pending"
+    ).select_related("selectPlan")
+
+    # Build WhatsApp links in Python — handles emoji + special chars correctly
+    pending_with_links = []
+    for e in pending:
+        msg = (
+            f"Hello {e.fullname}!Reminder from EnterGYM Bhilai: "
+            f"your payment of ₹{e.pendingAmount} is pending. "
+            f"Please clear your dues at your earliest convenience. "
+            f"Thank you! – EnterGYM"
+        )
+        wa_link = f"https://wa.me/91{e.phone}?text={quote(msg)}"
+        pending_with_links.append({
+            "enrollment": e,
+            "wa_link": wa_link,
+        })
+
+    return render(request, "admin_whatsapp.html", {
+        "pending": pending_with_links,
     })

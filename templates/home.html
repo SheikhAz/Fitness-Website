@@ -117,7 +117,13 @@
             <li><a href="/admin/attendance/">Attendance Analysis</a></li>
             {% endif %}
             {% if isSuperuser %}
-            <li><a href="/admin/revenue/">Revenue</a></li>
+            <li class="dropdown">
+              <a href="#">Payment ▼</a>  
+              <ul class="dropdown-menu">
+                  <li><a href="/admin/revenue/">Revenue</a></li>
+                  <li><a href="{% url 'whatsapp_pending' %}">Payment Reminders</a></li>
+              </ul>
+            </li>
             {% endif %} 
             {% if isStaff or isSuperuser %}
               <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
@@ -251,6 +257,7 @@
           <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
           <li><a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a></li>
           <li><a href="/admin/AuthFit/contact/">User Queries</a></li>
+          <li><a href="{% url 'whatsapp_pending' %}">Payment Reminders</a></li>
         </ul>
         {% else %}
         <ul>
