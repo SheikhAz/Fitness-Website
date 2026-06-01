@@ -20,4 +20,6 @@ urlpatterns = [
     path('api/save-embeddings-batch/', views.save_embeddings_batch,
          name='save-embeddings-batch'),
     path('admin-tools/whatsapp/', views.whatsapp_pending_users, name='whatsapp_pending'),
+    path('admin-tools/payments/',        views.payment_management, name='payment_management'),
+    path('admin-tools/update-payment/',  views.update_payment,     name='update_payment'),
 ]

@@ -1,7 +1,8 @@
 import os
 import json
 import calendar
-
+from datetime import date ,timedelta
+from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from django.utils import timezone
@@ -610,3 +611,125 @@ def whatsapp_pending_users(request):
     return render(request, "admin_whatsapp.html", {
         "pending": pending_with_links,
     })
+
+# ==============================
+# PAYMENT MANAGEMENT PAGE
+# ==============================
+@login_required
+@user_passes_test(is_staff)
+def payment_management(request):
+    """
+    Pending tab  → ALL members with paymentStatus=Pending (any age)
+    Paid tab     → last 7 days Done enrollments
+    """
+    status_filter = request.GET.get("filter", "pending")
+    since = timezone.now() - timedelta(days=7)
+ 
+    METHOD_LABELS = {"C": "Cash", "U": "UPI", "B": "UPI + Cash"}
+ 
+    if status_filter == "done":
+        # Paid tab: last 7 days, Done only
+        qs = Enrollment.objects.select_related("selectPlan", "trainer")                 .filter(created_at__gte=since, paymentStatus="Done")                 .order_by("-created_at")
+    else:
+        # Pending tab (default): ALL members with pending payment, newest first
+        qs = Enrollment.objects.select_related("selectPlan", "trainer")                 .filter(paymentStatus="Pending")                 .order_by("-created_at")
+ 
+    rows = []
+    for e in qs:
+        rows.append({
+            "id": e.id,
+            "unique_id": e.unique_id,
+            "fullname": e.fullname,
+            "phone": e.phone,
+            "plan_name": e.selectPlan.plan if e.selectPlan else "—",
+            "plan_price": float(e.selectPlan.price) if e.selectPlan else 0,
+            "amount": float(e.Amount),
+            "paid": float(e.paidAmount),
+            "pending": float(e.pendingAmount),
+            "payment_status": e.paymentStatus,
+            "payment_method": e.paymentMethod or "",
+            "payment_method_label": METHOD_LABELS.get(e.paymentMethod, "—"),
+            "payment_date": e.paymentDate.strftime("%Y-%m-%d") if e.paymentDate else "",
+            "doj": e.doj.strftime("%d %b %Y") if e.doj else "—",
+            "due_date": e.DueDate.strftime("%b. %d, %Y") if e.DueDate else "—",
+            "days_remaining": e.days_remaining,
+            "is_expired": e.is_expired,
+        })
+ 
+    # Badge counts — always fresh
+    pending_count = Enrollment.objects.filter(paymentStatus="Pending").count()
+    paid_count    = Enrollment.objects.filter(created_at__gte=since, paymentStatus="Done").count()
+    total_count   = len(rows)
+ 
+    return render(request, "payment_management.html", {
+        "rows": rows,
+        "status_filter": status_filter,
+        "total_pending_amount": sum(r["pending"] for r in rows),
+        "total_count": total_count,
+        "pending_count": pending_count,
+        "paid_count": paid_count,
+    })
+ 
+ 
+# ==============================
+# UPDATE PAYMENT (AJAX)
+# ==============================
+@login_required
+@user_passes_test(is_staff)
+@require_POST
+def update_payment(request):
+    try:
+        data = json.loads(request.body)
+        enrollment_id  = int(data.get("enrollment_id", 0))
+        paid_amount    = float(data.get("paid_amount", 0))
+        payment_method = data.get("payment_method", "").strip()
+        payment_date_s = data.get("payment_date", "").strip() or None
+ 
+        if paid_amount < 0:
+            return JsonResponse({"error": "Paid amount cannot be negative."}, status=400)
+        if payment_method not in ("C", "U", "B", ""):
+            return JsonResponse({"error": "Invalid payment method."}, status=400)
+ 
+        enrollment = Enrollment.objects.select_related("selectPlan").get(pk=enrollment_id)
+ 
+        plan_price     = float(enrollment.selectPlan.price) if enrollment.selectPlan else float(enrollment.Amount)
+        paid_amount    = min(paid_amount, plan_price)
+        pending_amount = max(plan_price - paid_amount, 0)
+ 
+        enrollment.paidAmount    = paid_amount
+        enrollment.pendingAmount = pending_amount
+        enrollment.paymentStatus = "Done" if pending_amount == 0 else "Pending"
+        enrollment.paymentMethod = payment_method or None
+ 
+        if payment_date_s:
+            enrollment.paymentDate = date.fromisoformat(payment_date_s)
+        elif paid_amount > 0 and not enrollment.paymentDate:
+            enrollment.paymentDate = timezone.localdate()
+ 
+        enrollment.save(update_fields=[
+            "paidAmount", "pendingAmount", "paymentStatus",
+            "paymentMethod", "paymentDate",
+        ])
+ 
+        cache.delete("admin_revenue")
+        cache.delete("admin_revenue_data")
+        cache.delete(f"enrollment_{enrollment.user_id}")
+ 
+        METHOD_LABELS = {"C": "Cash", "U": "UPI", "B": "UPI + Cash"}
+ 
+        return JsonResponse({
+            "ok": True,
+            "enrollment_id": enrollment.id,
+            "paid": float(enrollment.paidAmount),
+            "pending": float(enrollment.pendingAmount),
+            "payment_status": enrollment.paymentStatus,
+            "payment_method_label": METHOD_LABELS.get(enrollment.paymentMethod, "—"),
+            "payment_date": enrollment.paymentDate.strftime("%d %b %Y") if enrollment.paymentDate else "—",
+        })
+ 
+    except Enrollment.DoesNotExist:
+        return JsonResponse({"error": "Enrollment not found."}, status=404)
+    except (ValueError, KeyError) as e:
+        return JsonResponse({"error": f"Invalid data: {e}"}, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
