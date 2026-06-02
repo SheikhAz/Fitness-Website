@@ -113,8 +113,14 @@
           </a>
 
           <ul class="nav-links" id="navLinks">
-            {% if isSuperuser %}
-            <li><a href="/admin/attendance/">Attendance Analysis</a></li>
+            {% if isSuperuser or isStaff %}
+            <li class="dropdown">
+              <a href="#">Attendance ▼</a>  
+              <ul class="dropdown-menu">
+                  <li><a href="/admin/attendance/">Attendance Analysis</a></li>
+                  <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
+              </ul>
+            </li>
             {% endif %}
             {% if isSuperuser %}
             <li class="dropdown">
@@ -127,7 +133,7 @@
             </li>
             {% endif %} 
             {% if isStaff or isSuperuser %}
-              <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
+              <li><a href="/manage/orders/">Orders</a></li>
               <li>
                 <a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a>
               </li>
@@ -161,6 +167,7 @@
             <li><a href="#Price">Free Trial</a></li>
             <li><a href="#About">About</a></li>
             <li><a href="/contact/">Contact</a></li>
+            <li><a href="/products/">Supplements</a></li>
             {% endif %}
           </ul>
 
@@ -264,6 +271,7 @@
         {% else %}
         <ul>
           <li><a href="/">Home</a></li>
+          <li><a href="/products/">Supplements</a></li>
           <li><a href="#Price">Free Trial</a></li>
           <li><a href="#About">About</a></li>
           <li><a href="/contact/">Contact</a></li>

@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'AuthFit',
     'cloudinary',
     'cloudinary_storage',
+    'Shop',
 ]
 
 JAZZMIN_UI_TWEAKS = {
@@ -55,7 +56,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
 ]
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 ROOT_URLCONF = 'Fitness.urls'
 
 TEMPLATES = [
@@ -80,7 +81,9 @@ cloudinary.config(
     api_key=os.environ['CLOUDINARY_API_KEY'],
     api_secret=os.environ['CLOUDINARY_API_SECRET'],
 )
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ✅ Database
 DATABASES = {
