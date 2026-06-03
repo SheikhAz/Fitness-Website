@@ -630,7 +630,8 @@
             <!-- Timeline -->
             <div class="timeline-wrap">
               <div class="timeline">
-                <!-- Placed -->
+
+                <!-- Placed — always done -->
                 <div class="tl-step">
                   <div class="tl-dot done">
                     <i class="bi bi-check2"></i>
@@ -640,48 +641,57 @@
 
                 <!-- Confirmed -->
                 <div class="tl-step">
-                  <div
-                    class="tl-dot {% if order.status == 'Delivered' %}done {% elif order.status == 'Confirmed' %}active pulse {% endif %}"
-                  >
-                    {% if order.status == 'Delivered' %}<i
-                      class="bi bi-check2"
-                    ></i>
-                    {% elif order.status == 'Confirmed' %}<i
-                      class="bi bi-building-check"
-                    ></i>
-                    {% else %}<i class="bi bi-building"></i>{% endif %}
+                  <div class="tl-dot
+                    {% if order.status == 'Confirmed' %}active pulse
+                    {% elif order.status == 'Delivered' %}done
+                    {% endif %}">
+                    {% if order.status == 'Delivered' %}
+                      <i class="bi bi-check2"></i>
+                    {% elif order.status == 'Confirmed' %}
+                      <i class="bi bi-building-check"></i>
+                    {% else %}
+                      <i class="bi bi-building"></i>
+                    {% endif %}
                   </div>
-                  <div
-                    class="tl-label {% if order.status == 'Delivered' %}done {% elif order.status == 'Confirmed' %}active{% endif %}"
-                  >
-                    Confirmed
-                  </div>
+                  <div class="tl-label
+                    {% if order.status == 'Confirmed' %}active
+                    {% elif order.status == 'Delivered' %}done
+                    {% endif %}">Confirmed</div>
                 </div>
 
                 <!-- Ready -->
                 <div class="tl-step">
-                  <div
-                    class="tl-dot {% if order.status == 'Delivered' %}active pulse{% endif %}"
-                  >
-                    {% if order.status == 'Delivered' %}<i
-                      class="bi bi-bag-check"
-                    ></i>
-                    {% else %}<i class="bi bi-bag"></i>{% endif %}
+                  <div class="tl-dot
+                    {% if order.status == 'Delivered' %}done
+                    {% endif %}">
+                    {% if order.status == 'Delivered' %}
+                      <i class="bi bi-check2"></i>
+                    {% else %}
+                      <i class="bi bi-bag"></i>
+                    {% endif %}
                   </div>
-                  <div
-                    class="tl-label {% if order.status == 'Delivered' %}active{% endif %}"
-                  >
+                  <div class="tl-label
+                    {% if order.status == 'Delivered' %}done{% endif %}">
                     Ready
                   </div>
                 </div>
 
                 <!-- Delivered -->
                 <div class="tl-step">
-                  <div class="tl-dot">
-                    <i class="bi bi-check2-all"></i>
+                  <div class="tl-dot
+                    {% if order.status == 'Delivered' %}active pulse{% endif %}">
+                    {% if order.status == 'Delivered' %}
+                      <i class="bi bi-check2-all"></i>
+                    {% else %}
+                      <i class="bi bi-check2-all"></i>
+                    {% endif %}
                   </div>
-                  <div class="tl-label">Delivered</div>
+                  <div class="tl-label
+                    {% if order.status == 'Delivered' %}active{% endif %}">
+                    Delivered
+                  </div>
                 </div>
+
               </div>
             </div>
 
@@ -695,8 +705,8 @@
               <span>
                 {% if order.status == 'Pending' %}Pending — awaiting admin
                 confirmation {% elif order.status == 'Confirmed' %}Confirmed —
-                your item has arrived at the gym! Come pick it up. {% elif
-                order.status == 'Delivered' %}Delivered — enjoy your supplement!
+                your item has arrived at the gym! Come pick it up. 
+                {% elif order.status == 'Delivered' %}Delivered — enjoy your supplement!
                 {% else %}Order Cancelled{% endif %}
               </span>
             </div>
