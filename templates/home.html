@@ -11,21 +11,38 @@
     />
     <!-- ✅ ADD THESE SEO TAGS -->
     <title>EnterGYM | Fitness Center in Bhilai, Chhattisgarh</title>
-    <meta name="description" content="EnterGYM Bhilai - Transform your body with expert coaches, modern equipment & personalized plans. Start your 2-day free trial today!" />
-    <meta name="keywords" content="gym Bhilai, fitness center Chhattisgarh, personal trainer Bhilai, EnterGym" />
+    <meta
+      name="description"
+      content="EnterGYM Bhilai - Transform your body with expert coaches, modern equipment & personalized plans. Start your 2-day free trial today!"
+    />
+    <meta
+      name="keywords"
+      content="gym Bhilai, fitness center Chhattisgarh, personal trainer Bhilai, EnterGym"
+    />
 
     <!-- ✅ WhatsApp/Facebook preview -->
     <meta property="og:title" content="EnterGYM | Fitness Center Bhilai" />
-    <meta property="og:description" content="Crush your health and fitness goals with EnterGYM. Start a 2-day free trial!" />
+    <meta
+      property="og:description"
+      content="Crush your health and fitness goals with EnterGYM. Start a 2-day free trial!"
+    />
     <meta property="og:url" content="https://entergym.com" />
     <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media = 'all'"
+    />
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+        rel="stylesheet"
+      />
     </noscript>
-    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
   </head>
   <body>
     <div id="message-container">
@@ -42,13 +59,13 @@
     <!-- HERO -->
     <section class="hero" id="home">
       <!-- Background -->
-      <img 
-      src="{% static 'images/Fitness.webp' %}" 
-      class="hero-bg" 
-      loading="eager"
-      fetchpriority="high"
+      <img
+        src="{% static 'images/Fitness.webp' %}"
+        class="hero-bg"
+        loading="eager"
+        fetchpriority="high"
       />
-      
+
       <div class="overlay"></div>
 
       <!-- TOP BAR -->
@@ -73,20 +90,20 @@
             <div class="notif-ticker" id="notifTicker">
               {% for notif in gym_notifications %}
               <span class="notif-item">
-                {% if notif.icon %}
-                {{ notif.icon }}
-                {% endif %} 
+                {% if notif.icon %} {{ notif.icon }} {% endif %} 
                 {{ notif.message}} 
-                {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
+                {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;
+                {% endif %}
               </span>
               {% endfor %}
               <!-- Duplicate for seamless loop -->
               {% for notif in gym_notifications %}
               <span class="notif-item" aria-hidden="true">
-                {% if notif.icon %}
-                {{ notif.icon }}
-                {% endif %} {{ notif.message}} 
-                {% if not forloop.last %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
+                {% if notif.icon %} {{ notif.icon }} {% endif %} 
+                {{ notif.message}} 
+                {% if not forloop.last %}
+                &nbsp;&nbsp;•&nbsp;&nbsp;
+                {% endif %}
               </span>
               {% endfor %}
             </div>
@@ -115,36 +132,36 @@
           <ul class="nav-links" id="navLinks">
             {% if isSuperuser or isStaff %}
             <li class="dropdown">
-              <a href="#">Attendance ▼</a>  
+              <a href="#">Attendance ▼</a>
               <ul class="dropdown-menu">
-                  <li><a href="/admin/attendance/">Attendance Analysis</a></li>
-                  <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
+                <li><a href="/admin/attendance/">Attendance Analysis</a></li>
+                <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
               </ul>
             </li>
-            {% endif %}
-            {% if isSuperuser %}
+            {% endif %} {% if isSuperuser %}
             <li class="dropdown">
-              <a href="#">Payment ▼</a>  
+              <a href="#">Payment ▼</a>
               <ul class="dropdown-menu">
-                  <li><a href="/admin/AuthFit/enrollment/">Total Member</a></li>
-                  <li><a href="/admin/revenue/">Revenue</a></li>
-                  <li><a href="{% url 'whatsapp_pending' %}">Payment Reminders</a></li>
+                <li><a href="/admin/AuthFit/enrollment/">Total Member</a></li>
+                <li><a href="/admin/revenue/">Revenue</a></li>
+                <li>
+                  <a href="{% url 'whatsapp_pending' %}">Payment Reminders</a>
+                </li>
               </ul>
             </li>
-            {% endif %} 
-            {% if isStaff or isSuperuser %}
-              <li><a href="/manage/orders/">Orders</a></li>
-              <li>
-                <a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a>
-              </li>
-              <li><a href="/admin/AuthFit/contact/">User Queries</a></li>
+            {% endif %} {% if isStaff or isSuperuser %}
+            <li><a href="/manage/orders/">Orders</a></li>
+            <li>
+              <a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a>
+            </li>
+            <li><a href="/admin/AuthFit/contact/">User Queries</a></li>
             {% else %}
             <li class="dropdown">
-              <a href="#">Membership ▼</a>  
+              <a href="#">Membership ▼</a>
               <ul class="dropdown-menu">
                 {% if request.user.is_authenticated %} 
                   {% if not enrolled %}
-                    <li><a href="/enrollment/">Enroll</a></li>
+                  <li><a href="/enrollment/">Enroll</a></li>
                   {% endif %} 
                 {% else %}
                 <li><a href="/signup/">Enroll</a></li>
@@ -158,7 +175,7 @@
                       <a href="/admin/AuthFit/attendence/">Attendance List</a>
                     </li>
                   {% else %}
-                  <li><a href="/attendence/">Attendance</a></li>
+                <li><a href="/attendence/">Attendance</a></li>
                   {% endif %} 
                 {% endif %}
               </ul>
@@ -197,7 +214,12 @@
             <a href="/signup/" class="btn">SignUp/LogIn</a>
             {% endif %}
 
-            <button id="menuBtn" class="hamburger-icon" aria-label="Open navigation menu" aria-expanded="false">
+            <button
+              id="menuBtn"
+              class="hamburger-icon"
+              aria-label="Open navigation menu"
+              aria-expanded="false"
+            >
               <span></span>
               <span></span>
               <span></span>
@@ -253,55 +275,116 @@
       </div>
     </section>
 
-    <!-- MOBILE POPUP MENU -->
-    <div id="mobileMenu" class="mobile-menu" >
+    <!-- MOBILE MENU OVERLAY -->
+    <div id="mobileMenu" class="mobile-menu">
       <div class="menu-box">
-        <span id="closeMenu" class="close-btn">×</span>
-        <ul>
+        <div class="menu-header">
+          <div class="menu-logo">
+            <div class="logo-bars"><span></span><span></span><span></span></div>
+            <div class="logo-text">
+              <b>EnterGYM</b>
+              <small>Bhilai &middot; Chhattisgarh</small>
+            </div>
+          </div>
+          <button id="closeMenu" class="menu-close-btn" aria-label="Close menu">
+            &#10005;
+          </button>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <ul class="menu-nav">
           {% if isSuperuser %}
-          <li><a href="/admin/revenue/">Revenue</a></li>
-          <li><a href="/manage/orders/">Orders</a></li>
-          <li><a href="/admin/attendance/">Attendance Analysis</a></li>
-          <li><a href="/admin/AuthFit/enrollment/">Total Member</a></li>
-          {% endif %} {% if isStaff or isSuperuser %}
-          <li><a href="/admin/AuthFit/attendence/">Attendance</a></li>
-          <li><a href="/admin/AuthFit/membershipplan/">MemberShip Plan</a></li>
-          <li><a href="/admin/AuthFit/contact/">User Queries</a></li>
-          <li><a href="{% url 'whatsapp_pending' %}">Payment Reminders</a></li>
+          <li>
+            <a href="/admin/revenue/">Revenue <span>↗</span></a>
+          </li>
+          {% endif %}
+          {% if isStaff %}
+          <li>
+            <a href="/manage/orders/">Orders <span>↗</span></a>
+          </li>
+          <li>
+            <a href="/admin/AuthFit/attendence/">Attendance List <span>↗</span></a>
+          </li>
+          <li>
+            <a href="/admin/attendance/">Attendance Analysis <span>↗</span></a>
+          </li>
+          <li>
+            <a href="/admin/AuthFit/enrollment/">Members <span>↗</span></a>
+          </li>
+          <li>
+            <a href="/admin/AuthFit/membershipplan/"> Plans <span>↗</span></a>
+          </li>
+          <li>
+            <a href="/admin/AuthFit/contact/">Queries <span>↗</span></a>
+          </li>
+          {% else %}
+          <li class="active">
+            <a href="/">Home <span>↗</span></a>
+          </li>
+          <li>
+            <a href="/products/">Supplements <span>↗</span></a>
+          </li>
+          <li>
+            <a href="#Price">Free Trial <span>↗</span></a>
+          </li>
+          <li>
+            <a href="#About">About <span>↗</span></a>
+          </li>
+          <li>
+            <a href="/contact/">Contact <span>↗</span></a>
+          </li>
+          <li>
+            <a href="/workout/">Workout <span>↗</span></a>
+          </li>
+          {% endif %}
         </ul>
-        {% else %}
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/products/">Supplements</a></li>
-          <li><a href="#Price">Free Trial</a></li>
-          <li><a href="#About">About</a></li>
-          <li><a href="/contact/">Contact</a></li>
-          <li><a href="/workout/">Workout</a></li>
-        </ul>
-        {% endif %} {% if request.user.is_authenticated %}
-        <form action="{% url 'logout' %}" method="POST">
+
+        {% if not isStaff and not isSuperuser %} 
+          {% if request.user.is_authenticated %}
+            <a href="/enrollment/" class="menu-cta">Start 2-Day Free Trial</a>
+          {% else %}
+            <a href="/signup/" class="menu-cta">Start 2-Day Free Trial</a>
+          {% endif %} 
+        {% endif %}
+
+        <div class="menu-footer">
+          <p class="menu-footer-label">[ Contact Info ]</p>
+          <a href="tel:+917000032565">(+91) 70000 32565</a>
+          <a href="#classes">Junwani Rd, Bhilai, CG 490023</a>
+        </div>
+
+        {% if request.user.is_authenticated %}
+        <form
+          action="{% url 'logout' %}"
+          method="POST"
+          class="menu-logout-form"
+        >
           {% csrf_token %}
-          <button class="logout-btn">Logout</button>
+          <button type="submit" class="menu-logout-btn">Logout</button>
         </form>
         {% endif %}
       </div>
     </div>
 
-        <section id="About" class="features-section">
+    <section id="About" class="features-section">
       <div class="features-container">
         <p class="small-heading">WHY CHOOSE US?</p>
         <h2 class="main-heading">PUSH YOUR <span>LIMITS</span> FORWARD</h2>
         <div class="cyber-divider"></div>
-    
+
         <div class="features-grid">
-    
           <!-- Card 1 -->
           <div class="feature-card" onclick="toggleFeature(this)">
             <span class="cyber-corner tl"></span>
             <span class="cyber-corner br"></span>
             <div class="card-top">
               <div class="icon-box">
-                <img src="{% static 'images/features/barbell.png' %}" alt="Modern gym barbells and free weights at EnterGYM" loading="lazy" />
+                <img
+                  src="{% static 'images/features/barbell.png' %}"
+                  alt="Modern gym barbells and free weights at EnterGYM"
+                  loading="lazy"
+                />
               </div>
               <div class="card-meta">
                 <p class="card-label">Equipment</p>
@@ -312,22 +395,34 @@
             <div class="feature-desc">
               <div class="feature-desc-inner">
                 <ul class="feature-list">
-                  <li><span class="cyber-bullet"></span>State-of-the-art machines &amp; free weights</li>
-                  <li><span class="cyber-bullet"></span>Enhances performance and ensures safety</li>
-                  <li><span class="cyber-bullet"></span>Suitable for beginners to advanced athletes</li>
+                  <li>
+                    <span class="cyber-bullet"></span>State-of-the-art machines
+                    &amp; free weights
+                  </li>
+                  <li>
+                    <span class="cyber-bullet"></span>Enhances performance and
+                    ensures safety
+                  </li>
+                  <li>
+                    <span class="cyber-bullet"></span>Suitable for beginners to
+                    advanced athletes
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
-    
+
           <!-- Card 2 -->
           <div class="feature-card" onclick="toggleFeature(this)">
             <span class="cyber-corner tl"></span>
             <span class="cyber-corner br"></span>
             <div class="card-top">
               <div class="icon-box">
-                <img src="{% static 'images/features/vitamins.png' %}" alt="Healthy nutrition plan supplements"
-                loading="lazy" />
+                <img
+                  src="{% static 'images/features/vitamins.png' %}"
+                  alt="Healthy nutrition plan supplements"
+                  loading="lazy"
+                />
               </div>
               <div class="card-meta">
                 <p class="card-label">Nutrition</p>
@@ -338,22 +433,34 @@
             <div class="feature-desc">
               <div class="feature-desc-inner">
                 <ul class="feature-list">
-                  <li><span class="cyber-bullet"></span>Customized programs aligned to your goals</li>
-                  <li><span class="cyber-bullet"></span>Balanced macros for energy &amp; recovery</li>
-                  <li><span class="cyber-bullet"></span>Micro-nutrient guidance included</li>
+                  <li>
+                    <span class="cyber-bullet"></span>Customized programs
+                    aligned to your goals
+                  </li>
+                  <li>
+                    <span class="cyber-bullet"></span>Balanced macros for energy
+                    &amp; recovery
+                  </li>
+                  <li>
+                    <span class="cyber-bullet"></span>Micro-nutrient guidance
+                    included
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
-    
+
           <!-- Card 3 -->
           <div class="feature-card" onclick="toggleFeature(this)">
             <span class="cyber-corner tl"></span>
             <span class="cyber-corner br"></span>
             <div class="card-top">
               <div class="icon-box">
-                <img src="{% static 'images/features/trainer.png' %}" alt="Professional personal trainer at EnterGYM Bhilai" 
-                loading="lazy"/>
+                <img
+                  src="{% static 'images/features/trainer.png' %}"
+                  alt="Professional personal trainer at EnterGYM Bhilai"
+                  loading="lazy"
+                />
               </div>
               <div class="card-meta">
                 <p class="card-label">Training</p>
@@ -364,22 +471,34 @@
             <div class="feature-desc">
               <div class="feature-desc-inner">
                 <ul class="feature-list">
-                  <li><span class="cyber-bullet"></span>Expert-designed workouts for your body type</li>
-                  <li><span class="cyber-bullet"></span>Tailored to your current fitness level</li>
-                  <li><span class="cyber-bullet"></span>Structured for consistent, efficient progress</li>
+                  <li>
+                    <span class="cyber-bullet"></span>Expert-designed workouts
+                    for your body type
+                  </li>
+                  <li>
+                    <span class="cyber-bullet"></span>Tailored to your current
+                    fitness level
+                  </li>
+                  <li>
+                    <span class="cyber-bullet"></span>Structured for consistent,
+                    efficient progress
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
-    
+
           <!-- Card 4 -->
           <div class="feature-card" onclick="toggleFeature(this)">
             <span class="cyber-corner tl"></span>
             <span class="cyber-corner br"></span>
             <div class="card-top">
               <div class="icon-box">
-                <img src="{% static 'images/features/heart-beat.png' %}" alt="Personalized fitness heart rate monitoring" 
-                loading="lazy"/>
+                <img
+                  src="{% static 'images/features/heart-beat.png' %}"
+                  alt="Personalized fitness heart rate monitoring"
+                  loading="lazy"
+                />
               </div>
               <div class="card-meta">
                 <p class="card-label">Personalized</p>
@@ -390,14 +509,22 @@
             <div class="feature-desc">
               <div class="feature-desc-inner">
                 <ul class="feature-list">
-                  <li><span class="cyber-bullet"></span>Personalized solutions for your lifestyle</li>
-                  <li><span class="cyber-bullet"></span>Adapts to your preferences &amp; health goals</li>
-                  <li><span class="cyber-bullet"></span>One-on-one assessments to find the right plan</li>
+                  <li>
+                    <span class="cyber-bullet"></span>Personalized solutions for
+                    your lifestyle
+                  </li>
+                  <li>
+                    <span class="cyber-bullet"></span>Adapts to your preferences
+                    &amp; health goals
+                  </li>
+                  <li>
+                    <span class="cyber-bullet"></span>One-on-one assessments to
+                    find the right plan
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
-    
         </div>
       </div>
     </section>
@@ -411,8 +538,11 @@
 
         <div class="offer-grid">
           <div class="offer-card">
-            <img src="{% static 'images/offer/machine_1.webp' %}" alt="Weightlifting machines at EnterGYM" 
-            loading="lazy"/>
+            <img
+              src="{% static 'images/offer/machine_1.webp' %}"
+              alt="Weightlifting machines at EnterGYM"
+              loading="lazy"
+            />
             <div class="overlay"></div>
             <div class="skew-box"></div>
             <div class="content">
@@ -422,8 +552,11 @@
           </div>
 
           <div class="offer-card">
-            <img src="{% static 'images/offer/machine_2.webp' %}" alt="Indoor cycling cardio equipment at EnterGYM" 
-            loading="lazy"/>
+            <img
+              src="{% static 'images/offer/machine_2.webp' %}"
+              alt="Indoor cycling cardio equipment at EnterGYM"
+              loading="lazy"
+            />
             <div class="overlay"></div>
             <div class="skew-box"></div>
             <div class="content">
@@ -433,8 +566,11 @@
           </div>
 
           <div class="offer-card center-card">
-            <img src="{% static 'images/offer/trainer.webp' %}" alt="Certified personal trainer at EnterGYM Bhilai" 
-            loading="lazy"/>
+            <img
+              src="{% static 'images/offer/trainer.webp' %}"
+              alt="Certified personal trainer at EnterGYM Bhilai"
+              loading="lazy"
+            />
             <div class="overlay"></div>
             <div class="skew-box"></div>
             <div class="content">
@@ -475,50 +611,49 @@
       <div class="pricing-container">
         <p class="pricing-subtitle">OUR PLANS</p>
         <h2 class="pricing-title">CHOOSE YOUR FITNESS PLAN</h2>
-    
+
         <div class="pricing-grid">
           {% for plan in plans %}
-          <div class="pricing-card {% if forloop.counter == 2 %}popular{% endif %}"
-              onclick="togglePricing(this)">
-    
+          <div
+            class="pricing-card {% if forloop.counter == 2 %}popular{% endif %}"
+            onclick="togglePricing(this)"
+          >
             {# ── Badge: "MOST POPULAR" on 2nd plan, "BEST VALUE" on last ── #}
             {% if forloop.counter == 2 %}
-              <span class="badge">MOST POPULAR</span>
+            <span class="badge">MOST POPULAR</span>
             {% elif forloop.last and plans|length > 1 %}
-              <span class="badge best">BEST VALUE</span>
+            <span class="badge best">BEST VALUE</span>
             {% endif %}
-    
+
             <h3>{{ plan.plan }}</h3>
-    
+
             <div class="price">₹{{ plan.price }}</div>
-    
+
             {# ── Duration label derived from duration_days ── #}
             <p class="duration">
-              {% if plan.duration_days == 1 %}
-                PER DAY
-              {% elif plan.duration_days <= 7 %}
-                {{ plan.duration_days }} DAYS
-              {% elif plan.duration_days <= 14 %}
-                {{ plan.duration_days }} DAYS
-              {% elif plan.duration_days == 30 or plan.duration_days == 31 %}
-                PER MONTH
-              {% elif plan.duration_days == 60 %}
-                2 MONTHS
-              {% elif plan.duration_days == 90 or plan.duration_days == 91 %}
-                3 MONTHS
+              {% if plan.duration_days == 1 %} PER DAY 
+              {% elif plan.duration_days <= 7 %} {{ plan.duration_days }} DAYS {% elif plan.duration_days <= 14 %} {{ plan.duration_days }} DAYS {% elif plan.duration_days == 30 or plan.duration_days == 31 %} PER MONTH
+              {% elif plan.duration_days == 60 %} 2 MONTHS 
+              {% elif plan.duration_days == 90 or plan.duration_days == 91 %} 3 MONTHS
               {% elif plan.duration_days == 180 or plan.duration_days == 182 %}
-                6 MONTHS
-              {% elif plan.duration_days == 365 or plan.duration_days == 366 %}
-                12 MONTHS
-              {% else %}
-                {{ plan.duration_days }} DAYS
+              6 MONTHS 
+              {% elif plan.duration_days == 365 or plan.duration_days
+              == 366 %} 12 MONTHS 
+              {% else %} {{ plan.duration_days }} DAYS 
               {% endif %}
             </p>
           </div>
           {% empty %}
-            <p style="color:rgba(255,255,255,0.5); grid-column:1/-1; text-align:center; padding:40px 0;">
-              No membership plans available right now. Check back soon!
-            </p>
+          <p
+            style="
+              color: rgba(255, 255, 255, 0.5);
+              grid-column: 1/-1;
+              text-align: center;
+              padding: 40px 0;
+            "
+          >
+            No membership plans available right now. Check back soon!
+          </p>
           {% endfor %}
         </div>
       </div>
@@ -540,7 +675,10 @@
           </div>
           <div class="footer-contact">
             <div class="footer-icon">
-              <img src="{% static 'images/footer/email.png' %}" alt="Email EnterGYM support" />
+              <img
+                src="{% static 'images/footer/email.png' %}"
+                alt="Email EnterGYM support"
+              />
             </div>
             <p>support@gymcenter.com</p>
           </div>
@@ -555,8 +693,14 @@
             equipment and expert fitness coaching.
           </p>
           <div class="footer-social">
-            <img src="{% static 'images/footer/instagram.png' %}" alt="EnterGYM Instagram" />
-            <img src="{% static 'images/footer/email.png' %}" alt="EnterGYM Email" />
+            <img
+              src="{% static 'images/footer/instagram.png' %}"
+              alt="EnterGYM Instagram"
+            />
+            <img
+              src="{% static 'images/footer/email.png' %}"
+              alt="EnterGYM Email"
+            />
           </div>
         </div>
 
@@ -609,6 +753,6 @@
       </div>
     </footer>
 
-    <script src="{% static 'js/home.js' %}" defer ></script>
+    <script src="{% static 'js/home.js' %}" defer></script>
   </body>
 </html>
