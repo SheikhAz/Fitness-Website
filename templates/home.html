@@ -637,11 +637,11 @@
               {% if plan.duration_days == 1 %} PER DAY 
               {% elif plan.duration_days <= 7 %} {{ plan.duration_days }} DAYS {% elif plan.duration_days <= 14 %} {{ plan.duration_days }} DAYS {% elif plan.duration_days == 30 or plan.duration_days == 31 %} PER MONTH
               {% elif plan.duration_days == 60 %} 2 MONTHS 
-              {% elif plan.duration_days == 90 or plan.duration_days == 91 %} 3 MONTHS
+              {% elif plan.duration_days == 90 or plan.duration_days == 91 %} 
+              3 MONTHS
               {% elif plan.duration_days == 180 or plan.duration_days == 182 %}
               6 MONTHS 
-              {% elif plan.duration_days == 365 or plan.duration_days
-              == 366 %} 12 MONTHS 
+              {% elif plan.duration_days == 365 or plan.duration_days == 366 %} 12 MONTHS 
               {% else %} {{ plan.duration_days }} DAYS 
               {% endif %}
             </p>
