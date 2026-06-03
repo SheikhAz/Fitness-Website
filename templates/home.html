@@ -43,6 +43,17 @@
       />
     </noscript>
     <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+    <!-- Preload mobile image for small screens -->
+    <link rel="preload" as="image"
+      href="{% static 'images/Fitness_mobile.webp' %}"
+      media="(max-width: 768px)"
+      fetchpriority="high" />
+
+    <!-- Preload desktop image for large screens -->
+    <link rel="preload" as="image"
+      href="{% static 'images/Fitness.webp' %}"
+      media="(min-width: 769px)"
+      fetchpriority="high" />
   </head>
   <body>
     <div id="message-container">
@@ -59,11 +70,19 @@
     <!-- HERO -->
     <section class="hero" id="home">
       <!-- Background -->
-      <img
+      <img 
         src="{% static 'images/Fitness.webp' %}"
+        srcset="
+          {% static 'images/Fitness_mobile.webp' %} 768w,
+          {% static 'images/Fitness.webp' %}        1920w
+        "
+        sizes="100vw"
         class="hero-bg"
+        width="1920"
+        height="1080"
         loading="eager"
         fetchpriority="high"
+        alt="EnterGYM fitness center Bhilai"
       />
 
       <div class="overlay"></div>

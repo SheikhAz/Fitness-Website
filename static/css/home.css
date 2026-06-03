@@ -1330,7 +1330,7 @@ body {
 .footer-links ul, .footer-extra ul  { list-style: none; }
 .footer-links li, .footer-extra li  { margin-bottom: 8px; }
 .footer-links a { text-decoration: none; color: rgba(255,255,255,0.7); transition: 0.3s; }
-.footer-links a:hover { color: #f97316; }
+.footer-links a:hover { color: #f97316;text-decoration: underline; }
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.1);
   text-align: center;
