@@ -70,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'AuthFit.context_processors.gym_config',
             ],
         },
     }
@@ -205,3 +206,7 @@ JAZZMIN_SETTINGS = {
         ]
     }
 }
+
+GYM_LATITUDE  = 21.22672   # ← replace with your actual gym lat
+GYM_LONGITUDE = 81.3465   # ← replace with your actual gym lng
+GYM_RADIUS_METERS = 100

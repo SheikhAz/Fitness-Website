@@ -1,25 +1,39 @@
-from django.urls import path ,include
+from django.urls import path, include
 from AuthFit import views
+from AuthFit.geo_views import geo_mark_attendance, serve_sw ,attendance_status
 
 urlpatterns = [
-    path('',views.homePage , name = "home"),\
+    path('', views.homePage, name='home'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('signup/',views.signupPage , name = "signPage"),
+    path('signup/', views.signupPage, name='signPage'),
     path('login/', views.loginPage, name='login'),
-    path('workout/',views.workout , name = "workout"), 
-    path('profile/',views.Profile , name = "Profile"),
-    path('logout/',views.handlelogout , name = "logout"),
-    path('contact/',views.contact , name = "contact"),
-    path('enrollment/',views.enrollment , name = "enrollment"),
-    path('attendence/',views.attendence , name = "attendence"),
+    path('workout/', views.workout, name='workout'),
+    path('profile/', views.Profile, name='Profile'),
+    path('logout/', views.handlelogout, name='logout'),
+    path('contact/', views.contact, name='contact'),
+    path('enrollment/', views.enrollment, name='enrollment'),
+    path('attendence/', views.attendence, name='attendence'),
     path('profile/upload-pic/', views.upload_profile_pic, name='upload_profile_pic'),
+
+    # ── Existing APIs ──────────────────────────────────────────
     path('api/mark-attendance/', views.mark_attendance_api),
     path('api/get-users/', views.get_users),
     path('api/upload-face-image/', views.upload_face_image),
     path('api/stats/', views.stats_api, name='stats_api'),
-    path('api/save-embeddings-batch/', views.save_embeddings_batch,
-         name='save-embeddings-batch'),
+    path('api/save-embeddings-batch/', views.save_embeddings_batch, name='save-embeddings-batch'),
+
+    # ── NEW: Background geo auto-mark ─────────────────────────
+    path('api/geo-mark-attendance/', geo_mark_attendance, name='geo_mark_attendance'),
+    path('api/attendance-status/', attendance_status),
+
+    # ── NEW: Serve SW from root scope (/sw.js) ────────────────
+    # Must be at / scope so SW can intercept all site requests.
+    # This bypasses STATIC_URL prefix (/static/js/sw.js would
+    # give SW a /static/js/ scope — too narrow).
+    path('sw.js', serve_sw, name='sw'),
+
+    # ── Admin tools ────────────────────────────────────────────
     path('admin-tools/whatsapp/', views.whatsapp_pending_users, name='whatsapp_pending'),
-    path('admin-tools/payments/',        views.payment_management, name='payment_management'),
-    path('admin-tools/update-payment/',  views.update_payment,     name='update_payment'),
+    path('admin-tools/payments/', views.payment_management, name='payment_management'),
+    path('admin-tools/update-payment/', views.update_payment, name='update_payment'),
 ]

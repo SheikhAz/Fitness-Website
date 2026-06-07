@@ -13,6 +13,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.cache import cache
 
+from django.conf import settings
 from cloudinary.utils import cloudinary_url
 
 from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Attendence, GymNotification
@@ -553,7 +554,7 @@ def Profile(request):
 # ==============================
 # ATTENDANCE PAGE
 # ==============================
-@login_required  # ✅ Fixed: was missing login_required
+@login_required 
 def attendence(request):
     today = timezone.localdate()
     user = request.user
@@ -581,6 +582,8 @@ def attendence(request):
         'total_days': total_days,
         'monthly_days': monthly_days,
         'today': today,
+        'gym_lat': settings.GYM_LATITUDE,    # ← add these two
+        'gym_lng': settings.GYM_LONGITUDE,
     })
 
 # ==============================
