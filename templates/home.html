@@ -9,6 +9,13 @@
       type="image/png"
       href="{% static 'images/favicons.png' %}"
     />
+    <!-- PWA manifest + mobile meta tags -->
+    <link rel="manifest" href="{% static 'js/manifest.json' %}">
+    <meta name="theme-color" content="#00dcff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <!-- ✅ ADD THESE SEO TAGS -->
     <title>EnterGYM | Fitness Center in Bhilai, Chhattisgarh</title>
     <meta
@@ -43,8 +50,9 @@
       />
     </noscript>
     <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/loc_modal.css' %}">
     <!-- Preload mobile image for small screens -->
-    <link rel="preload" as="image"
+    <link
       href="{% static 'images/Fitness_mobile.webp' %}"
       media="(max-width: 768px)"
       fetchpriority="high" />
@@ -776,5 +784,22 @@
     </footer>
 
     <script src="{% static 'js/home.js' %}" defer></script>
+    <!-- GYM_CONFIG — values injected automatically by context_processors.py -->
+  <script>
+    window.GYM_CONFIG = {
+      gymLat:           {{ GYM_LATITUDE }},
+      gymLng:           {{ GYM_LONGITUDE }},
+      radius:           {{ GYM_RADIUS_METERS }},
+      userId:           {% if user.is_authenticated %}{{ user.id }}{% else %}null{% endif %},
+      isAuthenticated:  {% if user.is_authenticated %}true{% else %}false{% endif %},
+      isEnrolled:       {% if is_enrolled %}true{% else %}false{% endif %},
+      onAttendancePage: {% if 'attendence' in request.path %}true{% else %}false{% endif %},
+      alreadyMarked:    {% if already_marked %}true{% else %}false{% endif %}
+    };
+
+  </script>
+  <script src="{% static 'js/loc_permission.js' %}"></script>
+  <script src="{% static 'js/geo_attendance.js' %}"></script>
+
   </body>
 </html>

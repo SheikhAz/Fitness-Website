@@ -76,16 +76,12 @@
       radius:           {{ GYM_RADIUS_METERS }},
       userId:           {% if user.is_authenticated %}{{ user.id }}{% else %}null{% endif %},
       isAuthenticated:  {% if user.is_authenticated %}true{% else %}false{% endif %},
+      isEnrolled:       {% if is_enrolled %}true{% else %}false{% endif %},
       onAttendancePage: {% if 'attendence' in request.path %}true{% else %}false{% endif %},
-      alreadyMarked:    {% if already_marked %}true{% else %}false{% endif %},
+      alreadyMarked:    {% if already_marked %}true{% else %}false{% endif %}
     };
-  </script>
 
-  <!--
-    Load order is important:
-    1. loc_permission.js  → shows one-time modal, caches GPS on first visit
-    2. geo_attendance.js  → registers SW, starts background watcher
-  -->
+  </script>
   <script src="{% static 'js/loc_permission.js' %}"></script>
   <script src="{% static 'js/geo_attendance.js' %}"></script>
 

@@ -207,6 +207,6 @@ JAZZMIN_SETTINGS = {
     }
 }
 
-GYM_LATITUDE  = 21.2279944   # ← replace with your actual gym lat
-GYM_LONGITUDE = 81.343357   # ← replace with your actual gym lng
-GYM_RADIUS_METERS = 100
+GYM_LATITUDE  = os.environ['GYM_LATITUDE']   
+GYM_LONGITUDE = os.environ['GYM_LONGITUDE'] 
+GYM_RADIUS_METERS = os.environ['GYM_RADIUS_METERS']

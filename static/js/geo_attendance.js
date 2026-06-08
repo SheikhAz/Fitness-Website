@@ -1,5 +1,5 @@
 // ============================================================
-//  geo_attendance.js  v2 — fixed REQUEST_LOC response timing
+//  geo_attendance.js  v3 — reliable START_GEO on every load
 // ============================================================
 
 (function () {
@@ -12,12 +12,13 @@
     radius        = 100,
     userId,
     isAuthenticated,
+    isEnrolled,
     onAttendancePage,
     alreadyMarked,
   } = cfg;
 
   const LOC_KEY    = 'gym_location';
-  const LOC_MAX_MS = 10 * 60 * 1000;   // 10 minutes
+  const LOC_MAX_MS = 10 * 60 * 1000;
 
   // ── Haversine ────────────────────────────────────────────────
   function haversine(lat1, lng1, lat2, lng2) {
@@ -47,10 +48,31 @@
     } catch { return null; }
   }
 
+  // ── Build gym config object ──────────────────────────────────
+  function buildConfig() {
+    return { gymLat, gymLng, radius, userId, isEnrolled };
+  }
+
   // ── Send message to SW ───────────────────────────────────────
   function swPost(msg) {
     if (navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage(msg);
+    }
+  }
+
+  // ── Send START_GEO + immediate location to SW ────────────────
+  // Called on every page load so gymCfg is never null in SW,
+  // even after Chrome restarts the SW process.
+  function sendStartGeo() {
+    swPost({ type: 'START_GEO', config: buildConfig() });
+
+    // Also send current location immediately so SW can check
+    // distance right away without waiting for the 30s poll.
+    const loc = loadLoc();
+    if (loc) {
+      setTimeout(() => {
+        swPost({ type: 'REPORT_LOC', lat: loc.lat, lng: loc.lng });
+      }, 300);  // small delay so START_GEO is processed first
     }
   }
 
@@ -69,7 +91,7 @@
   // ── Silent cache on login ────────────────────────────────────
   function silentlyCache() {
     if (!navigator.geolocation) return;
-    if (loadLoc()) return;   // already fresh
+    if (loadLoc()) return;
 
     navigator.geolocation.getCurrentPosition(
       pos => {
@@ -87,15 +109,12 @@
       const { type } = event.data || {};
 
       if (type === 'REQUEST_LOC') {
-        // ✅ KEY FIX: respond IMMEDIATELY with cached location
-        // Don't call getCurrentPosition() here — that takes 5-10s
-        // and by then the SW has already moved on.
+        // Respond instantly with cached location
         const cached = loadLoc();
         if (cached) {
-          // Respond instantly with cached coords
           swPost({ type: 'REPORT_LOC', lat: cached.lat, lng: cached.lng });
         } else {
-          // No cache — get live GPS (slower but necessary)
+          // No cache — get live GPS
           navigator.geolocation.getCurrentPosition(
             pos => {
               saveLoc(pos.coords.latitude, pos.coords.longitude);
@@ -108,7 +127,6 @@
       }
 
       if (type === 'ATTENDANCE_MARKED') {
-        console.log('[GEO] Auto-attendance marked by SW!');
         if (onAttendancePage) {
           setTimeout(() => window.location.reload(), 1500);
         }
@@ -117,23 +135,19 @@
   }
 
   // ── Background watchPosition — keeps localStorage fresh ─────
-  // This means REQUEST_LOC always finds a fresh cached location.
   let bgWatchId = null;
 
   function startBackgroundWatch() {
     if (!navigator.geolocation || bgWatchId !== null) return;
 
     bgWatchId = navigator.geolocation.watchPosition(
-      pos => {
-        // Every time GPS updates, refresh the cache
-        saveLoc(pos.coords.latitude, pos.coords.longitude);
-      },
+      pos => saveLoc(pos.coords.latitude, pos.coords.longitude),
       () => {},
       { enableHighAccuracy: true, maximumAge: 30_000 }
     );
   }
 
-  // ── Attendance page UI helpers ───────────────────────────────
+  // ── Attendance page UI ───────────────────────────────────────
   function showGeoError(msg) {
     const el = document.getElementById('geo-error');
     if (!el) return;
@@ -189,7 +203,6 @@
     const cached = loadLoc();
     if (cached) {
       evaluateLocation(cached.lat, cached.lng);
-      // Refresh cache silently in background
       navigator.geolocation.getCurrentPosition(
         pos => saveLoc(pos.coords.latitude, pos.coords.longitude),
         () => {},
@@ -233,26 +246,30 @@
     const reg = await registerSW();
     if (!reg) return;
 
-    // Attach SW message listener BEFORE sending START_GEO
     listenToSW();
-
     await requestNotificationPermission();
-
-    // Keep localStorage fresh via watchPosition
     startBackgroundWatch();
-
-    // Silently grab location if not cached yet
     silentlyCache();
 
-    // Wait for SW to be controlling this page, then send START_GEO
+    // ── KEY FIX: always send START_GEO on every page load ───────
+    // SW loses gymCfg when Chrome restarts it. Resending on every
+    // page load ensures it always has the config it needs.
     if (navigator.serviceWorker.controller) {
-      swPost({ type: 'START_GEO', config: { gymLat, gymLng, radius, userId } });
+      // SW already controlling — send immediately
+      sendStartGeo();
     } else {
-      // SW just installed for the first time — wait for it to activate
+      // SW just installed — wait for it to take control
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        swPost({ type: 'START_GEO', config: { gymLat, gymLng, radius, userId } });
+        sendStartGeo();
       });
     }
+
+    // Belt-and-suspenders: also resend after SW is fully ready
+    // This catches the case where controllerchange already fired
+    // before our listener was attached.
+    navigator.serviceWorker.ready.then(() => {
+      setTimeout(sendStartGeo, 1000);
+    });
   }
 
   if (document.readyState === 'loading') {

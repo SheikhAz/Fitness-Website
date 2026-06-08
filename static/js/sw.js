@@ -1,105 +1,79 @@
 // ============================================================
-//  EnterGYM Service Worker — Background Geo Attendance
-//  Rewritten: single message handler, immediate first check
+//  EnterGYM Service Worker v4
+//  Only marks attendance for enrolled members
 // ============================================================
 
-const SW_VERSION = 'v2';
-
-// ── Install & Activate ──────────────────────────────────────
 self.addEventListener('install',  () => self.skipWaiting());
 self.addEventListener('activate', e  => e.waitUntil(self.clients.claim()));
 
-// ── State ───────────────────────────────────────────────────
-let gymCfg     = null;   // { gymLat, gymLng, radius, userId }
-let watchId    = null;   // setInterval id
-let markedToday = null;  // "YYYY-MM-DD" — prevents double-mark
-let cachedLoc  = null;   // last known { lat, lng }
+let gymCfg  = null;
+let watchId = null;
 
-// ── SINGLE top-level message handler ────────────────────────
-// Chrome requires ALL addEventListener calls at top-level
-// evaluation time — never inside a callback or function.
 self.addEventListener('message', async (event) => {
   const msg = event.data || {};
 
   switch (msg.type) {
-
-    // Page sends gym config and asks SW to start polling
     case 'START_GEO':
-      gymCfg = msg.config;  // { gymLat, gymLng, radius, userId }
+      gymCfg = msg.config;  // { gymLat, gymLng, radius, userId, isEnrolled }
       if (watchId === null) {
-        startPolling();
+        requestLocationFromClients();
+        watchId = setInterval(requestLocationFromClients, 30_000);
       }
       break;
 
-    // Page sends a fresh location reading (response to REQUEST_LOC)
     case 'REPORT_LOC':
-      cachedLoc = { lat: msg.lat, lng: msg.lng };
-      await evaluateLocation(msg.lat, msg.lng);
-      break;
-
-    // Page caches location at login time
     case 'CACHE_LOC':
-      cachedLoc = { lat: msg.lat, lng: msg.lng };
-      // Evaluate immediately — user might already be at gym
-      if (gymCfg) {
-        await evaluateLocation(msg.lat, msg.lng);
-      }
+      if (gymCfg) await evaluateLocation(msg.lat, msg.lng);
       break;
 
-    // Stop watching (e.g. user logged out)
     case 'STOP_GEO':
-      if (watchId !== null) {
-        clearInterval(watchId);
-        watchId = null;
-      }
+      clearInterval(watchId);
+      watchId = null;
       break;
   }
 });
-
-// ── Start polling loop ───────────────────────────────────────
-// Asks all open pages for their current position every 30s.
-// The page's geo_attendance.js responds with REPORT_LOC.
-function startPolling() {
-  // Ask immediately on start — don't wait 30s for first check
-  requestLocationFromClients();
-
-  // Then poll every 30 seconds
-  watchId = setInterval(requestLocationFromClients, 30_000);
-}
 
 async function requestLocationFromClients() {
   const clients = await self.clients.matchAll({ type: 'window' });
   clients.forEach(c => c.postMessage({ type: 'REQUEST_LOC' }));
 }
 
-// ── Evaluate distance and auto-mark if close enough ─────────
 async function evaluateLocation(lat, lng) {
-  if (!gymCfg) return;
+  const { gymLat, gymLng, radius = 100, userId, isEnrolled } = gymCfg;
 
-  const { gymLat, gymLng, radius = 100, userId } = gymCfg;
+  // ── Not enrolled → skip entirely ────────────────────────────
+  if (!isEnrolled) return;
+
   const dist = haversine(lat, lng, gymLat, gymLng);
-  const today = todayStr();
+  if (dist > radius) return;
 
-  // Already marked today → skip
-  if (markedToday === today) return;
+  // Within range — verify with server (source of truth)
+  const statusRes = await checkAttendanceStatus();
+  if (!statusRes.enrolled) return;   // server confirms not enrolled
+  if (statusRes.marked)   return;   // already marked today
 
-  if (dist <= radius) {
-    const ok = await autoMarkAttendance(userId);
-    if (ok) {
-      markedToday = today;
-      showNotification(dist);
-
-      // Tell all open pages to refresh
-      const clients = await self.clients.matchAll({ type: 'window' });
-      clients.forEach(c => c.postMessage({ type: 'ATTENDANCE_MARKED' }));
-    }
+  // Mark attendance
+  const ok = await autoMarkAttendance(userId);
+  if (ok) {
+    showNotification(dist);
+    const clients = await self.clients.matchAll({ type: 'window' });
+    clients.forEach(c => c.postMessage({ type: 'ATTENDANCE_MARKED' }));
   }
 }
 
-// ── POST to Django to mark attendance ───────────────────────
+async function checkAttendanceStatus() {
+  try {
+    const res  = await fetch('/api/attendance-status/', { credentials: 'include' });
+    const data = await res.json();
+    return { marked: data.marked === true, enrolled: data.enrolled !== false };
+  } catch {
+    return { marked: false, enrolled: true };  // on error, try to mark
+  }
+}
+
 async function autoMarkAttendance(userId) {
   try {
-    const res = await fetch('/api/geo-mark-attendance/', {
+    const res  = await fetch('/api/geo-mark-attendance/', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -112,14 +86,13 @@ async function autoMarkAttendance(userId) {
   }
 }
 
-// ── Push notification ────────────────────────────────────────
 function showNotification(dist) {
   const distStr = dist < 1000
     ? `${Math.round(dist)} m`
     : `${(dist / 1000).toFixed(1)} km`;
 
   self.registration.showNotification('✅ EnterGYM — Attendance Marked!', {
-    body:     `You're at the gym (${distStr} away). Today's attendance logged automatically.`,
+    body:     `You're at the gym (${distStr} away). Attendance logged automatically.`,
     icon:     '/static/images/Logo.png',
     badge:    '/static/images/Logo.png',
     tag:      'gym-attendance',
@@ -128,7 +101,6 @@ function showNotification(dist) {
   });
 }
 
-// ── Notification click ───────────────────────────────────────
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
@@ -140,11 +112,6 @@ self.addEventListener('notificationclick', (event) => {
     })
   );
 });
-
-// ── Helpers ──────────────────────────────────────────────────
-function todayStr() {
-  return new Date().toLocaleDateString('en-CA'); // "YYYY-MM-DD"
-}
 
 function haversine(lat1, lng1, lat2, lng2) {
   const R = 6371000;
