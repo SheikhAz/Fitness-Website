@@ -355,9 +355,13 @@
           <li>
             <a href="/products/">Supplements <span>↗</span></a>
           </li>
+          {% if isEnrolled %}
+          
+          {% else %}
           <li>
             <a href="#Price">Free Trial <span>↗</span></a>
           </li>
+          {% endif %}
           <li>
             <a href="#About">About <span>↗</span></a>
           </li>
@@ -366,6 +370,9 @@
           </li>
           <li>
             <a href="/workout/">Workout <span>↗</span></a>
+          </li>
+          <li>
+            <a href="{% url 'download_app' %}">Download App<span>↗</span></a>
           </li>
           {% endif %}
         </ul>

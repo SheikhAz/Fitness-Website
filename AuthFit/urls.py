@@ -22,6 +22,7 @@ urlpatterns = [
     path('api/stats/', views.stats_api, name='stats_api'),
     path('api/save-embeddings-batch/', views.save_embeddings_batch, name='save-embeddings-batch'),
     path('admin-tools/today-attendance/', views.today_attendance, name='today_attendance'),
+    path('download/', views.download_app, name='download_app'),
 
     # ── NEW: Background geo auto-mark ─────────────────────────
     path('api/geo-mark-attendance/', geo_mark_attendance, name='geo_mark_attendance'),

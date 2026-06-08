@@ -99,6 +99,21 @@
     ">
       ◈ BACKGROUND TRACKING ACTIVE — ATTENDANCE MARKS AUTOMATICALLY WHEN YOU ARRIVE
     </div>
+    <div id="ios-note" style="
+      display: none;
+      margin-top: 10px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border-left: 3px solid #00dcff;
+      background: rgba(0,220,255,0.06);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 12px;
+      color: #00dcff;
+      text-align: center; 
+      letter-spacing: 1px;
+    ">
+      iPHONE USERS — KEEP THIS PAGE OPEN FOR AUTO-ATTENDANCE DETECTION
+    </div>
 
   </div>
 
@@ -183,7 +198,15 @@
   }
 </script>
 {% endif %}
-
+<script>
+  // Show iOS note only on Apple devices
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  {% if not already_mark %}
+  if (isIOS) {
+    document.getElementById('ios-note').style.display = 'block';
+  }
+  {% endif %}
+</script>
 <script src="{% static 'js/messages.js' %}"></script>
 <script src="{% static 'js/attendance_heatmap.js' %}"></script>
 {# geo_attendance.js is loaded globally in base.html — no need to load again #}

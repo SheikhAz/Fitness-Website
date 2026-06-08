@@ -788,3 +788,6 @@ def today_attendance(request):
         "today": today,
         "total": len(morning) + len(evening),
     })
+
+def download_app(request):
+    return render(request, 'download.html')
