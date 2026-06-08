@@ -21,6 +21,7 @@ urlpatterns = [
     path('api/upload-face-image/', views.upload_face_image),
     path('api/stats/', views.stats_api, name='stats_api'),
     path('api/save-embeddings-batch/', views.save_embeddings_batch, name='save-embeddings-batch'),
+    path('admin-tools/today-attendance/', views.today_attendance, name='today_attendance'),
 
     # ── NEW: Background geo auto-mark ─────────────────────────
     path('api/geo-mark-attendance/', geo_mark_attendance, name='geo_mark_attendance'),

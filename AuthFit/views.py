@@ -736,3 +736,55 @@ def update_payment(request):
         return JsonResponse({"error": f"Invalid data: {e}"}, status=400)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+    
+
+# ==============================
+# TODAY'S ATTENDANCE (STAFF)
+# ==============================
+@login_required
+@user_passes_test(is_staff)
+def today_attendance(request):
+    today = timezone.localdate()
+
+    records = (
+        Attendence.objects.filter(date=today)
+        .select_related("user__enrollment__selectPlan", "user__enrollment__trainer")
+        .order_by("timestamp")
+    )
+
+    morning = []
+    evening = []
+
+    for rec in records:
+        enrollment = getattr(rec.user, "enrollment", None)
+        entry = {
+            "id": rec.id,
+            "time": rec.timestamp.strftime("%I:%M %p"),
+            "name": enrollment.fullname if enrollment else rec.user.username,
+            "unique_id": enrollment.unique_id if enrollment else "—",
+            "pending_amount": float(enrollment.pendingAmount) if enrollment else 0,
+            "due_date": enrollment.DueDate.strftime("%d %b %Y") if enrollment and enrollment.DueDate else "—",
+            "is_expired": enrollment.is_expired if enrollment else False,
+            # detail fields
+            "phone": enrollment.phone if enrollment else "—",
+            "address": enrollment.address if enrollment else "—",
+            "plan": enrollment.selectPlan.plan if enrollment and enrollment.selectPlan else "—",
+            "plan_price": float(enrollment.selectPlan.price) if enrollment and enrollment.selectPlan else 0,
+            "trainer": enrollment.trainer.name if enrollment and enrollment.trainer else "No Trainer",
+            "gender": enrollment.get_gender_display() if enrollment else "—",
+            "dob": enrollment.dob.strftime("%d %b %Y") if enrollment and enrollment.dob else "—",
+            "doj": enrollment.doj.strftime("%d %b %Y") if enrollment and enrollment.doj else "—",
+            "payment_status": enrollment.paymentStatus if enrollment else "—",
+            "days_remaining": enrollment.days_remaining if enrollment else 0,
+        }
+        if rec.timestamp.hour < 14:  # before 2 PM = morning
+            morning.append(entry)
+        else:
+            evening.append(entry)
+
+    return render(request, "today_attendance.html", {
+        "morning": morning,
+        "evening": evening,
+        "today": today,
+        "total": len(morning) + len(evening),
+    })
