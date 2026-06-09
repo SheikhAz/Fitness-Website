@@ -581,7 +581,7 @@
                 <input type="hidden" name="product_id" value="{{ product.id }}" />
                 <input type="hidden" name="flavor"     value="{% if flavor %}{{ flavor.id }}{% else %}standard{% endif %}" />
                 <input type="hidden" name="quantity"   value="{{ quantity }}" />
-                <button type="submit" class="btn-place">
+                <button type="submit" id='order-btn' class="btn-place">
                   <i class="bi bi-lightning-fill me-2"></i> Place Order
                 </button>
               </form>
@@ -595,7 +595,15 @@
 
       </div>
     </main>
-
+    <script>
+      document.querySelector('.glass-form').addEventListener('submit', function () {
+        const btn = document.getElementById('order-btn');
+        btn.disabled = true;
+        btn.textContent = 'Ordering in...';
+        btn.style.opacity = '0.6';
+        btn.style.cursor = 'not-allowed';
+      });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
   </body>
 </html>

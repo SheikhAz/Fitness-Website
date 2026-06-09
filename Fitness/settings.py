@@ -210,3 +210,18 @@ JAZZMIN_SETTINGS = {
 GYM_LATITUDE  = os.environ['GYM_LATITUDE']   
 GYM_LONGITUDE = os.environ['GYM_LONGITUDE'] 
 GYM_RADIUS_METERS = os.environ['GYM_RADIUS_METERS']
+
+FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'firebase-credentials.json')
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+    },
+    'loggers': {
+        'shop': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}

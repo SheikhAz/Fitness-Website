@@ -131,3 +131,26 @@ class Order(models.Model):
 
     class Meta:
         ordering = ['-ordered_at']
+
+
+class StaffDevice(models.Model):
+    """
+    Stores the FCM push token for each device belonging to a staff/owner user.
+    One user can have multiple devices (phone + tablet etc.).
+    """
+    user            = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='staff_devices'
+    )
+    fcm_token       = models.TextField(unique=True)
+    device_name     = models.CharField(max_length=120, blank=True)  # e.g. "Galaxy S24"
+    last_seen       = models.DateTimeField(auto_now=True)
+    active          = models.BooleanField(default=True)
+ 
+    def __str__(self):
+        return f"{self.user.username} — {self.device_name or 'device'}"
+ 
+    class Meta:
+        ordering = ['-last_seen']
+        verbose_name        = 'Staff Device'
+        verbose_name_plural = 'Staff Devices'
+ 

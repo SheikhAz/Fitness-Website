@@ -140,15 +140,15 @@ def confirm_order(request, product_id):
 def place_order(request):
     if request.method != 'POST':
         return redirect('product_list')
-
+ 
     product_id = request.POST.get('product_id')
     product    = _get_active_product(product_id)
     quantity   = int(request.POST.get('quantity', 1))
-
+ 
     flavor, ok = _resolve_flavor(request, product)
     if not ok:
         return redirect('product_detail', product_id=product_id)
-
+ 
     # Lock rows + hard stock check
     if flavor:
         flavor     = ProductFlavor.objects.select_for_update().get(id=flavor.id)
@@ -156,14 +156,14 @@ def place_order(request):
     else:
         flavors    = list(ProductFlavor.objects.select_for_update().filter(product=product))
         real_stock = sum(f.stock for f in flavors)
-
+ 
     if quantity < 1 or quantity > real_stock:
         messages.error(request, f"Sorry, only {real_stock} unit(s) left.")
         return redirect('product_detail', product_id=product_id)
-
+ 
     unit_price  = flavor.final_price if flavor else product.discounted_price
     total_price = unit_price * Decimal(quantity)
-
+ 
     order = Order.objects.create(
         user=request.user,
         product=product,
@@ -172,14 +172,21 @@ def place_order(request):
         total_price=total_price,
         status=Order.Status.PENDING,
     )
-
+ 
     # Decrement stock immediately on order placement
     if flavor:
         ProductFlavor.objects.filter(id=flavor.id).update(stock=flavor.stock - quantity)
-
+ 
+    # ── Push notification to all staff devices ────────────────────────────────
+    # Runs after the transaction commits so the order is visible in DB
+    # Uses transaction.on_commit to avoid notifying before the row is saved
+    from .notifications import notify_staff_new_order
+    transaction.on_commit(lambda: notify_staff_new_order(order))
+    # ─────────────────────────────────────────────────────────────────────────
+ 
     enrollment = _get_enrollment(request.user)
     image_url  = _get_profile_image(request.user, enrollment)
-
+ 
     return render(request, 'shop/order_success.html', {
         'order':      order,
         'enrollment': enrollment,

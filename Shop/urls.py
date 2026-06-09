@@ -2,6 +2,7 @@
 
 from django.urls import path
 from . import views
+from . import device_views
 
 urlpatterns = [
     path('products/',views.product_list,   name='product_list'),
@@ -15,4 +16,6 @@ urlpatterns = [
 
     path('manage/orders/',views.order_dashboard, name='admin_orders'),
     path('manage/orders/<int:order_id>/update/', views.order_update,    name='admin_order_update'),
+    path('devices/register/',   device_views.register_device,   name='register_device'),
+    path('devices/unregister/', device_views.unregister_device, name='unregister_device'),
 ]
