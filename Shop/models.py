@@ -138,9 +138,6 @@ class StaffDevice(models.Model):
     Stores the FCM push token for each device belonging to a staff/owner user.
     One user can have multiple devices (phone + tablet etc.).
     """
-    user            = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='staff_devices'
-    )
     fcm_token       = models.TextField(unique=True)
     device_name     = models.CharField(max_length=120, blank=True)  # e.g. "Galaxy S24"
     last_seen       = models.DateTimeField(auto_now=True)
