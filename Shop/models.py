@@ -144,7 +144,7 @@ class StaffDevice(models.Model):
     active          = models.BooleanField(default=True)
  
     def __str__(self):
-        return f"{self.user.username} — {self.device_name or 'device'}"
+        return f"{self.device_name} ({'Active' if self.active else 'Inactive'})"
  
     class Meta:
         ordering = ['-last_seen']
