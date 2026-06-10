@@ -45,16 +45,14 @@ def register_device(request):
     )
     return JsonResponse({'ok': True, 'created': created})
 
+# shop/device_views.py
+
 @csrf_exempt
-@login_required
 @require_POST
 def unregister_device(request):
-    """
-    POST  /shop/devices/unregister/
-    Body (JSON): { "token": "<fcm_token>" }
+    if request.headers.get('X-Api-Key') != settings.API_KEY:
+        return JsonResponse({'ok': False, 'error': 'Unauthorized.'}, status=403)
 
-    Marks the token inactive (e.g. on logout).
-    """
     try:
         body      = json.loads(request.body)
         fcm_token = body.get('token', '').strip()
