@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from django.core.cache import cache
 from datetime import timedelta
 
+
 # Create your models here.
 
 class Contact(models.Model):
@@ -80,8 +81,6 @@ class Enrollment(models.Model):
     email = models.EmailField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     phone = models.CharField(max_length=10, db_index=True)
-    dob = models.DateField()
-
     address = models.TextField()
     reference = models.CharField(max_length=30, null=True, blank=True)
 
@@ -151,6 +150,7 @@ class Enrollment(models.Model):
             if not self.DueDate and self.selectPlan.duration_days:
                 today = timezone.now().date()
                 self.DueDate = today + timedelta(days=self.selectPlan.duration_days)
+            self.pendingAmount = self.selectPlan.price - self.paidAmount
 
         super().save(*args, **kwargs)
 

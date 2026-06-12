@@ -71,28 +71,11 @@
   <script src="{% static 'js/base.js' %}"></script>
 
   <!-- GYM_CONFIG — values injected automatically by context_processors.py -->
-  <script>
-    window.GYM_CONFIG = {
-      gymLat:           {{ GYM_LATITUDE }},
-      gymLng:           {{ GYM_LONGITUDE }},
-      radius:           {{ GYM_RADIUS_METERS }},
-      userId:           {% if user.is_authenticated %}{{ user.id }}{% else %}null{% endif %},
-      isAuthenticated:  {% if user.is_authenticated %}true{% else %}false{% endif %},
-      isEnrolled:       {% if is_enrolled %}true{% else %}false{% endif %},
-      onAttendancePage: {% if 'attendence' in request.path %}true{% else %}false{% endif %},
-      alreadyMarked:    {% if already_marked %}true{% else %}false{% endif %}
-    };
-
+  <script nonce="{{ request.csp_nonce }}">
+    window.GYM_CONFIG = JSON.parse('{{ GYM_CONFIG_JSON|escapejs }}');
   </script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js', { scope: '/' })
-        .then(reg => console.log('SW registered', reg.scope))
-        .catch(err => console.error('SW error', err));
-    }
-  </script>
-  <script src="{% static 'js/loc_permission.js' %}"></script>
-  <script src="{% static 'js/geo_attendance.js' %}"></script>
+  <script src="{% static 'js/loc_permission.js' %}" defer></script>
+  <script src="{% static 'js/geo_attendance.js' %}" defer></script>
 
 </body>
 </html>

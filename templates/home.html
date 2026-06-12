@@ -38,17 +38,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
       rel="stylesheet"
-      media="print"
-      onload="this.media = 'all'"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
     />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
     <link rel="stylesheet" href="{% static 'css/home.css' %}" />
     <link rel="stylesheet" href="{% static 'css/loc_modal.css' %}">
     <!-- Preload mobile image for small screens -->
@@ -188,10 +180,10 @@
               <ul class="dropdown-menu">
                 {% if request.user.is_authenticated %} 
                   {% if not enrolled %}
-                  <li><a href="/enrollment/">Enroll</a></li>
+                  <li><a href="/enrollment/">Join Now</a></li>
                   {% endif %} 
                 {% else %}
-                <li><a href="/signup/">Enroll</a></li>
+                <li><a href="/signup/">Join Now</a></li>
                 {% endif %}
 
                 <li><a href="/workout/">Workout</a></li>
@@ -225,7 +217,7 @@
             {% if enrolled %}
             <a href="/attendence/" class="btn mobile-only">Attendance</a>
             {% else %}
-            <a href="/enrollment/" class="btn mobile-only">Enroll</a>
+            <a href="/enrollment/" class="btn mobile-only">Join Now</a>
             {% endif %} {% endif %}
 
             <form
@@ -257,22 +249,26 @@
 
       <!-- HERO CONTENT -->
       <div id="heroContent" class="hero-content hero-animate">
+        <div class="hero-tag">Now Open · Bhilai, Chhattisgarh</div>
         <h1 class="hero-title">
-          Crush your health and <br class="break-line" />
-          fitness goals in no time
+          Crush Your Fitness Goals<br class="break-line" />
+          <em>Faster</em> Than Ever Before
         </h1>
 
         <p class="hero-desc">
-          It doesn't matter if your goal is to get stronger, burn fat, or to
-          just stay fit. Our world class coaches will guide you every step of
-          the way.
+          It doesn't matter if your goal is to get stronger, burn fat, or stay fit.
+          Our world-class coaches will guide you every step of the way.
         </p>
 
-        {% if request.user.is_authenticated %}
-        <a href="/enrollment/" class="cta-btn">Start 2 day free trial</a>
-        {% else %}
-        <a href="/signup/" class="cta-btn">Start 2 day free trial</a>
-        {% endif %}
+
+        <div class="hero-cta-row">
+          {% if request.user.is_authenticated %}
+          <a href="/enrollment/" class="cta-btn">Start 2-Day Free Trial →</a>
+          {% else %}
+          <a href="/signup/" class="cta-btn">Start 2-Day Free Trial →</a>
+          {% endif %}
+          <a href="#About" class="cta-btn-ghost">Explore More</a>
+        </div>
 
         <!-- HERO STATS -->
         <div class="hero-stats">
@@ -412,7 +408,7 @@
 
         <div class="features-grid">
           <!-- Card 1 -->
-          <div class="feature-card" onclick="toggleFeature(this)">
+          <div class="feature-card">
             <span class="cyber-corner tl"></span>
             <span class="cyber-corner br"></span>
             <div class="card-top">
@@ -450,7 +446,7 @@
           </div>
 
           <!-- Card 2 -->
-          <div class="feature-card" onclick="toggleFeature(this)">
+          <div class="feature-card" >
             <span class="cyber-corner tl"></span>
             <span class="cyber-corner br"></span>
             <div class="card-top">
@@ -488,7 +484,7 @@
           </div>
 
           <!-- Card 3 -->
-          <div class="feature-card" onclick="toggleFeature(this)">
+          <div class="feature-card">
             <span class="cyber-corner tl"></span>
             <span class="cyber-corner br"></span>
             <div class="card-top">
@@ -526,7 +522,7 @@
           </div>
 
           <!-- Card 4 -->
-          <div class="feature-card" onclick="toggleFeature(this)">
+          <div class="feature-card" >
             <span class="cyber-corner tl"></span>
             <span class="cyber-corner br"></span>
             <div class="card-top">
@@ -653,7 +649,6 @@
           {% for plan in plans %}
           <div
             class="pricing-card {% if forloop.counter == 2 %}popular{% endif %}"
-            onclick="togglePricing(this)"
           >
             {# ── Badge: "MOST POPULAR" on 2nd plan, "BEST VALUE" on last ── #}
             {% if forloop.counter == 2 %}
@@ -789,24 +784,24 @@
         </span>
       </div>
     </footer>
-
+    <script nonce="{{ request.csp_nonce }}">
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&disp  lay=swap';
+      document.head.appendChild(l);
+    </script>
     <script src="{% static 'js/home.js' %}" defer></script>
     <!-- GYM_CONFIG — values injected automatically by context_processors.py -->
-  <script>
-    window.GYM_CONFIG = {
-      gymLat:           {{ GYM_LATITUDE }},
-      gymLng:           {{ GYM_LONGITUDE }},
-      radius:           {{ GYM_RADIUS_METERS }},
-      userId:           {% if user.is_authenticated %}{{ user.id }}{% else %}null{% endif %},
-      isAuthenticated:  {% if user.is_authenticated %}true{% else %}false{% endif %},
-      isEnrolled:       {% if is_enrolled %}true{% else %}false{% endif %},
-      onAttendancePage: {% if 'attendence' in request.path %}true{% else %}false{% endif %},
-      alreadyMarked:    {% if already_marked %}true{% else %}false{% endif %}
-    };
-
-  </script>
-  <script src="{% static 'js/loc_permission.js' %}"></script>
-  <script src="{% static 'js/geo_attendance.js' %}"></script>
+    <script nonce="{{ request.csp_nonce }}">
+      document.querySelectorAll('.pricing-card').forEach(card => {
+          card.addEventListener('click', () => {
+              togglePricing(card);
+          });
+      });
+      window.GYM_CONFIG = JSON.parse('{{ GYM_CONFIG_JSON|escapejs }}');
+    </script>
+    <script src="{% static 'js/loc_permission.js' %}"></script>
+    <script src="{% static 'js/geo_attendance.js' %}"></script>
 
   </body>
 </html>

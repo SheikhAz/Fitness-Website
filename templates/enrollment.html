@@ -64,13 +64,6 @@ GYM{% endblock %} {% block link %}
           </div>
           <input type="hidden" name="gender" id="genderInput" required />
         </div>
-
-        <!-- Date of Birth -->
-        <div class="dob-wrap">
-          <label class="dob-label" for="dobInput">Date of Joining</label>
-          <input class="field" type="date" name="dob" id="dobInput" required />
-        </div>
-
       </div>
 
       <div class="membership-section">
@@ -87,8 +80,10 @@ GYM{% endblock %} {% block link %}
           <div class="dropdown-menu" id="planDropdown">
             {% for p in plans %}
             <div
-              onclick="selectPlan('{{ p.id }}','{{ p.plan }}','{{ p.price }}')"
-              class="dropdown-item"
+              class="dropdown-item plan-item"
+              data-id="{{ p.id }}"
+              data-name="{{ p.plan }}"
+              data-price="{{ p.price }}"
             >
               {{ p.plan }}
               <span class="color-price"> ₹{{ p.price }} </span>
@@ -109,8 +104,9 @@ GYM{% endblock %} {% block link %}
           <div class="dropdown-menu" id="trainerDropdown">
             {% for t in trainers %}
             <div
-              onclick="selectTrainer('{{ t.id }}','{{ t.name }}')"
-              class="dropdown-item"
+              class="dropdown-item trainer-item"
+              data-id="{{ t.id }}"
+              data-name="{{ t.name }}"
             >
               {{ t.name }}
             </div>

@@ -289,7 +289,7 @@
 
 <!-- ══════════════ EXPIRY ALERT ══════════════ -->
 {% if enrollment and not is_expired and days_remaining <= 4 and days_remaining >= 0 %}
-<script>
+<script nonce="{{ request.csp_nonce }}" >
   (function () {
     const TODAY = new Date().toDateString();
     const STORAGE_KEY = "expiry_alert_played";
@@ -333,7 +333,7 @@
 {% endif %}
 
 <!-- ══════════════ UPLOAD SCRIPT ══════════════ -->
-<script>
+<script nonce="{{ request.csp_nonce }}" >
   (function () {
     const wrapper   = document.getElementById('avatar-wrapper');
     const badge     = document.getElementById('camera-badge');

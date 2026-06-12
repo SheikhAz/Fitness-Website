@@ -24,7 +24,7 @@
 {% block content %}
 
 {# Attended dates for heatmap #}
-<script>
+<script nonce="{{ request.csp_nonce }}">
   const ATTENDED_DATES = [
     {% for a in attended %}"{{ a.date|date:'Y-m-d' }}"{% if not forloop.last %},{% endif %}{% endfor %}
   ];
@@ -52,7 +52,6 @@
         id="btn-attend"
         {% if already_mark %}disabled{% endif %}
         class="btn-mark {% if already_mark %}marked{% endif %}"
-        onclick="checkLocationAndSubmit()"
       >
         <span class="btn-glow"></span>
         <span class="btn-text" id="btn-label">
@@ -66,7 +65,7 @@
       </button>
     </form>
 
-    {# ── Geo status messages ── #}
+    {# ── Geo error message ── #}
     <div id="geo-error" style="
       display: none;
       margin-top: 12px;
@@ -81,9 +80,15 @@
       letter-spacing: 1px;
     ">
       <span id="geo-error-text">⊘ OUT OF RANGE</span>
+      <div id="geo-distance" style="
+        margin-top: 6px;
+        font-size: 11px;
+        color: #ff6b6b;
+        letter-spacing: 2px;
+      "></div>
     </div>
 
-    {# Auto-mark status banner (shown when SW marks attendance in background) #}
+    {# ── Background tracking banner ── #}
     <div id="auto-mark-banner" style="
       display: none;
       margin-top: 12px;
@@ -99,6 +104,8 @@
     ">
       ◈ BACKGROUND TRACKING ACTIVE — ATTENDANCE MARKS AUTOMATICALLY WHEN YOU ARRIVE
     </div>
+
+    {# ── iOS note ── #}
     <div id="ios-note" style="
       display: none;
       margin-top: 10px;
@@ -109,7 +116,7 @@
       font-family: 'Share Tech Mono', monospace;
       font-size: 12px;
       color: #00dcff;
-      text-align: center; 
+      text-align: center;
       letter-spacing: 1px;
     ">
       iPHONE USERS — KEEP THIS PAGE OPEN FOR AUTO-ATTENDANCE DETECTION
@@ -190,24 +197,23 @@
 
 </div>
 
-{# ── Show auto-mark banner if SW is active and not yet marked ── #}
-{% if not already_mark %}
-<script>
+{# ── Show banners and wire button via nonce script ── #}
+<script nonce="{{ request.csp_nonce }}">
+  {% if not already_mark %}
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     document.getElementById('auto-mark-banner').style.display = 'block';
   }
-</script>
-{% endif %}
-<script>
-  // Show iOS note only on Apple devices
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  {% if not already_mark %}
-  if (isIOS) {
-    document.getElementById('ios-note').style.display = 'block';
-  }
   {% endif %}
+
+  var btn = document.getElementById('btn-attend');
+  if (btn && !btn.disabled) {
+    btn.addEventListener('click', function () {
+      checkLocationAndSubmit();
+    });
+  }
 </script>
+
 <script src="{% static 'js/messages.js' %}"></script>
 <script src="{% static 'js/attendance_heatmap.js' %}"></script>
-{# geo_attendance.js is loaded globally in base.html — no need to load again #}
+
 {% endblock %}

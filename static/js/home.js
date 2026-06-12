@@ -1,10 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   /* =========================
      RESET: no card open on load
   ========================= */
   document.querySelectorAll(".feature-card, .pricing-card").forEach((c) => {
     c.classList.remove("active");
+  });
+
+  /* =========================
+     CARD CLICK HANDLERS
+  ========================= */
+  document.querySelectorAll(".feature-card").forEach((card) => {
+    card.addEventListener("click", function () {
+      toggleFeature(this);
+    });
+  });
+
+  document.querySelectorAll(".pricing-card").forEach((card) => {
+    card.addEventListener("click", function () {
+      togglePricing(this);
+    });
   });
 
   /* =========================
@@ -116,12 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }, stepTime);
   }
 
-  // Static counters
   animateCount(document.getElementById("statExercise"), 20);
   animateCount(document.getElementById("statSatisfaction"), 92);
 
   /* =========================
-     DELAY API CALL
+     STATS API
   ========================= */
   window.addEventListener("load", () => {
     setTimeout(() => {
@@ -132,28 +145,17 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then((data) => {
           const users = data.total_users || 10;
-
-          const display =
-            users < 50
-              ? users
-              : Math.ceil(users / 10) * 10 * 2;
-
-          animateCount(
-            document.getElementById("statUsers"),
-            display
-          );
+          const display = users < 50 ? users : Math.ceil(users / 10) * 10 * 2;
+          animateCount(document.getElementById("statUsers"), display);
         })
         .catch(() => {
-          animateCount(
-            document.getElementById("statUsers"),
-            10
-          );
+          animateCount(document.getElementById("statUsers"), 10);
         });
     }, 2000);
   });
 
   /* =========================
-     HERO ANIMATION OPTIMIZATION
+     HERO ANIMATION
   ========================= */
   const animatedEls = document.querySelectorAll(".hero-animate");
 
@@ -171,9 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
       },
-      {
-        threshold: 0.15,
-      }
+      { threshold: 0.15 },
     );
 
     animatedEls.forEach((el) => {
@@ -181,7 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
       observer.observe(el);
     });
   } else {
-    // Disable animation on mobile
     animatedEls.forEach((el) => {
       el.style.opacity = "1";
       el.style.transform = "none";
@@ -189,21 +188,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* =========================
-     OPTIMIZED SCROLL EVENT
+     SCROLL — NAVBAR BORDER
   ========================= */
   const navbarEl = document.getElementById("navbar");
   let ticking = false;
 
   function updateNavbar() {
     if (!navbarEl) return;
-
     if (window.scrollY > 10) {
-      navbarEl.style.borderBottom =
-        "1px solid rgba(249,115,22,0.25)";
+      navbarEl.style.borderBottom = "1px solid rgba(249,115,22,0.25)";
     } else {
       navbarEl.style.borderBottom = "";
     }
-
     ticking = false;
   }
 
@@ -215,30 +211,21 @@ document.addEventListener("DOMContentLoaded", () => {
         ticking = true;
       }
     },
-    { passive: true }
+    { passive: true },
   );
 
   /* =========================
-     SMOOTH SCROLL LINKS
+     SMOOTH SCROLL
   ========================= */
   document.querySelectorAll('a[href^="#"]').forEach((link) => {
     link.addEventListener("click", (e) => {
-      const target = document.querySelector(
-        link.getAttribute("href")
-      );
-
+      const target = document.querySelector(link.getAttribute("href"));
       if (!target) return;
-
       e.preventDefault();
-
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
 });
-
 
 /* =========================
    FEATURE CARD TOGGLE
@@ -255,7 +242,6 @@ function toggleFeature(card) {
 
     setTimeout(() => {
       const rect = card.getBoundingClientRect();
-
       if (rect.bottom > window.innerHeight - 20) {
         window.scrollBy({
           top: rect.bottom - window.innerHeight + 40,
@@ -265,7 +251,6 @@ function toggleFeature(card) {
     }, 400);
   }
 }
-
 
 /* =========================
    PRICING CARD TOGGLE
@@ -282,7 +267,6 @@ function togglePricing(card) {
 
     setTimeout(() => {
       const rect = card.getBoundingClientRect();
-
       if (rect.bottom > window.innerHeight - 20) {
         window.scrollBy({
           top: rect.bottom - window.innerHeight + 40,

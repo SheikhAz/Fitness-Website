@@ -1,12 +1,13 @@
 <!doctype html>
+{% load static %}
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EnterGYM — Download App</title>
-
+    <link rel="icon" type="image/png" href="{% static 'images/favicons.png' %}">
     <!-- PWA manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="{% static 'js/manifest.json' %}">
     <meta name="theme-color" content="#080808" />
     <meta name="mobile-web-app-capable" content="yes" />
     <!-- iOS PWA meta -->
@@ -1008,7 +1009,7 @@
         </div>
         <h1>Download <span class="accent">App</span></h1>
         <p>
-          Get the EnterGYM app — auto GPS attendance, membership tracking, and
+          Get the EnterGYM app — auto attendance, membership tracking, and
           more.
         </p>
       </div>
@@ -1037,11 +1038,10 @@
           <button
             class="tab-btn active"
             data-tab="android"
-            onclick="switchTab('android')"
           >
             <i class="bi bi-android2"></i> Android
           </button>
-          <button class="tab-btn" data-tab="ios" onclick="switchTab('ios')">
+          <button class="tab-btn" data-tab="ios">
             <i class="bi bi-apple"></i> iPhone
           </button>
         </div>
@@ -1073,12 +1073,12 @@
             <div class="badge-row">
               <span class="pill pill-orange">v1.0.0</span>
               <span class="pill pill-green">Stable</span>
-              <span class="pill pill-gray">104 MB</span>
+              <span class="pill pill-gray">~110 MB</span>
               <span class="pill pill-gray">Android 8+</span>
             </div>
             <ul class="feature-list">
               <li>
-                <i class="bi bi-geo-alt-fill"></i> Auto GPS attendance at gym
+                <i class="bi bi-geo-alt-fill"></i> Auto Attendance at gym
               </li>
               <li>
                 <i class="bi bi-credit-card-fill"></i> Membership &amp; payment
@@ -1101,7 +1101,6 @@
               <button
                 class="btn-pwa"
                 id="pwa-install-btn"
-                onclick="triggerInstall()"
               >
                 <i class="bi bi-plus-circle"></i> Add to Home Screen
               </button>
@@ -1197,7 +1196,6 @@
               <button
                 type="button"
                 class="btn-download"
-                onclick="openIOSModal()"
               >
                 <i class="bi bi-plus-square"></i> Install on iPhone
               </button>
@@ -1243,7 +1241,6 @@
   ════════════════════════════════════════════════ -->
     <div
       id="ios-modal-overlay"
-      onclick="handleOverlayClick(event)"
       role="dialog"
       aria-modal="true"
       aria-label="Install EnterGYM on iPhone"
@@ -1300,7 +1297,7 @@
           </div>
         </div>
 
-        <button class="ios-modal-btn" onclick="closeIOSModal()">Got it!</button>
+        <button class="ios-modal-btn">Got it!</button>
 
         <p class="ios-modal-privacy">
           Your location is only checked on-device against gym proximity.<br />
@@ -1314,7 +1311,12 @@
       defer
     ></script>
 
-    <script>
+    <script nonce="{{ request.csp_nonce }}" >
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+              switchTab(btn.dataset.tab);
+          });
+      });
       /* ── Tab switching ── */
       function switchTab(name) {
         document

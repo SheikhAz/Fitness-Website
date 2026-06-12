@@ -1,10 +1,10 @@
+import secrets
 import os
 import json
-import calendar
-from datetime import date ,timedelta
-from django.views.decorators.http import require_POST
+from datetime import date, timedelta
+from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_log, logout
@@ -12,26 +12,40 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.cache import cache
-
 from django.conf import settings
 from cloudinary.utils import cloudinary_url
-
-from AuthFit.models import Contact, Enrollment, MembershipPlan, Trainer, Attendence, GymNotification
-from AuthFit.rate_limit import check_login_attempt, reset_attempt
+from django.utils.http import url_has_allowed_host_and_scheme
+import calendar
+from AuthFit.models import (
+    Contact, Enrollment, MembershipPlan, Trainer,
+    Attendence as Attendence_model, GymNotification
+)
+from AuthFit.rate_limit import check_login_attempt, reset_attempt, record_failed_attempt
 from .attendance import mark_attendance
 from .forms import UserLogin
-from urllib.parse import urlparse
-from AuthFit.rate_limit import check_login_attempt, reset_attempt, record_failed_attempt
+from urllib.parse import urlparse, quote
 import cloudinary.uploader
 from PIL import Image
 import io
-from urllib.parse import quote
+import logging
+
+logger = logging.getLogger(__name__)
+
+ALLOWED_IMAGE_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
+ALLOWED_EXTENSIONS  = {'.jpg', '.jpeg', '.png', '.webp'}
 
 
 # ==============================
-# API KEY (from environment)
+# INTERNAL API KEY
 # ==============================
 INTERNAL_API_KEY = os.environ.get("INTERNAL_API_KEY", "")
+
+
+def _check_internal_key(request):
+    provided = request.headers.get("X-Internal-Key", "")
+    if not INTERNAL_API_KEY or not provided:
+        return False
+    return secrets.compare_digest(provided, INTERNAL_API_KEY)
 
 
 # ==============================
@@ -54,7 +68,7 @@ def get_client_ip(request):
 
 
 # ==============================
-# SAVE EMBEDDING (STAFF ONLY)
+# SAVE EMBEDDINGS BATCH
 # ==============================
 @csrf_exempt
 def save_embeddings_batch(request):
@@ -62,47 +76,53 @@ def save_embeddings_batch(request):
         return JsonResponse({"error": "POST required"}, status=405)
 
     try:
-        data = json.loads(request.body)
-
-        if not INTERNAL_API_KEY or data.get("api_key") != INTERNAL_API_KEY:
+        if not _check_internal_key(request):
+            logger.warning("Invalid internal API key")
             return JsonResponse({"error": "Unauthorized"}, status=403)
 
-        unique_id = data.get("unique_id")
+        data = json.loads(request.body)
+        enrollment_id = data.get("enrollment_id")
         embeddings = data.get("embeddings", [])
 
-        if not unique_id or not embeddings:
-            return JsonResponse({"error": "Missing data"}, status=400)
+        if not enrollment_id:
+            return JsonResponse({"error": "Missing enrollment_id"}, status=400)
+        if not embeddings:
+            return JsonResponse({"error": "Missing embeddings"}, status=400)
 
-        enrollment = Enrollment.objects.get(unique_id=unique_id)
-
-        if not enrollment.face_embeddings:
-            enrollment.face_embeddings = []
-
+        enrollment = Enrollment.objects.get(pk=enrollment_id)
+        face_embeddings = enrollment.face_embeddings or []
         MAX_EMB = 7
-        for emb in embeddings:
-            if len(enrollment.face_embeddings) >= MAX_EMB:
-                enrollment.face_embeddings.pop(0)
-            enrollment.face_embeddings.append(emb)
 
+        for emb in embeddings:
+            if len(face_embeddings) >= MAX_EMB:
+                face_embeddings.pop(0)
+            face_embeddings.append(emb)
+
+        enrollment.face_embeddings = face_embeddings
         enrollment.face_enrolled = True
-        enrollment.save()
+        enrollment.save(update_fields=["face_embeddings", "face_enrolled"])
+
+        logger.info(
+            "Embeddings updated for enrollment_id=%s user_id=%s",
+            enrollment.id, enrollment.user_id
+        )
 
         return JsonResponse({
             "status": "success",
-            "total_embeddings": len(enrollment.face_embeddings)
+            "total_embeddings": len(face_embeddings)
         })
 
     except Enrollment.DoesNotExist:
-        return JsonResponse({"error": "User not found"}, status=404)
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse({"error": "Enrollment not found"}, status=404)
+    except Exception:
+        logger.exception("Unexpected error in save_embeddings_batch")
+        return JsonResponse({"error": "An internal error occurred."}, status=500)
 
 
 # ==============================
 # SIGNUP PAGE
 # ==============================
 def signupPage(request):
-    # Redirect already authenticated users
     if request.user.is_authenticated:
         return redirect('/')
 
@@ -133,10 +153,8 @@ def loginPage(request):
         phone = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
 
-        # ✅ Only check if locked out — don't increment yet
         if not check_login_attempt(ip, phone):
-            messages.error(
-                request, "Too many failed login attempts. Please try again later.")
+            messages.error(request, "Too many failed login attempts. Please try again later.")
             return redirect(f'/login/?next={next_url}')
 
         user = authenticate(request, username=phone, password=password)
@@ -147,7 +165,7 @@ def loginPage(request):
             messages.success(request, "Logged in successfully!")
             return redirect(_safe_next(next_url, request))
         else:
-            record_failed_attempt(ip, phone)   # ✅ Only increment on failure
+            record_failed_attempt(ip, phone)
             messages.error(request, "Incorrect phone number or password.")
             return redirect(f'/login/?next={next_url}')
 
@@ -155,26 +173,15 @@ def loginPage(request):
 
 
 def _safe_next(next_url: str, request) -> str:
-    """
-    Allow only same-origin redirects to prevent open-redirect attacks.
-    Falls back to '/' for external or malformed URLs.
-    """
-    parsed = urlparse(next_url)
-    if parsed.netloc and parsed.netloc != request.get_host():
+    if not next_url:
         return '/'
-    return next_url or '/'
-
-
-# ==============================
-# CACHE DEBUG (dev only)
-# ==============================
-def cache_debug(request):
-    cache.set("test_key", "working", timeout=30)
-    val = cache.get("test_key")
-    return JsonResponse({
-        "cache_backend": str(type(cache._cache)),
-        "test_value": val,
-    })
+    if url_has_allowed_host_and_scheme(
+        url=next_url,
+        allowed_hosts={request.get_host()},
+        require_https=not settings.DEBUG,
+    ):
+        return next_url
+    return '/'
 
 
 # ==============================
@@ -186,11 +193,10 @@ def mark_attendance_api(request):
         return JsonResponse({"error": "POST required"}, status=405)
 
     try:
-        data = json.loads(request.body)
-
-        if not INTERNAL_API_KEY or data.get("api_key") != INTERNAL_API_KEY:
+        if not _check_internal_key(request):
             return JsonResponse({"error": "Unauthorized"}, status=403)
 
+        data = json.loads(request.body)
         unique_id = data.get("unique_id")
         if not unique_id:
             return JsonResponse({"error": "Missing unique_id"}, status=400)
@@ -200,26 +206,33 @@ def mark_attendance_api(request):
 
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON"}, status=400)
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+    except Exception:
+        logger.exception("Unexpected error in mark_attendance_api")
+        return JsonResponse({"error": "An internal error occurred."}, status=500)
 
 
 # ==============================
 # GET USERS (face embeddings)
 # ==============================
+@login_required
+@user_passes_test(is_staff)
 def get_users(request):
+    if not _check_internal_key(request):
+        return JsonResponse({"error": "Unauthorized"}, status=403)
+
     data = cache.get("face_users")
     if data is None:
         enrollments = Enrollment.objects.filter(face_embeddings__isnull=False)
         data = [
             {
-                "unique_id": u.unique_id,
-                "name": u.fullname,
+                "unique_id":  u.unique_id,
+                "name":       u.fullname,
                 "embeddings": u.face_embeddings,
             }
             for u in enrollments
         ]
         cache.set("face_users", data, timeout=300)
+
     return JsonResponse(data, safe=False)
 
 
@@ -232,29 +245,41 @@ def upload_face_image(request):
         return JsonResponse({"error": "POST required"}, status=405)
 
     try:
-        api_key = request.POST.get("api_key")
-        if not INTERNAL_API_KEY or api_key != INTERNAL_API_KEY:
+        if not _check_internal_key(request):
+            logger.warning("Invalid internal API key")
             return JsonResponse({"error": "Unauthorized"}, status=403)
 
-        unique_id = request.POST.get("unique_id")
+        enrollment_id = request.POST.get("enrollment_id")
         face_image = request.FILES.get("face_image")
 
-        if not unique_id or not face_image:
-            return JsonResponse({"error": "Missing data"}, status=400)
+        if not enrollment_id:
+            return JsonResponse({"error": "Missing enrollment_id"}, status=400)
+        if not face_image:
+            return JsonResponse({"error": "Missing face_image"}, status=400)
 
-        enrollment = Enrollment.objects.get(unique_id=unique_id)
-        enrollment.face_image = face_image  # Cloudinary handles upload
-        enrollment.save()
+        enrollment = Enrollment.objects.get(pk=enrollment_id)
+        enrollment.face_image = face_image
+        enrollment.save(update_fields=["face_image"])
 
         cache.delete(f"profile_image_{enrollment.user.id}")
         cache.delete(f"enrollment_{enrollment.user.id}")
 
-        return JsonResponse({"status": "success", "image_url": enrollment.face_image.url})
+        logger.info(
+            "Face image updated for enrollment_id=%s user_id=%s",
+            enrollment.id, enrollment.user_id
+        )
+
+        return JsonResponse({
+            "status": "success",
+            "image_url": enrollment.face_image.url
+        })
 
     except Enrollment.DoesNotExist:
-        return JsonResponse({"error": "User not found"}, status=404)
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse({"error": "Enrollment not found"}, status=404)
+    except Exception:
+        logger.exception("Unexpected error in upload_face_image")
+        return JsonResponse({"error": "An internal error occurred."}, status=500)
+
 
 @login_required
 def upload_profile_pic(request):
@@ -342,46 +367,46 @@ def upload_profile_pic(request):
 
     return redirect('/profile/')
 
+
 # ==============================
 # HOME PAGE
 # ==============================
 def homePage(request):
-    enrolled = False
-    isStaff = False
+    enrolled  = False
+    isStaff   = False
     isSuperuser = False
- 
+
     gym_notifications = cache.get("notifications")
     if gym_notifications is None:
         gym_notifications = list(
-            GymNotification.objects.filter(
-                is_active=True).values("icon", "message")
+            GymNotification.objects.filter(is_active=True).values("icon", "message")
         )
         cache.set("notifications", gym_notifications, timeout=3600)
- 
-    # ── NEW: pass live membership plans to template ──
+
     plans = cache.get("membership_plans")
     if plans is None:
         plans = list(MembershipPlan.objects.all().values(
             "id", "plan", "price", "duration_days"
         ))
-        cache.set("membership_plans", plans, timeout=3600)  # cache 1 hr
- 
+        cache.set("membership_plans", plans, timeout=3600)
+
     if request.user.is_authenticated:
-        isStaff = request.user.is_staff
+        isStaff     = request.user.is_staff
         isSuperuser = request.user.is_superuser
- 
+
         enrolled = cache.get(f"enrolled_{request.user.id}")
         if enrolled is None:
             enrolled = Enrollment.objects.filter(user=request.user).exists()
             cache.set(f"enrolled_{request.user.id}", enrolled, timeout=300)
- 
+
     return render(request, "home.html", {
-        "enrolled": enrolled,
-        "isStaff": isStaff,
-        "isSuperuser": isSuperuser,
-        "gym_notifications": gym_notifications,
-        "plans": plans,          
+        "enrolled":           enrolled,
+        "isStaff":            isStaff,
+        "isSuperuser":        isSuperuser,
+        "gym_notifications":  gym_notifications,
+        "plans":              plans,
     })
+
 
 # ==============================
 # STATS API
@@ -396,26 +421,18 @@ def stats_api(request):
 # ==============================
 def contact(request):
     if request.method == "POST":
-        name = request.POST.get('name', '').strip()
-        number = request.POST.get('number', '').strip()
-        email = request.POST.get('email', '').strip()
+        name    = request.POST.get('name', '').strip()
+        number  = request.POST.get('number', '').strip()
+        email   = request.POST.get('email', '').strip()
         message = request.POST.get('description', '').strip()
 
-        # ✅ Validate: exactly 10 digits, numeric only
         if not number.isdigit() or len(number) != 10:
-            messages.error(
-                request, "Please enter a valid 10-digit phone number.")
+            messages.error(request, "Please enter a valid 10-digit phone number.")
             return redirect('/contact/')
 
-        query = Contact(
-            name=name,
-            email=email,
-            phonenumber=number,
-            description=message
-        )
+        query = Contact(name=name, email=email, phonenumber=number, description=message)
         query.save()
-        messages.success(
-            request, "Thanks for contacting us — we'll get back to you soon!")
+        messages.success(request, "Thanks for contacting us — we'll get back to you soon!")
         return redirect('/contact/')
 
     return render(request, 'contact.html')
@@ -435,23 +452,21 @@ def handlelogout(request):
 # ==============================
 @login_required
 def enrollment(request):
-    # Redirect if already enrolled
     if Enrollment.objects.filter(user=request.user).exists():
         return redirect('/profile/')
 
-    plans = MembershipPlan.objects.all()
+    plans    = MembershipPlan.objects.all()
     trainers = Trainer.objects.all()
 
     if request.method == "POST":
-        name = request.POST.get('name', '').strip()
-        email = request.POST.get('email', '').strip()
-        phone = request.POST.get('phone', '').strip()
-        gender = request.POST.get('gender')
-        dob = request.POST.get('dob')
-        plan_id = request.POST.get('plan')
+        name       = request.POST.get('name', '').strip()
+        email      = request.POST.get('email', '').strip()
+        phone      = request.POST.get('phone', '').strip()
+        gender     = request.POST.get('gender')
+        plan_id    = request.POST.get('plan')
         trainer_id = request.POST.get('trainer')
-        reference = request.POST.get('reference', '').strip()
-        address = request.POST.get('address', '').strip()
+        reference  = request.POST.get('reference', '').strip()
+        address    = request.POST.get('address', '').strip()
 
         selected_trainer = None
         if trainer_id:
@@ -471,7 +486,6 @@ def enrollment(request):
             fullname=name,
             email=email,
             phone=phone,
-            dob=dob,
             selectPlan=selected_plan,
             trainer=selected_trainer,
             gender=gender,
@@ -479,10 +493,10 @@ def enrollment(request):
             address=address,
             user=request.user,
             paidAmount=0,
+            pendingAmount=selected_plan.price,
         )
         enroll.save()
 
-        # Clear relevant caches
         cache.delete(f"enrollment_{request.user.id}")
         cache.delete(f"profile_image_{request.user.id}")
         cache.delete(f"enrolled_{request.user.id}")
@@ -493,10 +507,7 @@ def enrollment(request):
         )
         return redirect('/profile/')
 
-    return render(request, 'enrollment.html', {
-        "plans": plans,
-        "trainers": trainers,
-    })
+    return render(request, 'enrollment.html', {"plans": plans, "trainers": trainers})
 
 
 # ==============================
@@ -507,84 +518,87 @@ def workout(request):
 
 
 # ==============================
-# 👤 PROFILE PAGE
+# PROFILE PAGE
+# ==============================
+# ==============================
+# PROFILE PAGE
 # ==============================
 @login_required
 def Profile(request):
-    enrollment = cache.get(f"enrollment_{request.user.id}")
-    if enrollment is None:
-        enrollment = Enrollment.objects.filter(user=request.user).first()
-        cache.set(f"enrollment_{request.user.id}", enrollment, timeout=300)
+    # ── Never cache model instances — CloudinaryField breaks on unpickling ──
+    enrollment = (
+        Enrollment.objects
+        .filter(user=request.user)
+        .select_related("selectPlan", "trainer")
+        .first()
+    )
 
     image_url = None
     if enrollment and enrollment.face_image:
         image_url = cache.get(f"profile_image_{request.user.id}")
         if image_url is None:
             try:
-                # Works whether face_image is a CloudinaryField object
-                # (set by enroll_face.py) or a plain public_id string
-                # (set by upload_profile_pic view).
+                # CloudinaryField has .public_id when accessed on a live instance
                 public_id = (
                     enrollment.face_image.public_id
                     if hasattr(enrollment.face_image, "public_id")
                     else str(enrollment.face_image)
                 )
-                image_url, _ = cloudinary_url(
-                    public_id,
-                    width=130,
-                    height=130,
-                    crop="fill",
-                )
-                cache.set(
-                    f"profile_image_{request.user.id}",
-                    image_url,
-                    timeout=300,
-                )
+                if public_id:
+                    image_url, _ = cloudinary_url(
+                        public_id,
+                        width=130, height=130,
+                        crop="fill", gravity="face",
+                        fetch_format="auto", quality="auto",
+                    )
+                    cache.set(f"profile_image_{request.user.id}", image_url, timeout=3600)
             except Exception:
-                image_url = None
+                logger.exception("Failed to build Cloudinary URL for user %s", request.user.id)
 
-    return render(request, 'profile.html', {
-        'enrollment': enrollment,
-        'image_url': image_url,
-        'is_expired': enrollment.is_expired if enrollment else False,
-        'days_remaining': enrollment.days_remaining if enrollment else 0,
+    return render(request, "profile.html", {
+        "enrollment":     enrollment,
+        "image_url":      image_url,
+        "is_expired":     enrollment.is_expired if enrollment else False,
+        "days_remaining": enrollment.days_remaining if enrollment else 0,
     })
 
 
 # ==============================
 # ATTENDANCE PAGE
 # ==============================
-@login_required 
-def attendence(request):
+@login_required
+def Attendence(request):
+    enrollment = Enrollment.objects.filter(user=request.user).first()
+    if not enrollment:
+        return redirect('/enrollment/')
+
     today = timezone.localdate()
-    user = request.user
+    user  = request.user
 
-    already_mark = Attendence.objects.filter(user=user, date=today).exists()
+    already_mark = Attendence_model.objects.filter(user=user, date=today).exists()
 
-    if request.method == "POST":
-        obj, created = Attendence.objects.get_or_create(user=user, date=today)
+    all_attended = list(
+        Attendence_model.objects
+        .filter(user=user)
+        .order_by('-date')
+    )
+    attended     = all_attended[:7]
+    total_days   = len(all_attended)
+    monthly_days = sum(
+        1 for a in all_attended
+        if a.date.year == today.year and a.date.month == today.month
+    )
 
-        if created:
-            messages.success(request, "Attendance successfully marked.")
-        else:
-            messages.error(request, "Attendance already marked today.")
-
-        return redirect('/attendence/')
-
-    all_attended = list(Attendence.objects.filter(user=user).order_by('-date'))
-    attended = all_attended[:7]
-    total_days = len(all_attended)
-    monthly_days = calendar.monthrange(today.year, today.month)[1]
-
-    return render(request, 'attendence.html', {
-        'already_mark': already_mark,
-        'attended': attended,
-        'total_days': total_days,
-        'monthly_days': monthly_days,
-        'today': today,
-        'gym_lat': settings.GYM_LATITUDE,    # ← add these two
-        'gym_lng': settings.GYM_LONGITUDE,
+    return render(request, "attendence.html", {
+        "enrollment":   enrollment,
+        "records":      all_attended[:30],
+        "already_mark": already_mark,
+        "attended":     attended,
+        "total_days":   total_days,
+        "monthly_days": monthly_days,
+        "today":        today,
     })
+
 
 # ==============================
 # WHATSAPP PAYMENT REMINDER
@@ -592,28 +606,21 @@ def attendence(request):
 @login_required
 @user_passes_test(is_staff)
 def whatsapp_pending_users(request):
-    pending = Enrollment.objects.filter(
-        paymentStatus="Pending"
-    ).select_related("selectPlan")
+    pending = Enrollment.objects.filter(paymentStatus="Pending").select_related("selectPlan")
 
-    # Build WhatsApp links in Python — handles emoji + special chars correctly
     pending_with_links = []
     for e in pending:
         msg = (
-            f"Hello {e.fullname}!Reminder from EnterGYM Bhilai: "
+            f"Hello {e.fullname} ! Reminder from EnterGYM Bhilai: "
             f"your payment of ₹{e.pendingAmount} is pending. "
             f"Please clear your dues at your earliest convenience. "
             f"Thank you! – EnterGYM"
         )
         wa_link = f"https://wa.me/91{e.phone}?text={quote(msg)}"
-        pending_with_links.append({
-            "enrollment": e,
-            "wa_link": wa_link,
-        })
+        pending_with_links.append({"enrollment": e, "wa_link": wa_link})
 
-    return render(request, "admin_whatsapp.html", {
-        "pending": pending_with_links,
-    })
+    return render(request, "admin_whatsapp.html", {"pending": pending_with_links})
+
 
 # ==============================
 # PAYMENT MANAGEMENT PAGE
@@ -621,59 +628,62 @@ def whatsapp_pending_users(request):
 @login_required
 @user_passes_test(is_staff)
 def payment_management(request):
-    """
-    Pending tab  → ALL members with paymentStatus=Pending (any age)
-    Paid tab     → last 7 days Done enrollments
-    """
     status_filter = request.GET.get("filter", "pending")
     since = timezone.now() - timedelta(days=7)
- 
+
     METHOD_LABELS = {"C": "Cash", "U": "UPI", "B": "UPI + Cash"}
- 
+
     if status_filter == "done":
-        # Paid tab: last 7 days, Done only
-        qs = Enrollment.objects.select_related("selectPlan", "trainer")                 .filter(created_at__gte=since, paymentStatus="Done")                 .order_by("-created_at")
+        qs = (
+            Enrollment.objects
+            .select_related("selectPlan", "trainer")
+            .filter(created_at__gte=since, paymentStatus="Done")
+            .order_by("-created_at")
+        )
     else:
-        # Pending tab (default): ALL members with pending payment, newest first
-        qs = Enrollment.objects.select_related("selectPlan", "trainer")                 .filter(paymentStatus="Pending")                 .order_by("-created_at")
- 
+        qs = (
+            Enrollment.objects
+            .select_related("selectPlan", "trainer")
+            .filter(paymentStatus="Pending")
+            .order_by("-created_at")
+        )
+
     rows = []
     for e in qs:
         rows.append({
-            "id": e.id,
-            "unique_id": e.unique_id,
-            "fullname": e.fullname,
-            "phone": e.phone,
-            "plan_name": e.selectPlan.plan if e.selectPlan else "—",
-            "plan_price": float(e.selectPlan.price) if e.selectPlan else 0,
-            "amount": float(e.Amount),
-            "paid": float(e.paidAmount),
-            "pending": float(e.pendingAmount),
-            "payment_status": e.paymentStatus,
-            "payment_method": e.paymentMethod or "",
+            "id":                   e.id,
+            "unique_id":            e.unique_id,
+            "fullname":             e.fullname,
+            "phone":                e.phone,
+            "plan_name":            e.selectPlan.plan if e.selectPlan else "—",
+            "plan_price":           float(e.selectPlan.price) if e.selectPlan else 0,
+            "amount":               float(e.Amount),
+            "paid":                 float(e.paidAmount),
+            "pending":              float(e.pendingAmount),
+            "payment_status":       e.paymentStatus,
+            "payment_method":       e.paymentMethod or "",
             "payment_method_label": METHOD_LABELS.get(e.paymentMethod, "—"),
-            "payment_date": e.paymentDate.strftime("%Y-%m-%d") if e.paymentDate else "",
-            "doj": e.doj.strftime("%d %b %Y") if e.doj else "—",
-            "due_date": e.DueDate.strftime("%b. %d, %Y") if e.DueDate else "—",
-            "days_remaining": e.days_remaining,
-            "is_expired": e.is_expired,
+            "payment_date":         e.paymentDate.strftime("%Y-%m-%d") if e.paymentDate else "",
+            "doj":                  e.doj.strftime("%d %b %Y") if e.doj else "—",
+            "due_date":             e.DueDate.strftime("%b. %d, %Y") if e.DueDate else "—",
+            "days_remaining":       e.days_remaining,
+            "is_expired":           e.is_expired,
         })
- 
-    # Badge counts — always fresh
+
     pending_count = Enrollment.objects.filter(paymentStatus="Pending").count()
     paid_count    = Enrollment.objects.filter(created_at__gte=since, paymentStatus="Done").count()
     total_count   = len(rows)
- 
+
     return render(request, "payment_management.html", {
-        "rows": rows,
-        "status_filter": status_filter,
+        "rows":                rows,
+        "status_filter":       status_filter,
         "total_pending_amount": sum(r["pending"] for r in rows),
-        "total_count": total_count,
-        "pending_count": pending_count,
-        "paid_count": paid_count,
+        "total_count":         total_count,
+        "pending_count":       pending_count,
+        "paid_count":          paid_count,
     })
- 
- 
+
+
 # ==============================
 # UPDATE PAYMENT (AJAX)
 # ==============================
@@ -682,61 +692,65 @@ def payment_management(request):
 @require_POST
 def update_payment(request):
     try:
-        data = json.loads(request.body)
+        data           = json.loads(request.body)
         enrollment_id  = int(data.get("enrollment_id", 0))
         paid_amount    = float(data.get("paid_amount", 0))
         payment_method = data.get("payment_method", "").strip()
         payment_date_s = data.get("payment_date", "").strip() or None
- 
+
         if paid_amount < 0:
             return JsonResponse({"error": "Paid amount cannot be negative."}, status=400)
         if payment_method not in ("C", "U", "B", ""):
             return JsonResponse({"error": "Invalid payment method."}, status=400)
- 
-        enrollment = Enrollment.objects.select_related("selectPlan").get(pk=enrollment_id)
- 
+
+        enrollment = Enrollment.objects.select_related("selectPlan", "user").get(pk=enrollment_id)
+
+        if not enrollment.user_id:
+            return JsonResponse({"error": "Invalid enrollment."}, status=403)
+
         plan_price     = float(enrollment.selectPlan.price) if enrollment.selectPlan else float(enrollment.Amount)
         paid_amount    = min(paid_amount, plan_price)
         pending_amount = max(plan_price - paid_amount, 0)
- 
+
         enrollment.paidAmount    = paid_amount
         enrollment.pendingAmount = pending_amount
         enrollment.paymentStatus = "Done" if pending_amount == 0 else "Pending"
         enrollment.paymentMethod = payment_method or None
- 
+
         if payment_date_s:
             enrollment.paymentDate = date.fromisoformat(payment_date_s)
         elif paid_amount > 0 and not enrollment.paymentDate:
             enrollment.paymentDate = timezone.localdate()
- 
+
         enrollment.save(update_fields=[
             "paidAmount", "pendingAmount", "paymentStatus",
             "paymentMethod", "paymentDate",
         ])
- 
+
         cache.delete("admin_revenue")
         cache.delete("admin_revenue_data")
         cache.delete(f"enrollment_{enrollment.user_id}")
- 
+
         METHOD_LABELS = {"C": "Cash", "U": "UPI", "B": "UPI + Cash"}
- 
+
         return JsonResponse({
-            "ok": True,
-            "enrollment_id": enrollment.id,
-            "paid": float(enrollment.paidAmount),
-            "pending": float(enrollment.pendingAmount),
-            "payment_status": enrollment.paymentStatus,
+            "ok":                   True,
+            "enrollment_id":        enrollment.id,
+            "paid":                 float(enrollment.paidAmount),
+            "pending":              float(enrollment.pendingAmount),
+            "payment_status":       enrollment.paymentStatus,
             "payment_method_label": METHOD_LABELS.get(enrollment.paymentMethod, "—"),
-            "payment_date": enrollment.paymentDate.strftime("%d %b %Y") if enrollment.paymentDate else "—",
+            "payment_date":         enrollment.paymentDate.strftime("%d %b %Y") if enrollment.paymentDate else "—",
         })
- 
+
     except Enrollment.DoesNotExist:
         return JsonResponse({"error": "Enrollment not found."}, status=404)
     except (ValueError, KeyError) as e:
         return JsonResponse({"error": f"Invalid data: {e}"}, status=400)
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
-    
+    except Exception:
+        logger.exception("Unexpected error in update_payment")
+        return JsonResponse({"error": "An internal error occurred."}, status=500)
+
 
 # ==============================
 # TODAY'S ATTENDANCE (STAFF)
@@ -744,10 +758,16 @@ def update_payment(request):
 @login_required
 @user_passes_test(is_staff)
 def today_attendance(request):
-    today = timezone.localdate()
+    today     = timezone.localdate()
+    cache_key = f"today_attendance_{today}"
+
+    cached = cache.get(cache_key)
+    if cached:
+        return render(request, "today_attendance.html", cached)
 
     records = (
-        Attendence.objects.filter(date=today)
+        Attendence_model.objects
+        .filter(date=today)
         .select_related("user__enrollment__selectPlan", "user__enrollment__trainer")
         .order_by("timestamp")
     )
@@ -757,37 +777,66 @@ def today_attendance(request):
 
     for rec in records:
         enrollment = getattr(rec.user, "enrollment", None)
+
+        # ── Build Cloudinary image URL (server-side, never cached in context) ──
+        image_url = None
+        if enrollment and enrollment.face_image:
+            try:
+                public_id = (
+                    enrollment.face_image.public_id
+                    if hasattr(enrollment.face_image, "public_id")
+                    else str(enrollment.face_image)
+                )
+                if public_id:
+                    image_url, _ = cloudinary_url(
+                        public_id,
+                        width=60, height=60,
+                        crop="fill", gravity="face",
+                        fetch_format="auto", quality="auto",
+                    )
+            except Exception:
+                logger.exception("Cloudinary URL error for user %s", rec.user.id)
+
         entry = {
-            "id": rec.id,
-            "time": rec.timestamp.strftime("%I:%M %p"),
-            "name": enrollment.fullname if enrollment else rec.user.username,
-            "unique_id": enrollment.unique_id if enrollment else "—",
+            "id":             rec.id,
+            "time":           rec.timestamp.strftime("%I:%M %p"),
+            "name":           enrollment.fullname if enrollment else rec.user.username,
+            "unique_id":      enrollment.unique_id if enrollment else "—",
+            "image_url":      image_url,
             "pending_amount": float(enrollment.pendingAmount) if enrollment else 0,
-            "due_date": enrollment.DueDate.strftime("%d %b %Y") if enrollment and enrollment.DueDate else "—",
-            "is_expired": enrollment.is_expired if enrollment else False,
-            # detail fields
-            "phone": enrollment.phone if enrollment else "—",
-            "address": enrollment.address if enrollment else "—",
-            "plan": enrollment.selectPlan.plan if enrollment and enrollment.selectPlan else "—",
-            "plan_price": float(enrollment.selectPlan.price) if enrollment and enrollment.selectPlan else 0,
-            "trainer": enrollment.trainer.name if enrollment and enrollment.trainer else "No Trainer",
-            "gender": enrollment.get_gender_display() if enrollment else "—",
-            "dob": enrollment.dob.strftime("%d %b %Y") if enrollment and enrollment.dob else "—",
-            "doj": enrollment.doj.strftime("%d %b %Y") if enrollment and enrollment.doj else "—",
+            "due_date":       enrollment.DueDate.strftime("%d %b %Y") if enrollment and enrollment.DueDate else "—",
+            "is_expired":     enrollment.is_expired if enrollment else False,
+            "phone":          enrollment.phone if enrollment else "—",
+            "address":        enrollment.address if enrollment else "—",
+            "plan":           enrollment.selectPlan.plan if enrollment and enrollment.selectPlan else "—",
+            "plan_price":     float(enrollment.selectPlan.price) if enrollment and enrollment.selectPlan else 0,
+            "trainer":        enrollment.trainer.name if enrollment and enrollment.trainer else "No Trainer",
+            "gender":         enrollment.get_gender_display() if enrollment else "—",
+            "doj":            enrollment.doj.strftime("%d %b %Y") if enrollment and enrollment.doj else "—",
             "payment_status": enrollment.paymentStatus if enrollment else "—",
             "days_remaining": enrollment.days_remaining if enrollment else 0,
+            "payment_date":   enrollment.paymentDate.strftime("%d %b %Y") if enrollment and enrollment.paymentDate else "—",
         }
-        if rec.timestamp.hour < 14:  # before 2 PM = morning
+        if rec.timestamp.hour < 14:
             morning.append(entry)
         else:
             evening.append(entry)
 
-    return render(request, "today_attendance.html", {
-        "morning": morning,
-        "evening": evening,
+    context = {
+      "sections": [
+          ("Morning", "🌅", morning),
+          ("Evening", "🌆", evening),
+        ],
         "today": today,
         "total": len(morning) + len(evening),
-    })
+    }
 
+    cache.set(cache_key, context, timeout=120)
+    return render(request, "today_attendance.html", context)
+
+
+# ==============================
+# DOWNLOAD APP PAGE
+# ==============================
 def download_app(request):
     return render(request, 'download.html')

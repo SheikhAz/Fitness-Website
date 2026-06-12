@@ -12,7 +12,7 @@ urlpatterns = [
     path('logout/', views.handlelogout, name='logout'),
     path('contact/', views.contact, name='contact'),
     path('enrollment/', views.enrollment, name='enrollment'),
-    path('attendence/', views.attendence, name='attendence'),
+    path('attendence/', views.Attendence, name='Attendence'),
     path('profile/upload-pic/', views.upload_profile_pic, name='upload_profile_pic'),
 
     # ── Existing APIs ──────────────────────────────────────────
@@ -28,10 +28,6 @@ urlpatterns = [
     path('api/geo-mark-attendance/', geo_mark_attendance, name='geo_mark_attendance'),
     path('api/attendance-status/', attendance_status),
 
-    # ── NEW: Serve SW from root scope (/sw.js) ────────────────
-    # Must be at / scope so SW can intercept all site requests.
-    # This bypasses STATIC_URL prefix (/static/js/sw.js would
-    # give SW a /static/js/ scope — too narrow).
     path('sw.js', serve_sw, name='sw'),
 
     # ── Admin tools ────────────────────────────────────────────

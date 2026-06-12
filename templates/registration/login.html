@@ -65,7 +65,7 @@
   </form>
 </div>
 <script src="{% static 'js/messages.js' %}"></script>
-<script>
+<script nonce="{{ request.csp_nonce }}" >
   document.querySelector('.glass-form').addEventListener('submit', function () {
     const btn = document.getElementById('signup-btn');
     btn.disabled = true;

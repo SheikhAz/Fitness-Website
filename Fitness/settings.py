@@ -1,6 +1,7 @@
+# ✅ REPLACE WITH THIS
 import os
-import dj_database_url
 from pathlib import Path
+import dj_database_url
 import cloudinary
 from dotenv import load_dotenv
 
@@ -12,8 +13,16 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 API_KEY = os.environ.get("INTERNAL_API_KEY", "")
 
+# ── ALLOWED_HOSTS ─────────────────────────────────────────────────────────
+# Never use ["*"] in production — it accepts requests spoofing any Host header
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+else:
+    ALLOWED_HOSTS = [
+        'entergym.onrender.com',
+        'www.entergym.onrender.com',
+    ]
 
-ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     "https://entergym.onrender.com",
     "http://localhost:8000",
@@ -48,14 +57,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'AuthFit.middleware.SecurityHeadersMiddleware',  # ← add this
 ]
 
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.Argon2PasswordHasher',  
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',  
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
 ]
-
 
 ROOT_URLCONF = 'Fitness.urls'
 
@@ -75,18 +84,19 @@ TEMPLATES = [
         },
     }
 ]
+
 WSGI_APPLICATION = 'Fitness.wsgi.application'
 
 cloudinary.config(
     cloud_name=os.environ['CLOUDINARY_CLOUD_NAME'],
     api_key=os.environ['CLOUDINARY_API_KEY'],
     api_secret=os.environ['CLOUDINARY_API_SECRET'],
+    secure=True, 
 )
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+DEFAULT_FILE_STORAGE   = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE    = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ✅ Database
 DATABASES = {
     'default': dj_database_url.parse(os.environ['DATABASE_URL'])
 }
@@ -99,21 +109,19 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Kolkata'
-USE_I18N = True
-USE_TZ = True
+TIME_ZONE     = 'Asia/Kolkata'
+USE_I18N      = True
+USE_TZ        = True
 
-STATIC_URL = '/static/'
+STATIC_URL      = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles_build")
+STATIC_ROOT     = os.path.join(BASE_DIR, "staticfiles_build")
 
-# ✅ Redis — auto detects local vs cloud
 REDIS_URL = os.environ['REDIS_URL']
 
-# ✅ Cache
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
+        "BACKEND":  "django_redis.cache.RedisCache",
         "LOCATION": REDIS_URL,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -123,98 +131,38 @@ CACHES = {
     }
 }
 
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL           = '/login/'
+LOGIN_REDIRECT_URL  = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'default'
+# ── Session & Cookie Security ─────────────────────────────────────────────
+SESSION_ENGINE       = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS  = 'default'
+SESSION_COOKIE_AGE   = 86400        # 24 hours
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE   = not DEBUG  # True in production (HTTPS only)
+
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE   = not DEBUG
+
+# ── File upload limits ────────────────────────────────────────────────────
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024   # 5 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-JAZZMIN_SETTINGS = {
-    "site_title": "EnterGYM Admin",
-    "site_header": "EnterGYM Dashboard",
-    "site_brand": "EnterGYM",
-    "welcome_sign": "Welcome to EnterGYM Control Panel",
-    "site_logo": "images/Logo.png",
-    "site_icon": "images/Logo.png",
-    "copyright": "EnterGYM",
-
-    # 🔝 Top Menu
-    "topmenu_links": [
-        {"name": "Support", "url": "https://wa.me/917000032565", "new_window": True},
-    ],
-
-    # 👤 User menu
-    "usermenu_links": [
-        {"name": "Support", "url": "https://wa.me/917000032565", "new_window": True},
-    ],
-
-    # 📊 Sidebar
-    "show_sidebar": True,
-    "navigation_expanded": True,
-
-    # 🎯 Order your apps (important for clean UI)
-    "order_with_respect_to": [
-        "AuthFit",
-        "AuthFit.enrollment",
-        "AuthFit.attendance",
-        "AuthFit.membershipplan",
-        "AuthFit.trainer",
-        "AuthFit.contact",
-        "AuthFit.gymnotification",
-        "auth",
-    ],
-
-    # 🎨 Icons (VERY IMPORTANT for modern UI)
-    "icons": {
-        "AuthFit": "fas fa-dumbbell",
-
-        "AuthFit.attendence": "fas fa-clipboard-user",
-        "AuthFit.contact": "fas fa-address-book",
-        "AuthFit.enrollment": "fas fa-id-card",
-        "AuthFit.gymnotification": "fas fa-bell",
-        "AuthFit.membershipplan": "fas fa-layer-group",
-        "AuthFit.trainer": "fas fa-user-tie",
-
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.group": "fas fa-users",
-    },
-
-    # ⚡ UI Enhancements
-    "changeform_format": "horizontal_tabs",
-    "related_modal_active": False,
-
-    # 🎨 Custom Styling
-    "custom_css": "css/admin_custom.css",
-    "custom_links": {
-    "EnterGYM": [
-        {
-            "name": "Visit Website",
-            "url": "https://entergym.onrender.com/",
-            "icon": "fas fa-globe",
-            "new_window": True,
-        },
-        {
-            "name": "Support",
-            "url": "https://wa.me/917000032565",
-            "icon": "fas fa-headset",
-            "new_window": True
-        }
-        ]
-    }
-}
-
-GYM_LATITUDE  = os.environ['GYM_LATITUDE']   
-GYM_LONGITUDE = os.environ['GYM_LONGITUDE'] 
-GYM_RADIUS_METERS = os.environ['GYM_RADIUS_METERS']
+# ── Gym Config (server-side only — never sent to browser directly) ────────
+GYM_LATITUDE      = float(os.environ.get('GYM_LATITUDE',      21.2179))
+GYM_LONGITUDE     = float(os.environ.get('GYM_LONGITUDE',     81.3311))
+GYM_RADIUS_METERS = float(os.environ.get('GYM_RADIUS_METERS', 100))
 
 FIREBASE_CREDENTIALS_PATH = os.getenv(
     "FIREBASE_CREDENTIALS_PATH",
     "firebase-credentials.json"
 )
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -226,5 +174,71 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'INFO',
         },
+        'django.security': {        # log security events
+            'handlers': ['console'],
+            'level': 'WARNING',
+        },
     },
+}
+
+if not DEBUG:
+    SECURE_HSTS_SECONDS        = 31536000   # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD        = True
+    SECURE_SSL_REDIRECT        = True
+    SECURE_PROXY_SSL_HEADER    = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
+JAZZMIN_SETTINGS = {
+    "site_title":   "EnterGYM Admin",
+    "site_header":  "EnterGYM Dashboard",
+    "site_brand":   "EnterGYM",
+    "welcome_sign": "Welcome to EnterGYM Control Panel",
+    "site_logo":    "images/Logo.png",
+    "site_icon":    "images/Logo.png",
+    "copyright":    "EnterGYM",
+    "topmenu_links": [
+        {"name": "Support", "url": "https://wa.me/917000032565", "new_window": True},
+    ],
+    "usermenu_links": [
+        {"name": "Support", "url": "https://wa.me/917000032565", "new_window": True},
+    ],
+    "show_sidebar":          True,
+    "navigation_expanded":   True,
+    "order_with_respect_to": [
+        "AuthFit", "AuthFit.enrollment", "AuthFit.attendance",
+        "AuthFit.membershipplan", "AuthFit.trainer",
+        "AuthFit.contact", "AuthFit.gymnotification", "auth",
+    ],
+    "icons": {
+        "AuthFit":                   "fas fa-dumbbell",
+        "AuthFit.attendence":        "fas fa-clipboard-user",
+        "AuthFit.contact":           "fas fa-address-book",
+        "AuthFit.enrollment":        "fas fa-id-card",
+        "AuthFit.gymnotification":   "fas fa-bell",
+        "AuthFit.membershipplan":    "fas fa-layer-group",
+        "AuthFit.trainer":           "fas fa-user-tie",
+        "auth":                      "fas fa-users-cog",
+        "auth.user":                 "fas fa-user",
+        "auth.group":                "fas fa-users",
+    },
+    "changeform_format":     "horizontal_tabs",
+    "related_modal_active":  False,
+    "custom_css":            "css/admin_custom.css",
+    "custom_links": {
+        "EnterGYM": [
+            {
+                "name": "Visit Website",
+                "url":  "https://entergym.onrender.com/",
+                "icon": "fas fa-globe",
+                "new_window": True,
+            },
+            {
+                "name": "Support",
+                "url":  "https://wa.me/917000032565",
+                "icon": "fas fa-headset",
+                "new_window": True,
+            },
+        ]
+    }
 }

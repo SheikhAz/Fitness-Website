@@ -758,7 +758,7 @@
                         value="{{ row.paid|floatformat:0 }}"
                         id="input-paid-{{ row.id }}"
                         placeholder="₹ Paid"
-                        onkeydown="if(event.key==='Enter') savePayment({{ row.id }})"
+                        data-row-id="{{ row.id }}"
                       />
                       <select id="input-method-{{ row.id }}">
                         <option value="">Method</option>
@@ -807,7 +807,7 @@
                       <button
                         class="save-btn"
                         id="btn-{{ row.id }}"
-                        onclick="savePayment({{ row.id }})"
+                        data-row-id="{{ row.id }}"
                       >
                         Save
                       </button>
@@ -974,7 +974,7 @@
                 <button
                   class="mob-save-btn"
                   id="mob-btn-{{ row.id }}"
-                  onclick="savePaymentMob({{ row.id }})"
+                  data-row-id="{{ row.id }}"
                 >
                   Save Payment
                 </button>
@@ -1005,9 +1005,40 @@
     </section>
 
     <script src="{% static 'js/base.js' %}"></script>
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
       const CSRF = "{{ csrf_token }}";
+      document.addEventListener("DOMContentLoaded", () => {
+        const todayISO = new Date().toISOString().split("T")[0];
+        document.querySelectorAll('input[id^="input-date-"]').forEach(el => {
+          if (!el.value) el.value = todayISO;
+        });
+        document.querySelectorAll('input[id^="mob-input-date-"]').forEach(el => {
+          if (!el.value) el.value = todayISO;
+        });
+        // Desktop save buttons
+        document.querySelectorAll(".save-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            savePayment(btn.dataset.rowId);
+          });
+        });
 
+        // Mobile save buttons
+        document.querySelectorAll(".mob-save-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            savePaymentMob(btn.dataset.rowId);
+          });
+        });
+
+        // Enter key support
+        document.querySelectorAll('input[id^="input-paid-"]').forEach(input => {
+          input.addEventListener("keydown", e => {
+            if (e.key === "Enter") {
+              savePayment(input.dataset.rowId);
+            }
+          });
+        });
+
+      });
       /* ── Desktop table: live preview ── */
       document.querySelectorAll('input[id^="input-paid-"]').forEach((input) => {
         const rowId = input.id.replace("input-paid-", "");

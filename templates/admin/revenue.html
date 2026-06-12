@@ -431,7 +431,7 @@
 </div><!-- /#dash-root -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
+<script nonce="{{ request.csp_nonce }}" >
   /* ── Live clock ── */
   (function tick() {
     const el = document.getElementById('dash-clock');

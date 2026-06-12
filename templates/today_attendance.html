@@ -6,12 +6,9 @@
 {% block link %}
 <style>
 
-  .header-color{
-    color:#ff4d00;
-  }
-  .date-color{
-    color:#22c55e;
-  }
+  .header-color { color:#ff4d00; }
+  .date-color   { color:#22c55e; }
+
   .att-page {
     padding: 16px 12px 80px;
     max-width: 860px;
@@ -35,13 +32,6 @@
     font-weight: 800;
     letter-spacing: 1px;
     margin: 0;
-  }
-  .att-date {
-    color: #555;
-    font-size: clamp(9px, 2.5vw, 11px);
-    letter-spacing: 2px;
-    font-weight: 600;
-    margin-top: 2px;
   }
   .att-badge {
     background: #ff4d0022;
@@ -92,9 +82,10 @@
     box-sizing: border-box;
     width: 100%;
   }
-  .att-card:hover { border-color: #ff4d0055; background: #161616; }
+  .att-card:hover  { border-color: #ff4d0055; background: #161616; }
   .att-card.expired { border-left: 3px solid #ff3333; }
 
+  /* Time */
   .att-time {
     min-width: clamp(54px, 14vw, 72px);
     text-align: center;
@@ -120,6 +111,32 @@
     flex-shrink: 0;
   }
 
+  /* Avatar */
+  .att-avatar {
+    width: clamp(34px, 9vw, 42px);
+    height: clamp(34px, 9vw, 42px);
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #2a2a2a;
+    flex-shrink: 0;
+    background: #1a1a1a;
+  }
+  .att-avatar-placeholder {
+    width: clamp(34px, 9vw, 42px);
+    height: clamp(34px, 9vw, 42px);
+    border-radius: 50%;
+    border: 1px solid #2a2a2a;
+    background: #1a1a1a;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    font-size: clamp(13px, 3.5vw, 17px);
+    font-weight: 800;
+  }
+
+  /* Info */
   .att-info {
     flex: 1;
     min-width: 0;
@@ -140,6 +157,7 @@
     margin-top: 2px;
   }
 
+  /* Meta */
   .att-meta {
     text-align: right;
     flex-shrink: 0;
@@ -148,9 +166,7 @@
   .att-pending {
     font-size: clamp(12px, 3vw, 14px);
     font-weight: 800;
-    color: #fff;
   }
-  .att-pending.zero { color: #22c55e; }
   .att-pending.has-pending { color: #ff4d00; }
   .att-due {
     font-size: clamp(8px, 2vw, 10px);
@@ -169,7 +185,7 @@
     font-weight: 600;
   }
 
-  /* Modal overlay */
+  /* Modal */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -195,7 +211,6 @@
   }
   .modal-overlay.open .modal-panel { transform: translateX(0); }
 
-  /* On small screens, modal takes full width */
   @media (max-width: 440px) {
     .modal-panel { max-width: 100%; border-left: none; }
   }
@@ -220,21 +235,50 @@
   }
   .modal-close:hover { color: #fff; }
 
+  /* Modal avatar */
+  .modal-avatar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+    padding-right: 36px;
+  }
+  .modal-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ff4d0055;
+    background: #1a1a1a;
+    flex-shrink: 0;
+  }
+  .modal-avatar-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid #2a2a2a;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #444;
+    font-size: 22px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .modal-title-block { min-width: 0; }
   .modal-uid {
     color: #ff4d00;
     font-size: clamp(9px, 2.5vw, 11px);
     font-weight: 800;
     letter-spacing: 4px;
-    margin-bottom: 5px;
-    padding-right: 36px;
+    margin-bottom: 4px;
   }
   .modal-name {
     color: #fff;
     font-size: clamp(16px, 5vw, 22px);
     font-weight: 900;
     letter-spacing: 1px;
-    margin-bottom: 4px;
-    padding-right: 36px;
     word-break: break-word;
   }
   .modal-accent {
@@ -267,11 +311,10 @@
     word-break: break-word;
   }
   .detail-value.highlight { color: #ff4d00; }
-  .detail-value.success { color: #22c55e; }
-  .detail-value.danger { color: #ff3333; }
+  .detail-value.success   { color: #22c55e; }
+  .detail-value.danger    { color: #ff3333; }
 
   .modal-divider { height: 1px; background: #1a1a1a; margin: 18px 0; }
-
   .modal-section-title {
     color: #333;
     font-size: clamp(8px, 2vw, 9px);
@@ -288,77 +331,64 @@
   <h1 class="header-color">ATTENDANCE</h1>
   <p class="date-color">{{ today|date:"l, d F Y" }}</p>
   <div class="att-header">
-    <div>
-      <h2>CHECK-INS</h2>
-    </div>
+    <div><h2>CHECK-INS</h2></div>
     <div class="att-badge">{{ total }} TOTAL</div>
   </div>
 
-  <!-- Morning -->
-  <div class="section-label"><span>🌅 Morning</span></div>
-  {% if morning %}
-    {% for r in morning %}
-    <div class="att-card {% if r.is_expired %}expired{% endif %}" onclick="openModal({{ r|safe_json }})">
-      <div class="att-time">
-        <div class="time-val">{{ r.time }}</div>
-        <div class="time-label">CHECK-IN</div>
-      </div>
-      <div class="att-divider"></div>
-      <div class="att-info">
-        <div class="att-name">{{ r.name }}</div>
-        <div class="att-uid">UID · {{ r.unique_id }}</div>
-      </div>
-      <div class="att-meta">
-        <div class="att-pending {% if r.pending_amount == 0 %}zero{% else %}has-pending{% endif %}">
-          ₹{{ r.pending_amount|floatformat:0 }}
-        </div>
-        <div class="att-due {% if r.is_expired %}expired-tag{% endif %}">
-          {% if r.is_expired %}EXPIRED{% else %}{{ r.due_date }}{% endif %}
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-  {% else %}
-    <div class="empty-state">NO MORNING CHECK-INS</div>
-  {% endif %}
+  {% for section_name, section_icon, records in sections %}
+  <div class="section-label"><span>{{ section_icon }} {{ section_name }}</span></div>
+  {% if records %}
+    {% for r in records %}
+    <div class="att-card {% if r.is_expired %}expired{% endif %}" data-json="{{ r|data_json }}">
 
-  <!-- Evening -->
-  <div class="section-label"><span>🌆 Evening</span></div>
-  {% if evening %}
-    {% for r in evening %}
-    <div class="att-card {% if r.is_expired %}expired{% endif %}" onclick="openModal({{ r|safe_json }})">
       <div class="att-time">
         <div class="time-val">{{ r.time }}</div>
         <div class="time-label">CHECK-IN</div>
       </div>
       <div class="att-divider"></div>
+
+      {% if r.image_url %}
+        <img class="att-avatar" src="{{ r.image_url }}" alt="{{ r.name }}" loading="lazy">
+      {% else %}
+        <div class="att-avatar-placeholder">{{ r.name|first|upper }}</div>
+      {% endif %}
+
       <div class="att-info">
         <div class="att-name">{{ r.name }}</div>
         <div class="att-uid">UID · {{ r.unique_id }}</div>
       </div>
+
       <div class="att-meta">
-        <div class="att-pending {% if r.pending_amount == 0 %}zero{% else %}has-pending{% endif %}">
-          ₹{{ r.pending_amount|floatformat:0 }}
-        </div>
+        {% if r.pending_amount > 0 %}
+        <div class="att-pending has-pending">₹{{ r.pending_amount|floatformat:0 }}</div>
+        {% endif %}
         <div class="att-due {% if r.is_expired %}expired-tag{% endif %}">
           {% if r.is_expired %}EXPIRED{% else %}{{ r.due_date }}{% endif %}
         </div>
       </div>
+
     </div>
     {% endfor %}
   {% else %}
-    <div class="empty-state">NO EVENING CHECK-INS</div>
+    <div class="empty-state">NO {{ section_name|upper }} CHECK-INS</div>
   {% endif %}
+  {% endfor %}
 
 </div>
 
 <!-- Detail Modal -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeOnBackdrop(event)">
+<div class="modal-overlay" id="modalOverlay">
   <div class="modal-panel" id="modalPanel">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+    <button class="modal-close" id="modalCloseBtn">✕</button>
 
-    <div class="modal-uid" id="mUid"></div>
-    <div class="modal-name" id="mName"></div>
+    <div class="modal-avatar-wrap">
+      <img class="modal-avatar" id="mAvatar" src="" alt="" style="display:none">
+      <div class="modal-avatar-placeholder" id="mAvatarPlaceholder"></div>
+      <div class="modal-title-block">
+        <div class="modal-uid" id="mUid"></div>
+        <div class="modal-name" id="mName"></div>
+      </div>
+    </div>
     <div class="modal-accent"></div>
 
     <div class="modal-section-title">Personal</div>
@@ -370,10 +400,6 @@
       <div class="detail-item">
         <div class="detail-label">Gender</div>
         <div class="detail-value" id="mGender"></div>
-      </div>
-      <div class="detail-item">
-        <div class="detail-label">Date of Birth</div>
-        <div class="detail-value" id="mDob"></div>
       </div>
       <div class="detail-item">
         <div class="detail-label">Joined</div>
@@ -397,6 +423,7 @@
         <div class="detail-label">Plan Price</div>
         <div class="detail-value" id="mPlanPrice"></div>
       </div>
+
       <div class="detail-item">
         <div class="detail-label">Trainer</div>
         <div class="detail-value" id="mTrainer"></div>
@@ -417,48 +444,81 @@
         <div class="detail-label">Days Remaining</div>
         <div class="detail-value" id="mDays"></div>
       </div>
+      <div class="detail-item">
+        <div class="detail-label">Payment Date</div>
+        <div class="detail-value" id="mPayDate"></div>
+      </div>
     </div>
 
   </div>
 </div>
 
-<script>
-function openModal(r) {
-  document.getElementById('mUid').textContent     = 'UID · ' + r.unique_id;
-  document.getElementById('mName').textContent    = r.name;
-  document.getElementById('mPhone').textContent   = r.phone;
-  document.getElementById('mGender').textContent  = r.gender;
-  document.getElementById('mDob').textContent     = r.dob;
-  document.getElementById('mDoj').textContent     = r.doj;
-  document.getElementById('mAddress').textContent = r.address;
-  document.getElementById('mPlan').textContent    = r.plan;
-  document.getElementById('mPlanPrice').textContent = '₹' + r.plan_price;
-  document.getElementById('mTrainer').textContent = r.trainer;
+<script nonce="{{ request.csp_nonce }}">
+  const overlay  = document.getElementById('modalOverlay');
+  const closeBtn = document.getElementById('modalCloseBtn');
 
-  const ps = document.getElementById('mPayStatus');
-  ps.textContent = r.payment_status;
-  ps.className   = 'detail-value ' + (r.payment_status === 'Done' ? 'success' : 'danger');
+  document.addEventListener('click', function (e) {
+    const card = e.target.closest('.att-card');
+    if (card) {
+      try { openModal(JSON.parse(card.dataset.json)); }
+      catch (err) { console.error('Modal parse error:', err); }
+    }
+  });
 
-  const pend = document.getElementById('mPending');
-  pend.textContent = '₹' + r.pending_amount;
-  pend.className   = 'detail-value ' + (r.pending_amount > 0 ? 'danger' : 'success');
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
 
-  const due = document.getElementById('mDue');
-  due.textContent = r.due_date;
-  due.className   = 'detail-value ' + (r.is_expired ? 'danger' : '');
+  function openModal(r) {
+    // Avatar
+    const img         = document.getElementById('mAvatar');
+    const placeholder = document.getElementById('mAvatarPlaceholder');
+    if (r.image_url) {
+      img.src              = r.image_url;
+      img.alt              = r.name || '';
+      img.style.display    = 'block';
+      placeholder.style.display = 'none';
+    } else {
+      img.style.display         = 'none';
+      placeholder.style.display = 'flex';
+      placeholder.textContent   = (r.name || '?')[0].toUpperCase();
+    }
 
-  const days = document.getElementById('mDays');
-  days.textContent = r.is_expired ? 'EXPIRED' : r.days_remaining + ' days';
-  days.className   = 'detail-value ' + (r.is_expired ? 'danger' : r.days_remaining <= 5 ? 'highlight' : 'success');
+    document.getElementById('mUid').textContent      = 'UID · ' + (r.unique_id || '—');
+    document.getElementById('mName').textContent     = r.name    || '—';
+    document.getElementById('mPhone').textContent    = r.phone   || '—';
+    document.getElementById('mGender').textContent   = r.gender  || '—';
+    document.getElementById('mDoj').textContent      = r.doj     || '—';
+    document.getElementById('mAddress').textContent  = r.address || '—';
+    document.getElementById('mPlan').textContent     = r.plan    || '—';
+    document.getElementById('mPlanPrice').textContent = r.plan_price != null ? '₹' + r.plan_price : '—';
+    document.getElementById('mTrainer').textContent  = r.trainer || '—';
 
-  document.getElementById('modalOverlay').classList.add('open');
-}
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-}
-function closeOnBackdrop(e) {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
-}
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    const ps = document.getElementById('mPayStatus');
+    ps.textContent = r.payment_status || '—';
+    ps.className   = 'detail-value ' + (r.payment_status === 'Done' ? 'success' : 'danger');
+
+    const pend = document.getElementById('mPending');
+    pend.textContent = r.pending_amount != null ? '₹' + r.pending_amount : '—';
+    pend.className   = 'detail-value ' + (r.pending_amount > 0 ? 'danger' : 'success');
+
+    const due = document.getElementById('mDue');
+    due.textContent = r.due_date || '—';
+    due.className   = 'detail-value ' + (r.is_expired ? 'danger' : '');
+
+    const days = document.getElementById('mDays');
+    days.textContent = r.is_expired             ? 'EXPIRED'
+                     : r.days_remaining != null  ? r.days_remaining + ' days'
+                     : '—';
+    days.className = 'detail-value ' + (
+      r.is_expired           ? 'danger'    :
+      r.days_remaining <= 5  ? 'highlight' : 'success'
+    );
+    document.getElementById('mPayDate').textContent = r.payment_date || '—';
+
+    overlay.classList.add('open');
+  }
+
+  function closeModal() { overlay.classList.remove('open'); }
 </script>
 {% endblock %}

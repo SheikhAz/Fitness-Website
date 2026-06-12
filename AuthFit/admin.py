@@ -11,8 +11,8 @@ from datetime import timedelta
 from collections import defaultdict
 from django.core.cache import cache
 from django.db.models import Count, Avg, Max, Min
-from django.db.models.functions import TruncDate, TruncHour, ExtractWeekDay, ExtractHour, TruncMonth ,TruncDay
-
+from django.db.models.functions import ExtractWeekDay, ExtractHour, TruncMonth ,TruncDay
+from cloudinary.utils import cloudinary_url
 
 @admin.register(GymNotification)
 class GymNotificationAdmin(admin.ModelAdmin):
@@ -39,7 +39,10 @@ def attendance_view(request):
     Admin attendance analytics view.
     Mounted at /admin/attendance/
     """
-
+    if not (request.user.is_staff or request.user.is_superuser):
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("Access denied.")
+    
     cached = cache.get("admin_attendance_data")
 
     if cached is None:
@@ -239,6 +242,9 @@ def attendance_view(request):
     return TemplateResponse(request, "admin/attendance_analysis.html", context)
 
 def revenue_view(request):
+    if not (request.user.is_staff or request.user.is_superuser):
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("Access denied.")
 
     data = cache.get("admin_revenue_data")
 
@@ -406,11 +412,18 @@ class EnrollmentAdmin(admin.ModelAdmin):
 
     # ✅ IMAGE PREVIEW FUNCTION
     def face_preview(self, obj):
-        if obj.face_image:
+        if not obj.face_image:
+            return "No Image"
+        try:
+            url, _ = cloudinary_url(
+                obj.face_image.public_id,
+                width=50, height=50,
+                crop="fill", gravity="face",
+                secure=True,   # ← forces https://
+            )
             return format_html(
                 '<img src="{}" width="50" height="50" style="border-radius:50%; object-fit:cover;" />',
-                obj.face_image.url
+                url
             )
-        return "No Image"
-
-    face_preview.short_description = "Face"
+        except Exception:
+            return "—"

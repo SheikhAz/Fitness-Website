@@ -601,7 +601,7 @@
 
       </div>
     </main>
-    <script>
+    <script nonce="{{ request.csp_nonce }}" >
       document.querySelector('form').addEventListener('submit', function () {
         const btn = document.getElementById('order-btn');
         btn.disabled = true;
