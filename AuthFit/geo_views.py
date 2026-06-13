@@ -38,9 +38,9 @@ def _is_json_request(request):
 
 
 # ── Main geo attendance endpoint ─────────────────────────────
-@csrf_exempt          # ← SW can't easily send CSRF token reliably cross-context
-@login_required       # ← session cookie still required — unauthenticated = 302
 @require_POST
+@csrf_exempt
+@login_required
 def geo_mark_attendance(request):
     """
     POST /api/geo-mark-attendance/
@@ -57,7 +57,7 @@ def geo_mark_attendance(request):
     Accepts: { "lat": float, "lng": float }
     Gym coordinates never leave the server.
     """
-
+    uid = request.user.id
     # ── Reject non-JSON (form submissions, CSRF-bypass probes) ─
     if not _is_json_request(request):
         return JsonResponse(
@@ -97,7 +97,7 @@ def geo_mark_attendance(request):
         )
 
     # ── Enrollment check (cached 5 min) ───────────────────────
-    enroll_key  = f"enrolled_{request.user.id}"
+    enroll_key = f"enrollment_status_{uid}"
     enroll_data = cache.get(enroll_key)
 
     if enroll_data is None:

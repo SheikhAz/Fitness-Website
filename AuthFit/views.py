@@ -15,7 +15,6 @@ from django.core.cache import cache
 from django.conf import settings
 from cloudinary.utils import cloudinary_url
 from django.utils.http import url_has_allowed_host_and_scheme
-import calendar
 from AuthFit.models import (
     Contact, Enrollment, MembershipPlan, Trainer,
     Attendence as Attendence_model, GymNotification
@@ -568,7 +567,7 @@ def Profile(request):
 # ATTENDANCE PAGE
 # ==============================
 @login_required
-def Attendence(request):
+def attendance_page(request):
     enrollment = Enrollment.objects.filter(user=request.user).first()
     if not enrollment:
         return redirect('/enrollment/')

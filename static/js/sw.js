@@ -113,7 +113,7 @@ async function postCoordsToServer(lat, lng) {
 }
 
 // ── Push notification ─────────────────────────────────────────
-async function showNotification(reg,title, body) {
+async function showNotification(title, body) {
   if (Notification.permission !== 'granted') return;
   if (self.registration.showNotification) {
     self.registration.showNotification(title, {

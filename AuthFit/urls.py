@@ -12,7 +12,7 @@ urlpatterns = [
     path('logout/', views.handlelogout, name='logout'),
     path('contact/', views.contact, name='contact'),
     path('enrollment/', views.enrollment, name='enrollment'),
-    path('attendence/', views.Attendence, name='Attendence'),
+    path('attendence/', views.attendance_page, name='Attendence'),
     path('profile/upload-pic/', views.upload_profile_pic, name='upload_profile_pic'),
 
     # ── Existing APIs ──────────────────────────────────────────

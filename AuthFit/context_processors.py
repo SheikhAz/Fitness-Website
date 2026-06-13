@@ -13,15 +13,10 @@ logger = logging.getLogger(__name__)
 
 
 def _user_hash(uid: int) -> str:
-    """
-    Stable non-reversible user identifier for frontend use.
-    Never exposes the real database ID.
-    """
-    key = settings.SECRET_KEY.encode()
     return hmac.new(
-        key,
-        str(uid).encode(),
-        hashlib.sha256
+        settings.SECRET_KEY.encode("utf-8"),
+        str(uid).encode("utf-8"),
+        hashlib.sha256,
     ).hexdigest()[:16]
 
 
