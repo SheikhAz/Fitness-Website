@@ -726,7 +726,7 @@ body {
 /* ===== DISABLE HEAVY ANIMATIONS ON MOBILE ===== */
 @media (max-width: 768px) {
   .notif-ticker  { animation: none; }
-  .hero-content  { animation: none; }
+  .hero-content  { animation: none; }                 
   .hero-animate  { animation: none; opacity: 1; transform: none; }
   .offer-card:hover img { transform: none; }
 }
@@ -745,13 +745,14 @@ body {
 .hero-content {
   position: relative;
   z-index: 20;
+  top:0px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   text-align: center;
-  padding: 140px 20px 40px;
+  padding: 180px 20px 40px; 
   opacity: 0;
   animation: fadeIn 1.2s ease forwards;
 }
@@ -869,7 +870,7 @@ body {
   .hero-desc  { font-size: 16px; }
 }
 @media (min-width: 768px) and (max-width: 1023px) {
-  .hero-content { padding-top: 160px; }
+  .hero-content { padding-top: 190px; }
   .hero-title   { font-size: 52px; }
   .hero-desc    { font-size: 17px; }
 }
@@ -877,10 +878,16 @@ body {
   .hero-title { font-size: 36px; margin-bottom: 30px; }
   .hero-desc  { font-size: 13px; margin-bottom: 20px; }
   .cta-btn    { margin-top: 20px; }
+  .hero-content {
+  padding: 130px 20px 40px;
+}
 }
 @media (min-width: 1024px) {
   .hero-title { font-size: 72px; }
   .hero-desc  { font-size: 20px; }
+  .hero-content {
+  padding-top: 200px;
+}
 }
 
 .break-line { display: none; }

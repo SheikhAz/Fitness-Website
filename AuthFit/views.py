@@ -500,6 +500,7 @@ def enrollment(request):
         cache.delete(f"enrollment_{request.user.id}")
         cache.delete(f"profile_image_{request.user.id}")
         cache.delete(f"enrolled_{request.user.id}")
+        cache.delete(f"enrollment_status_{request.user.id}")
 
         messages.success(
             request,
@@ -730,6 +731,7 @@ def update_payment(request):
         cache.delete("admin_revenue")
         cache.delete("admin_revenue_data")
         cache.delete(f"enrollment_{enrollment.user_id}")
+        cache.delete(f"enrollment_status_{enrollment.user_id}")
 
         METHOD_LABELS = {"C": "Cash", "U": "UPI", "B": "UPI + Cash"}
 

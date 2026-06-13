@@ -1380,7 +1380,14 @@
        iOS INSTALL MODAL
     ════════════════════════════════════════════════ */
       const overlay = document.getElementById("ios-modal-overlay");
+      // Wire up "Install on iPhone" button
+      document.querySelector("#tab-ios .btn-download").addEventListener("click", openIOSModal);
 
+      // Wire up "Got it!" close button
+      document.querySelector(".ios-modal-btn").addEventListener("click", closeIOSModal);
+
+      // Wire up backdrop click to close
+      overlay.addEventListener("click", handleOverlayClick);
       function openIOSModal() {
         overlay.classList.add("open");
         document.body.style.overflow = "hidden";

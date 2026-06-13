@@ -3,101 +3,162 @@
 import hmac
 import hashlib
 import json
-from django.utils import timezone
-from django.core.cache import cache
+import logging
+
 from django.conf import settings
+from django.core.cache import cache
+from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 
 def _user_hash(uid: int) -> str:
     """
-    HMAC-SHA256 of the user's PK.
-    - Stable per user across sessions
-    - Never exposes the raw DB primary key to the browser
-    - Used by the SW to namespace its cache flags per user
-      so flags don't bleed when one user logs out and another logs in
+    Stable non-reversible user identifier for frontend use.
+    Never exposes the real database ID.
     """
-    key = getattr(settings, 'SECRET_KEY', 'fallback').encode()
-    # FIX 1: was hmac.new() — correct Python API is hmac.new()
-    return hmac.new(key, str(uid).encode(), hashlib.sha256).hexdigest()[:16]
+    key = settings.SECRET_KEY.encode()
+    return hmac.new(
+        key,
+        str(uid).encode(),
+        hashlib.sha256
+    ).hexdigest()[:16]
 
 
 def gym_config(request):
     """
-    Injects window.GYM_CONFIG into every template via GYM_CONFIG_JSON.
+    Injects window.GYM_CONFIG into templates.
 
-    SECURITY RULES:
-    - NEVER include GYM_LATITUDE, GYM_LONGITUDE, GYM_RADIUS_METERS
-    - NEVER include user.id or any database primary key
-    - Only boolean flags + userHash the frontend legitimately needs
+    Exposes only:
+    - isAuthenticated
+    - isEnrolled
+    - alreadyMarked
+    - userHash
+
+    Never exposes:
+    - user.id
+    - gym coordinates
+    - radius
     """
-    is_enrolled    = False
+
+    is_enrolled = False
     already_marked = False
-    user_hash      = ''
+    user_hash = ""
 
     if request.user.is_authenticated:
-        try:
-            uid   = request.user.id
-            today = timezone.localdate()
 
+        uid = request.user.id
+        today = timezone.localdate()
+
+        # --------------------------------------------------
+        # User Hash
+        # --------------------------------------------------
+        try:
             user_hash = _user_hash(uid)
 
-            # ── Enrollment check (cached 5 min) ───────────────────
-            # FIX 2: key was f"enroll_geo_{uid}" but views.py deletes
-            # f"enrolled_{uid}" — they never matched, so cache was always
-            # stale. Now both use the same key: f"enrolled_{uid}"
-            enroll_key  = f"enrolled_{uid}"
+        except Exception:
+            logger.exception(
+                "Failed generating user hash for user %s",
+                uid
+            )
+
+        # --------------------------------------------------
+        # Enrollment Check
+        # --------------------------------------------------
+        try:
+            enroll_key = f"enrollment_status_{uid}"
+
             enroll_data = cache.get(enroll_key)
 
             if enroll_data is None:
+
                 from AuthFit.models import Enrollment
-                try:
-                    enrollment  = Enrollment.objects.get(user=request.user)
+
+                enrollment = (
+                    Enrollment.objects
+                    .filter(user=request.user)
+                    .first()
+                )
+
+                if enrollment:
+
                     enroll_data = {
-                        'exists':  True,
-                        'expired': enrollment.is_expired,
+                        "exists": True,
+                        "expired": bool(enrollment.is_expired),
                     }
-                except Enrollment.DoesNotExist:
-                    enroll_data = {'exists': False, 'expired': False}
-                cache.set(enroll_key, enroll_data, timeout=300)
 
-            is_enrolled = enroll_data.get('exists') and not enroll_data.get('expired')
+                else:
 
-            # ── Attendance check (cached, same key as geo_views.py) ──
-            if is_enrolled:
-                att_key        = f"att_marked_{uid}_{today}"
+                    enroll_data = {
+                        "exists": False,
+                        "expired": False,
+                    }
+
+                cache.set(
+                    enroll_key,
+                    enroll_data,
+                    timeout=300
+                )
+
+            is_enrolled = (
+                bool(enroll_data.get("exists"))
+                and
+                not bool(enroll_data.get("expired"))
+            )
+
+            logger.debug(
+                "User=%s enrolled=%s cache=%s",
+                uid,
+                is_enrolled,
+                enroll_data
+            )
+
+        except Exception:
+            logger.exception(
+                "Enrollment check failed for user %s",
+                uid
+            )
+
+        # --------------------------------------------------
+        # Attendance Check
+        # --------------------------------------------------
+        if is_enrolled:
+
+            try:
+                att_key = f"att_marked_{uid}_{today}"
+
                 already_marked = cache.get(att_key)
 
                 if already_marked is None:
+
                     from AuthFit.models import Attendence
+
                     already_marked = Attendence.objects.filter(
                         user=request.user,
                         date=today,
                     ).exists()
 
-                    if already_marked:
-                        cache.set(att_key, True, timeout=86400)
-                    else:
-                        cache.set(att_key, False, timeout=60)
+                    cache.set(
+                        att_key,
+                        already_marked,
+                        timeout=86400 if already_marked else 60
+                    )
 
-        except Exception:
-            # Never let a context processor crash the entire page render.
-            # Fail safe: unauthenticated defaults above are already set.
-            import logging
-            logging.getLogger(__name__).exception(
-                "gym_config context processor failed for user %s",
-                getattr(request.user, 'id', '?')
-            )
+            except Exception:
+                logger.exception(
+                    "Attendance check failed for user %s",
+                    uid
+                )
 
-    # ── Build the config object ────────────────────────────────
     config = {
-        'isAuthenticated': request.user.is_authenticated,
-        'isEnrolled':      bool(is_enrolled),
-        'alreadyMarked':   bool(already_marked),
-        'userHash':        user_hash,
+        "isAuthenticated": request.user.is_authenticated,
+        "isEnrolled": bool(is_enrolled),
+        "alreadyMarked": bool(already_marked),
+        "userHash": user_hash,
     }
 
     return {
-        'GYM_CONFIG_JSON': json.dumps(config),
-        'is_enrolled':     bool(is_enrolled),
-        'already_marked':  bool(already_marked),
+        "GYM_CONFIG_JSON": json.dumps(config),
+        "is_enrolled": bool(is_enrolled),
+        "already_marked": bool(already_marked),
     }
