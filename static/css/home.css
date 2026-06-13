@@ -152,14 +152,15 @@ body {
   border-top: 1px solid rgba(249, 115, 22, 0.3);
   border-bottom: 2px solid #f97316;
   overflow: hidden;
-  transition: max-height 0.4s ease, opacity 0.4s ease;
+  transition: max-height 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
   max-height: 100px;
 }
 
 .notif-bar.hidden {
   opacity: 0;
-  transform: translateY(-100%);
+  max-height: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .notif-inner {
@@ -725,7 +726,6 @@ body {
 
 /* ===== DISABLE HEAVY ANIMATIONS ON MOBILE ===== */
 @media (max-width: 768px) {
-  .notif-ticker  { animation: none; }
   .hero-content  { animation: none; }                 
   .hero-animate  { animation: none; opacity: 1; transform: none; }
   .offer-card:hover img { transform: none; }
