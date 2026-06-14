@@ -142,16 +142,20 @@
   }
 
   // ── UI helpers ───────────────────────────────────────────────
-  function showGeoError(msg,distance) {
-    const box = document.getElementById('geo-error');
-    const txt = document.getElementById('geo-error-text');
-    if (txt) txt.textContent = msg;
-    if (box) box.style.display = 'block';
+  function showGeoError(msg, distance) {
+  const box  = document.getElementById('geo-error');
+  const txt  = document.getElementById('geo-error-text');
+  const dist = document.getElementById('geo-distance');
+  if (txt) txt.textContent = msg;
+  if (dist) dist.textContent = distance != null ? `📍 ${distance}m FROM GYM` : '';
+  if (box) box.style.display = 'block';
   }
 
   function hideGeoError() {
-    const box = document.getElementById('geo-error');
-    if (box) box.style.display = 'none';
+  const box  = document.getElementById('geo-error');
+  const dist = document.getElementById('geo-distance');
+  if (box) box.style.display = 'none';
+  if (dist) dist.textContent = '';
   }
 
   function setBtn(state) {
