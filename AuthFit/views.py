@@ -80,15 +80,15 @@ def save_embeddings_batch(request):
             return JsonResponse({"error": "Unauthorized"}, status=403)
 
         data = json.loads(request.body)
-        enrollment_id = data.get("enrollment_id")
+        unique_id = data.get("unique_id")
         embeddings = data.get("embeddings", [])
 
-        if not enrollment_id:
-            return JsonResponse({"error": "Missing enrollment_id"}, status=400)
+        if not unique_id:
+            return JsonResponse({"error": "Missing unique_id"}, status=400)
         if not embeddings:
             return JsonResponse({"error": "Missing embeddings"}, status=400)
 
-        enrollment = Enrollment.objects.get(pk=enrollment_id)
+        enrollment = Enrollment.objects.get(unique_id=unique_id)
         face_embeddings = enrollment.face_embeddings or []
         MAX_EMB = 7
 
@@ -213,8 +213,7 @@ def mark_attendance_api(request):
 # ==============================
 # GET USERS (face embeddings)
 # ==============================
-@login_required
-@user_passes_test(is_staff)
+@csrf_exempt
 def get_users(request):
     if not _check_internal_key(request):
         return JsonResponse({"error": "Unauthorized"}, status=403)
@@ -248,15 +247,15 @@ def upload_face_image(request):
             logger.warning("Invalid internal API key")
             return JsonResponse({"error": "Unauthorized"}, status=403)
 
-        enrollment_id = request.POST.get("enrollment_id")
+        unique_id = request.POST.get("unique_id")
         face_image = request.FILES.get("face_image")
 
-        if not enrollment_id:
-            return JsonResponse({"error": "Missing enrollment_id"}, status=400)
+        if not unique_id:
+            return JsonResponse({"error": "Missing unique_id"}, status=400)
         if not face_image:
             return JsonResponse({"error": "Missing face_image"}, status=400)
 
-        enrollment = Enrollment.objects.get(pk=enrollment_id)
+        enrollment = Enrollment.objects.get(unique_id=unique_id)
         enrollment.face_image = face_image
         enrollment.save(update_fields=["face_image"])
 
