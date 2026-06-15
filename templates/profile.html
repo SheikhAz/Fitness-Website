@@ -258,7 +258,14 @@
           <div class="card-cell">
             <div class="cell-label">Membership Status</div>
             {% if enrollment.is_expired %}
-            <div class="cell-value danger">Expired</div>
+            <div class="cell-value danger" style="display:flex;align-items:center;gap:10px;">
+              Expired
+              <button id="renewBtn" style="font-size:11px;padding:4px 10px;background:#ff5a00;color:#fff;
+              border:none;border-radius:4px;cursor:pointer;font-weight:700;
+              letter-spacing:.5px;white-space:nowrap;">
+              RENEW
+            </button>
+            </div>
             {% else %}
             <div class="cell-value green">
               Active ({{ enrollment.days_remaining }} days left)
@@ -391,6 +398,124 @@
     });
   })();
 </script>
+{% if enrollment and is_expired %}
+<!-- ══════════════ RENEW MODAL ══════════════ -->
+<div id="renewModal" style="
+  display:none; position:fixed; inset:0; z-index:9999;
+  background:rgba(0,0,0,0.75); align-items:center; justify-content:center;">
+
+  <div style="
+    background:#111; border:1px solid #222; border-radius:12px;
+    padding:32px 28px; width:90%; max-width:420px; position:relative;">
+
+    <!-- Close -->
+    <button id="renewModalClose" style="position:absolute;top:12px;right:16px;background:none;border:none;
+    color:#888;font-size:22px;cursor:pointer;line-height:1;">×</button>
+
+    <h3 style="margin:0 0 6px;color:#fff;font-family:'Barlow Condensed',sans-serif;
+               font-size:22px;letter-spacing:1px;">RENEW MEMBERSHIP</h3>
+    <p style="margin:0 0 20px;color:#888;font-size:13px;">
+      Select a plan to reactivate your membership from today.
+    </p>
+
+    <form method="POST" action="{% url 'renew_membership' %}" id="renewForm">
+      {% csrf_token %}
+
+      <label style="color:#aaa;font-size:12px;font-weight:600;letter-spacing:.5px;">
+        SELECT PLAN
+      </label>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:10px;" id="planList">
+        {% for p in plans %}
+        <label
+          data-plan-label
+          style="display:flex;align-items:center;justify-content:space-between;
+                 background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;
+                 padding:12px 14px;cursor:pointer;transition:border-color .2s;">
+          <span style="display:flex;align-items:center;gap:10px;">
+            <input type="radio" name="plan" value="{{ p.id }}"
+              {% if enrollment.selectPlan.id == p.id %}checked{% endif %}
+              style="accent-color:#ff5a00;width:16px;height:16px;">
+            <span style="color:#fff;font-size:14px;font-weight:600;">{{ p.plan }}</span>
+          </span>
+          <span style="color:#ff5a00;font-size:14px;font-weight:700;">₹{{ p.price }}</span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <button type="submit" id="renewSubmit" style="
+        margin-top:22px;width:100%;padding:13px;background:#ff5a00;
+        color:#fff;border:none;border-radius:8px;font-size:15px;
+        font-weight:800;letter-spacing:1px;cursor:pointer;
+        font-family:'Barlow Condensed',sans-serif;transition:background .2s;">
+        CONFIRM RENEWAL
+      </button>
+    </form>
+  </div>
+</div>
+
+<script nonce="{{ request.csp_nonce }}">
+  // ── Wire RENEW button ──
+  const renewBtn = document.getElementById('renewBtn');
+  if (renewBtn) {
+    renewBtn.addEventListener('click', function () {
+      document.getElementById('renewModal').style.display = 'flex';
+    });
+  }
+
+  // ── Close button ──
+  document.getElementById('renewModalClose').addEventListener('click', function () {
+    document.getElementById('renewModal').style.display = 'none';
+  });
+
+  // ── Close on backdrop click ──
+  document.getElementById('renewModal').addEventListener('click', function (e) {
+    if (e.target === this) this.style.display = 'none';
+  });
+
+  // ── Plan label hover + selection highlight ──
+  const planLabels = document.querySelectorAll('[data-plan-label]');
+
+  function updateBorders() {
+    planLabels.forEach(function (label) {
+      const inp = label.querySelector('input[type="radio"]');
+      label.style.borderColor = inp && inp.checked ? '#ff5a00' : '#2a2a2a';
+    });
+  }
+
+  planLabels.forEach(function (label) {
+    label.addEventListener('mouseenter', function () {
+      this.style.borderColor = '#ff5a00';
+    });
+    label.addEventListener('mouseleave', function () {
+      const inp = this.querySelector('input[type="radio"]');
+      this.style.borderColor = inp && inp.checked ? '#ff5a00' : '#2a2a2a';
+    });
+    const radio = label.querySelector('input[type="radio"]');
+    if (radio) {
+      radio.addEventListener('change', updateBorders);
+    }
+  });
+
+  // Set initial border for pre-selected plan
+  updateBorders();
+
+  // ── Submit button hover ──
+  const renewSubmit = document.getElementById('renewSubmit');
+  renewSubmit.addEventListener('mouseenter', function () {
+    this.style.background = '#e04e00';
+  });
+  renewSubmit.addEventListener('mouseleave', function () {
+    this.style.background = '#ff5a00';
+  });
+
+  // ── Prevent double-submit ──
+  document.getElementById('renewForm').addEventListener('submit', function () {
+    renewSubmit.textContent = 'Processing...';
+    renewSubmit.disabled = true;
+  });
+</script>
+{% endif %}
 
 <script src="{% static 'js/messages.js' %}"></script>
 {% endblock %}

@@ -14,6 +14,7 @@ urlpatterns = [
     path('enrollment/', views.enrollment, name='enrollment'),
     path('attendence/', views.attendance_page, name='Attendence'),
     path('profile/upload-pic/', views.upload_profile_pic, name='upload_profile_pic'),
+    path('renew-membership/', views.renew_membership, name='renew_membership'),
 
     # ── Existing APIs ──────────────────────────────────────────
     path('api/mark-attendance/', views.mark_attendance_api),

@@ -532,6 +532,10 @@ def Profile(request):
         .select_related("selectPlan", "trainer")
         .first()
     )
+    plans = cache.get("membership_plans")
+    if plans is None:
+        plans = list(MembershipPlan.objects.all().values("id", "plan", "price", "duration_days"))
+        cache.set("membership_plans", plans, timeout=3600)
 
     image_url = None
     if enrollment and enrollment.face_image:
@@ -560,6 +564,7 @@ def Profile(request):
         "image_url":      image_url,
         "is_expired":     enrollment.is_expired if enrollment else False,
         "days_remaining": enrollment.days_remaining if enrollment else 0,
+        "plans":          plans,
     })
 
 
@@ -835,6 +840,44 @@ def today_attendance(request):
     cache.set(cache_key, context, timeout=120)
     return render(request, "today_attendance.html", context)
 
+# ==============================
+# RENEW MEMBERSHIP
+# ==============================
+@login_required
+@require_POST
+def renew_membership(request):
+    enrollment = get_object_or_404(Enrollment, user=request.user)
+
+    plan_id = request.POST.get("plan")
+    try:
+        selected_plan = MembershipPlan.objects.get(id=plan_id)
+    except MembershipPlan.DoesNotExist:
+        messages.error(request, "Invalid plan selected.")
+        return redirect('/profile/')
+
+    # Update plan, reset dates & payment
+    enrollment.selectPlan  = selected_plan
+    enrollment.Amount      = selected_plan.price
+    enrollment.paidAmount  = 0
+    enrollment.pendingAmount = selected_plan.price
+    enrollment.paymentStatus = "Pending"
+    enrollment.paymentMethod = None
+    enrollment.paymentDate   = None
+    enrollment.DueDate = timezone.now().date() + timedelta(days=selected_plan.duration_days)
+
+    enrollment.save(update_fields=[
+        "selectPlan", "Amount", "paidAmount", "pendingAmount",
+        "paymentStatus", "paymentMethod", "paymentDate", "DueDate",
+    ])
+
+    # Clear relevant caches
+    cache.delete(f"enrollment_{request.user.id}")
+    cache.delete(f"enrollment_status_{request.user.id}")
+    cache.delete("admin_revenue")
+    cache.delete("admin_revenue_data")
+
+    messages.success(request, f"Membership renewed with {selected_plan.plan}! Please complete your payment.")
+    return redirect('/profile/')
 
 # ==============================
 # DOWNLOAD APP PAGE
