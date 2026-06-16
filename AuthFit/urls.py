@@ -1,7 +1,7 @@
 from django.urls import path, include
 from AuthFit import views
 from AuthFit.geo_views import geo_mark_attendance, serve_sw ,attendance_status
-
+from . import device_views
 urlpatterns = [
     path('', views.homePage, name='home'),
     path('accounts/', include('django.contrib.auth.urls')),
@@ -28,11 +28,13 @@ urlpatterns = [
     # ── NEW: Background geo auto-mark ─────────────────────────
     path('api/geo-mark-attendance/', geo_mark_attendance, name='geo_mark_attendance'),
     path('api/attendance-status/', attendance_status),
-
     path('sw.js', serve_sw, name='sw'),
 
     # ── Admin tools ────────────────────────────────────────────
     path('admin-tools/whatsapp/', views.whatsapp_pending_users, name='whatsapp_pending'),
     path('admin-tools/payments/', views.payment_management, name='payment_management'),
     path('admin-tools/update-payment/', views.update_payment, name='update_payment'),
+    path('user-devices/register/',   device_views.register_user_device,   name='register_user_device'),
+    path('user-devices/unregister/', device_views.unregister_user_device, name='unregister_user_device'),
+    path('internal/run-expiry-check/', views.run_expiry_check, name='run_expiry_check'),
 ]

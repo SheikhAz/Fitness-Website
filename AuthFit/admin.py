@@ -13,7 +13,15 @@ from django.core.cache import cache
 from django.db.models import Count, Avg, Max, Min
 from django.db.models.functions import ExtractWeekDay, ExtractHour, TruncMonth ,TruncDay
 from cloudinary.utils import cloudinary_url
+from .models import UserDevice
 
+@admin.register(UserDevice)
+class UserDeviceAdmin(admin.ModelAdmin):
+    list_display = ('user', 'device_name', 'active', 'last_seen')
+    list_filter = ('active',)
+    search_fields = ('user__username', 'device_name', 'fcm_token')
+
+    
 @admin.register(GymNotification)
 class GymNotificationAdmin(admin.ModelAdmin):
     list_display = ("icon", "message", "is_active", "order", "created_at")

@@ -26,7 +26,7 @@ def _get_firebase_app():
 
 
 # ── Core send helper ──────────────────────────────────────────────────────────
-def send_push_to_tokens(tokens: list[str], title: str, body: str, data: dict = None) -> int:
+def send_push_to_tokens(tokens: list[str], title: str, body: str, data: dict = None, channel_id: str = 'entergym_orders') -> int:
     """
     Send a multicast push notification to a list of FCM tokens.
     Returns the number of successes.
@@ -46,7 +46,7 @@ def send_push_to_tokens(tokens: list[str], title: str, body: str, data: dict = N
             notification=messaging.AndroidNotification(
                 icon='ic_notification',   # drawable in your Android app
                 color='#ff4d00',
-                channel_id='entergym_orders',
+                channel_id=channel_id,
             ),
         ),
         apns=messaging.APNSConfig(
@@ -71,6 +71,8 @@ def send_push_to_tokens(tokens: list[str], title: str, body: str, data: dict = N
 
 def _prune_bad_tokens(tokens: list[str], response) -> None:
     """Remove FCM tokens that returned UNREGISTERED or INVALID_ARGUMENT errors."""
+    from AuthFit.models import UserDevice  # local import avoids circular import
+
     bad = []
     for idx, result in enumerate(response.responses):
         if not result.success and result.exception:
@@ -79,9 +81,10 @@ def _prune_bad_tokens(tokens: list[str], response) -> None:
                 bad.append(tokens[idx])
 
     if bad:
-        removed = StaffDevice.objects.filter(fcm_token__in=bad).update(active=False)
-        logger.info("Deactivated %d stale FCM tokens", removed)
-
+        removed_staff = StaffDevice.objects.filter(fcm_token__in=bad).update(active=False)
+        removed_user  = UserDevice.objects.filter(fcm_token__in=bad).update(active=False)
+        if removed_staff or removed_user:
+            logger.info("Deactivated stale FCM tokens — staff:%d user:%d", removed_staff, removed_user)
 
 # ── Domain-specific notification ─────────────────────────────────────────────
 def notify_staff_new_order(order) -> None:

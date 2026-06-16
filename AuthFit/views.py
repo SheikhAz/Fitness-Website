@@ -233,6 +233,24 @@ def get_users(request):
 
     return JsonResponse(data, safe=False)
 
+# ==============================
+# RUN EXPIRY CHECK (cron trigger)
+# ==============================
+@csrf_exempt
+def run_expiry_check(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    try:
+        if not _check_internal_key(request):
+            return JsonResponse({"error": "Unauthorized"}, status=403)
+
+        from AuthFit.notifications import send_expiry_reminders
+        count = send_expiry_reminders()
+        return JsonResponse({"ok": True, "sent": count})
+    except Exception:
+        logger.exception("Unexpected error in run_expiry_check")
+        return JsonResponse({"error": "An internal error occurred."}, status=500)
 
 # ==============================
 # UPLOAD FACE IMAGE

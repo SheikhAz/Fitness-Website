@@ -105,12 +105,13 @@ class Enrollment(models.Model):
     paymentStatus = models.CharField(
         max_length=10, choices=PAYMENT, default="Pending"
     )
+    last_expiry_notif_sent = models.DateField(null=True, blank=True)
 
     # ==============================
     # DATES
     # ==============================
     doj = models.DateField(auto_now_add=True)
-    DueDate = models.DateField(blank=True, null=True)
+    DueDate = models.DateField(blank=True, null=True,db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     # ==============================
@@ -220,7 +221,9 @@ class GymNotification(models.Model):
         return f"{self.icon} {self.message[:60]}"
     
 @receiver([post_save, post_delete], sender=Enrollment)
-def clear_enrollment_cache(sender, instance, **kwargs):
+def clear_enrollment_cache(sender, instance,update_fields=None, **kwargs):
+    if update_fields == frozenset({'last_expiry_notif_sent'}):
+        return
     cache.delete("admin_revenue")
     cache.delete("face_users")
     cache.delete(f"enrollment_{instance.user.id}")
@@ -235,3 +238,23 @@ def clear_notification_cache(sender, **kwargs):
 @receiver([post_save, post_delete], sender=MembershipPlan)
 def clear_plan_cache(sender, **kwargs):
     cache.delete("membership_plans")
+
+
+class UserDevice(models.Model):
+    """
+    FCM push token for a member's device (separate from StaffDevice,
+    which is for admin/owner order alerts). One user can have multiple devices.
+    """
+    user        = models.ForeignKey(User, on_delete=models.CASCADE, related_name='devices')
+    fcm_token   = models.TextField(unique=True)
+    device_name = models.CharField(max_length=120, blank=True)
+    last_seen   = models.DateTimeField(auto_now=True)
+    active      = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.user.username} — {self.device_name} ({'Active' if self.active else 'Inactive'})"
+
+    class Meta:
+        ordering = ['-last_seen']
+        verbose_name = 'User Device'
+        verbose_name_plural = 'User Devices'
