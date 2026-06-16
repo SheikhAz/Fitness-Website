@@ -13,6 +13,7 @@ import firebase_admin
 from firebase_admin import credentials, messaging
 from django.conf import settings
 from .models import StaffDevice
+from notifications.utils import send_web_push_to_all_staff
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +93,16 @@ def notify_staff_new_order(order) -> None:
     Push a 'new order' notification to every active staff device.
     Call this right after Order.objects.create(...).
     """
+    flavor_part = f" ({order.flavor.name})" if order.flavor else ""
+    customer    = (
+        order.user.get_full_name().strip()
+        or order.user.username
+    )
+    send_web_push_to_all_staff(
+        title=f"🛒 New Order #{order.id}",
+        body=f"{customer} ordered {order.product.name}{flavor_part} × {order.quantity} — ₹{int(order.total_price)}",
+        url="/shop/orders/admin/"
+    )
 
     tokens = list(
         StaffDevice.objects.filter(active=True)
@@ -100,12 +111,7 @@ def notify_staff_new_order(order) -> None:
     if not tokens:
         logger.debug("notify_staff_new_order: no staff devices registered, skipping.")
         return
-
-    flavor_part = f" ({order.flavor.name})" if order.flavor else ""
-    customer    = (
-        order.user.get_full_name().strip()
-        or order.user.username
-    )
+    
 
     send_push_to_tokens(
         tokens=tokens,
@@ -127,16 +133,22 @@ def notify_staff_new_enrollment(enrollment) -> None:
     Push a 'new member joined' notification to every active staff device.
     Call this right after a new Enrollment is saved.
     """
+    gender_emoji = "💪" if enrollment.gender == "M" else "🌟"
+    plan_name = enrollment.selectPlan.plan if enrollment.selectPlan else "a plan"
+    send_web_push_to_all_staff(
+        title=f"{gender_emoji} New Member Joined!",
+        body=f"{enrollment.fullname} enrolled with {plan_name} plan 🏋️",
+        url="/admin-tools/payments/"
+    )
     tokens = list(
         StaffDevice.objects.filter(active=True)
         .values_list('fcm_token', flat=True)
     )
+
     if not tokens:
         logger.debug("notify_staff_new_enrollment: no staff devices registered, skipping.")
         return
-
-    gender_emoji = "💪" if enrollment.gender == "M" else "🌟"
-    plan_name = enrollment.selectPlan.plan if enrollment.selectPlan else "a plan"
+    
 
     send_push_to_tokens(
         tokens=tokens,

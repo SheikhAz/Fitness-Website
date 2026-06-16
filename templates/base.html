@@ -25,13 +25,15 @@
   <link rel="stylesheet" href="{% static 'css/base.css' %}">
   <link rel="stylesheet" href="{% static 'css/loc_modal.css' %}">
   {% block link %}{% endblock %}
+  {% if request.user.is_staff and VAPID_PUBLIC_KEY %}
+  <div id="vapid-meta" data-key="{{ VAPID_PUBLIC_KEY }}" style="display:none;"></div>
+  {% endif %}
 </head>
 
 <body>
 
   <!-- EXTRA CONTENT (MESSAGES ETC) -->
   <div id="extra">{% block message %}{% endblock %}</div>
-
   <!-- HERO SECTION -->
   <section class="hero">
 
@@ -76,6 +78,8 @@
   </script>
   <script src="{% static 'js/loc_permission.js' %}" defer></script>
   <script src="{% static 'js/geo_attendance.js' %}" defer></script>
-
+  {% if request.user.is_staff %}
+  <script src="{% static 'js/push_subscribe.js' %}"></script>
+  {% endif %}
 </body>
 </html>

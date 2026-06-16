@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'Shop',
+    'notifications',
 ]
 
 JAZZMIN_UI_TWEAKS = {
@@ -80,6 +81,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'AuthFit.context_processors.gym_config',
+                'notifications.context_processors.vapid_key',
             ],
         },
     }
@@ -130,6 +132,10 @@ CACHES = {
         }
     }
 }
+
+VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY")
+VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY")
+VAPID_CLAIMS = {"sub": f"mailto:{os.environ.get('VAPID_EMAIL')}"}
 
 LOGIN_URL           = '/login/'
 LOGIN_REDIRECT_URL  = '/'

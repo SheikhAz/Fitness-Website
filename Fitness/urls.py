@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include("AuthFit.urls")),
     path('',include("Shop.urls")),
+    path('push/', include('notifications.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 ]

@@ -12,6 +12,7 @@ from datetime import timedelta
 from django.utils import timezone
 from Shop.notifications import send_push_to_tokens
 from .models import Enrollment, UserDevice
+from notifications.utils import send_web_push_to_all_staff
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +57,11 @@ def send_expiry_reminders() -> int:
                 channel_id='entergym_expiry',
             )
             sent_count += 1
+            send_web_push_to_all_staff(
+                title=title,
+                body=body,
+                url="/admin-tools/payments/",
+            )
         else:
             logger.debug(
                 "send_expiry_reminders: no devices for user_id=%s, skipping push",
