@@ -120,3 +120,36 @@ def notify_staff_new_order(order) -> None:
             "type":       "new_order",
         },
     )
+
+
+def notify_staff_new_enrollment(enrollment) -> None:
+    """
+    Push a 'new member joined' notification to every active staff device.
+    Call this right after a new Enrollment is saved.
+    """
+    tokens = list(
+        StaffDevice.objects.filter(active=True)
+        .values_list('fcm_token', flat=True)
+    )
+    if not tokens:
+        logger.debug("notify_staff_new_enrollment: no staff devices registered, skipping.")
+        return
+
+    gender_emoji = "💪" if enrollment.gender == "M" else "🌟"
+    plan_name = enrollment.selectPlan.plan if enrollment.selectPlan else "a plan"
+
+    send_push_to_tokens(
+        tokens=tokens,
+        title=f"{gender_emoji} New Member Joined!",
+        body=(
+            f"{enrollment.fullname} just enrolled at EnterGYM "
+            f"with the {plan_name} plan. Welcome them to the family! 🏋️"
+        ),
+        data={
+            "enrollment_id": str(enrollment.id),
+            "unique_id":     enrollment.unique_id,
+            "screen":        "MemberDetail",
+            "type":          "new_enrollment",
+        },
+        channel_id="entergym_orders",   # reuse existing high-priority channel
+    )

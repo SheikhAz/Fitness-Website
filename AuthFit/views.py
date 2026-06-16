@@ -27,7 +27,8 @@ import cloudinary.uploader
 from PIL import Image
 import io
 import logging
-
+from django.db import transaction
+from Shop.notifications import notify_staff_new_enrollment
 logger = logging.getLogger(__name__)
 
 ALLOWED_IMAGE_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
@@ -512,6 +513,9 @@ def enrollment(request):
             pendingAmount=selected_plan.price,
         )
         enroll.save()
+        # ── NEW: push notification to staff ──────────────────────────────────
+        transaction.on_commit(lambda: notify_staff_new_enrollment(enroll))
+        # ─────────────────────────────────────────────────────────────────────
 
         cache.delete(f"enrollment_{request.user.id}")
         cache.delete(f"profile_image_{request.user.id}")
