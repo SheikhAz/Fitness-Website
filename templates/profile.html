@@ -240,10 +240,15 @@
           <div class="card-cell">
             <div class="cell-label">Payment Status</div>
             <div class="cell-value
-              {% if enrollment.paymentStatus == 'Pending' %}red
+              {% if enrollment.is_expired %}red
+              {% elif enrollment.paymentStatus == 'Pending' %}red
               {% elif enrollment.paymentStatus == 'Done' %}green
               {% else %}default{% endif %}">
-              {{ enrollment.paymentStatus|default:"Not Provided" }}
+              {% if enrollment.is_expired %}
+                Renewal Required
+              {% else %}
+                {{ enrollment.paymentStatus|default:"Not Provided" }}
+              {% endif %}
             </div>
           </div>
         </div>
@@ -260,6 +265,15 @@
             {% if enrollment.is_expired %}
             <div class="cell-value danger" style="display:flex;align-items:center;gap:10px;">
               Expired
+              <button id="renewBtn" style="font-size:11px;padding:4px 10px;background:#ff5a00;color:#fff;
+              border:none;border-radius:4px;cursor:pointer;font-weight:700;
+              letter-spacing:.5px;white-space:nowrap;">
+              RENEW
+            </button>
+            </div>
+            {% elif days_remaining <= 7 and days_remaining >= 0 %}
+            <div class="cell-value" style="display:flex;align-items:center;gap:10px;color:#f0a500;">
+              Active ({{ enrollment.days_remaining }} days left)
               <button id="renewBtn" style="font-size:11px;padding:4px 10px;background:#ff5a00;color:#fff;
               border:none;border-radius:4px;cursor:pointer;font-weight:700;
               letter-spacing:.5px;white-space:nowrap;">
@@ -398,7 +412,7 @@
     });
   })();
 </script>
-{% if enrollment and is_expired %}
+{% if enrollment and is_expired or enrollment and days_remaining <= 7 and days_remaining >= 0 %}
 <!-- ══════════════ RENEW MODAL ══════════════ -->
 <div id="renewModal" style="
   display:none; position:fixed; inset:0; z-index:9999;
@@ -415,7 +429,7 @@
     <h3 style="margin:0 0 6px;color:#fff;font-family:'Barlow Condensed',sans-serif;
                font-size:22px;letter-spacing:1px;">RENEW MEMBERSHIP</h3>
     <p style="margin:0 0 20px;color:#888;font-size:13px;">
-      Select a plan to reactivate your membership from today.
+      Renew your membership by choosing one of the plans below.
     </p>
 
     <form method="POST" action="{% url 'renew_membership' %}" id="renewForm">

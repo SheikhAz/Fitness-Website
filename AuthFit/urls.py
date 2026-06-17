@@ -15,6 +15,8 @@ urlpatterns = [
     path('attendence/', views.attendance_page, name='Attendence'),
     path('profile/upload-pic/', views.upload_profile_pic, name='upload_profile_pic'),
     path('renew-membership/', views.renew_membership, name='renew_membership'),
+    path('freeze-membership/', views.freeze_membership,       name='freeze_membership'),
+    path('freeze-membership/apply/',views.freeze_membership_apply, name='freeze_membership_apply'),
 
     # ── Existing APIs ──────────────────────────────────────────
     path('api/mark-attendance/', views.mark_attendance_api),

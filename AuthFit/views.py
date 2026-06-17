@@ -26,6 +26,7 @@ from urllib.parse import urlparse, quote
 import cloudinary.uploader
 from PIL import Image
 import io
+from django.core.paginator import Paginator
 import logging
 from django.db import transaction
 from Shop.notifications import notify_staff_new_enrollment
@@ -876,22 +877,28 @@ def renew_membership(request):
         messages.error(request, "Invalid plan selected.")
         return redirect('/profile/')
 
-    # Update plan, reset dates & payment
-    enrollment.selectPlan  = selected_plan
-    enrollment.Amount      = selected_plan.price
-    enrollment.paidAmount  = 0
+    # ── If plan still active, extend from current DueDate
+    # ── If already expired, start fresh from today
+    today = timezone.now().date()
+    if enrollment.DueDate and enrollment.DueDate > today:
+        new_due_date = enrollment.DueDate + timedelta(days=selected_plan.duration_days)
+    else:
+        new_due_date = today + timedelta(days=selected_plan.duration_days)
+
+    enrollment.selectPlan    = selected_plan
+    enrollment.Amount        = selected_plan.price
+    enrollment.paidAmount    = 0
     enrollment.pendingAmount = selected_plan.price
     enrollment.paymentStatus = "Pending"
     enrollment.paymentMethod = None
     enrollment.paymentDate   = None
-    enrollment.DueDate = timezone.now().date() + timedelta(days=selected_plan.duration_days)
+    enrollment.DueDate       = new_due_date
 
     enrollment.save(update_fields=[
         "selectPlan", "Amount", "paidAmount", "pendingAmount",
         "paymentStatus", "paymentMethod", "paymentDate", "DueDate",
     ])
 
-    # Clear relevant caches
     cache.delete(f"enrollment_{request.user.id}")
     cache.delete(f"enrollment_status_{request.user.id}")
     cache.delete("admin_revenue")
@@ -899,6 +906,94 @@ def renew_membership(request):
 
     messages.success(request, f"Membership renewed with {selected_plan.plan}! Please complete your payment.")
     return redirect('/profile/')
+
+# ==============================
+# FREEZE MEMBERSHIP (Staff Only)
+# ==============================
+
+@login_required
+@user_passes_test(is_staff)
+def freeze_membership(request):
+    """
+    GET  — shows full member list with search by unique_id
+    """
+    query = request.GET.get("q", "").strip()
+
+    qs = (
+        Enrollment.objects
+        .select_related("selectPlan")
+        .order_by("fullname")
+    )
+
+    if query:
+        qs = qs.filter(unique_id=query)
+
+    paginator  = Paginator(qs, 20)          # 20 members per page
+    page_num   = request.GET.get("page", 1)
+    page_obj   = paginator.get_page(page_num)
+
+    return render(request, "freeze_membership.html", {
+        "page_obj": page_obj,
+        "query":    query,
+    })
+
+
+@login_required
+@user_passes_test(is_staff)
+@require_POST
+def freeze_membership_apply(request):
+    """
+    POST — applies the freeze (extends DueDate by N days).
+    Redirects back to the list, preserving search query if any.
+    """
+    enrollment_id = request.POST.get("enrollment_id", "").strip()
+    days_raw      = request.POST.get("days", "").strip()
+    back_query    = request.POST.get("q", "").strip()
+
+    redirect_url = "/freeze-membership/"
+    if back_query:
+        redirect_url += f"?q={back_query}" 
+
+    # ── Validate days ──────────────────────────────────────────────────────
+    try:
+        days = int(days_raw)
+        if days < 1 or days > 365:
+            raise ValueError
+    except (ValueError, TypeError):
+        messages.error(request, "Invalid number of days. Enter a value between 1 and 365.")
+        return redirect(redirect_url)
+
+    # ── Fetch enrollment ───────────────────────────────────────────────────
+    try:
+        enrollment = Enrollment.objects.select_related("user").get(pk=enrollment_id)
+    except Enrollment.DoesNotExist:
+        messages.error(request, "Member not found.")
+        return redirect(redirect_url)
+
+    # ── Extend DueDate ─────────────────────────────────────────────────────
+    if not enrollment.DueDate:
+        messages.error(
+            request,
+            f"Member {enrollment.unique_id} has no due date set. "
+            "Please set a plan before freezing."
+        )
+        return redirect(redirect_url)
+
+    old_due          = enrollment.DueDate
+    new_due          = old_due + timedelta(days=days)
+    enrollment.DueDate = new_due
+    enrollment.save(update_fields=["DueDate"])
+
+    # Bust relevant caches
+    cache.delete(f"enrollment_{enrollment.user_id}")
+    cache.delete(f"enrollment_status_{enrollment.user_id}")
+
+    messages.success(
+        request,
+        f"✅ {enrollment.fullname} ({enrollment.unique_id}) — due date extended by {days} day{'s' if days != 1 else ''}: "
+        f"{old_due.strftime('%d %b %Y')} → {new_due.strftime('%d %b %Y')}."
+    )
+    return redirect(redirect_url)
 
 # ==============================
 # DOWNLOAD APP PAGE
