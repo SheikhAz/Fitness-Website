@@ -118,6 +118,8 @@ USE_TZ        = True
 STATIC_URL      = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT     = os.path.join(BASE_DIR, "staticfiles_build")
+WHITENOISE_MAX_AGE = 60 * 60 * 24 * 365  # 1 year, in seconds
+
 
 REDIS_URL = os.environ['REDIS_URL']
 

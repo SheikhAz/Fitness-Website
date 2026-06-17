@@ -1,3 +1,9 @@
+// Activate preloaded stylesheets without inline event handlers
+['font-inter', 'font-orbitron', 'css-loc-modal'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.rel = 'stylesheet';
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const popupMenu = document.getElementById("popupMenu");
   const closeMenu = document.getElementById("closeMenu");

@@ -9,3 +9,4 @@ staticfiles_build/
 pc_access.mp3
 Application
 firebase-credentials.json
+resize_icons.py
